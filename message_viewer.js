@@ -1,0 +1,362 @@
+/// Message Viewer Content Script
+console.log("Trace Viewer Content Script");
+
+
+let resultsDiv;
+let resultsMessages;
+let headerMessageTrace;
+let traceContent;
+
+
+window.addEventListener("load", function() {
+	chrome.storage.local.get({
+		TimeFormat: false,
+		SortOrder: false,		
+		},	function(settings) {
+			if (settings.TimeFormat) {
+				// Change time format to COMPLETE
+				let timeFormat = document.getElementById("control_27");
+				timeFormat.click();
+				timeFormat.value = "999";
+				//timeFormat.click();
+				delay(1000).then(() => {
+					timeFormat.value = "999";
+				})
+				
+			}
+			
+			if (settings.SortOrder) {
+				// Change SortOrder to OLDEST FIRST
+				let sortOrder = document.getElementById("control_26");
+				sortOrder.click();
+				sortOrder.value = "1";
+				//sortOrder.click();
+				delay(1000).then(() => {
+					sortOrder.click();
+					sortOrder.value = "1";
+				})
+			}		
+		}
+	);
+	
+		// HEADERS & TRACE TAB CONTROLS
+	resultsDiv = document.getElementById("resultsTable")
+	resultsMessages = resultsDiv.getElementsByTagName("tr")
+
+	tabBar = document.getElementById("bar_82")
+	fullTraceHeader = tabBar.rows[0].insertCell(9);
+	fullTraceHeader.innerHTML = "&nbsp;Selected Messages&nbsp;";
+	fullTraceHeader.className = "tabGroupButtonOff";
+	fullTraceHeader.id = "selectedMessagesTab";
+	fullTraceHeader.title = "Selected Messages";
+
+	headerHeaderDetails = document.getElementById("btn_1_82");
+	headerBodyDetails = document.getElementById("btn_2_82");
+	headerBodyContents = document.getElementById("btn_3_82");
+	headerMessageTrace = document.getElementById("btn_4_82");
+
+
+
+	// BODY
+	tabGroupBody = document.getElementById("body_82");
+	headerDetails = document.getElementById("headerDetails");
+	bodyDetails = document.getElementById("bodyDetails");
+	bodyContents = document.getElementById("bodyContents");
+	traceContent = document.getElementById("traceContent");
+	selecteMessagesTab = document.createElement('div');
+
+	let notice = "<i>Check a message's checkbox to show the message here.</i>";
+	selecteMessagesTab.innerHTML = notice + selecteMessagesTab.innerHTML;
+	selecteMessagesTab.style.display = "none";
+	selecteMessagesTab.id = "selecteMessagesTab";
+	selecteMessagesTab.style.height = "100%";
+	
+	
+	
+	tabGroupBody.appendChild(selecteMessagesTab);
+
+
+	headerHeaderDetails.addEventListener('click', () => {
+		fullTraceDisplayOff();
+	});
+	headerBodyDetails.addEventListener('click', () => {
+		fullTraceDisplayOff();
+	});
+	headerBodyContents.addEventListener('click', () => {
+		fullTraceDisplayOff();
+	});
+
+	headerMessageTrace.addEventListener('click', () => {
+		fullTraceDisplayOff();
+	});
+
+	fullTraceHeader.addEventListener('click', () => {
+		fullTraceDisplayOn();
+	})
+
+	
+	// This event listener triggers on row selection.
+	resultsDiv.addEventListener("change", function(e) {
+		
+		// Check that it was the checkbox being clicked
+		if (e.target.type == "checkbox") {
+			
+			let messageId = e.target.parentElement.parentElement.children[3].innerText;
+			console.log("messageID = ", messageId);
+			let messageSearchNumber = e.target.parentElement.parentElement.children[2].innerText;
+			let messageCreated = e.target.parentElement.parentElement.children[4].innerText;
+			let messageStatus = e.target.parentElement.parentElement.children[7].innerText;
+			
+			// Default checkbox value is 'on' - treat the same as "unchecked"
+			if ((e.target.value == "on") || (e.target.value == "unchecked"))  {
+				e.target.value = "checked";
+				let messageStartOperation = e.target.parentElement.parentElement.children[8].innerText;
+				let messageEndOperation = e.target.parentElement.parentElement.children[9].innerText;
+				let messageHeading;
+				let traceMessageUrl = stubUrl[0] + "EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=";
+				let iframe = document.createElement("iframe");	
+
+				if (!mainIframe) {
+					iframe.src = traceMessageUrl + String(messageId) + "&btns=disable";
+				} else {
+					iframe.src = traceMessageUrl + String(messageId) + "&schema_expansion=disable&text_compare=disable&copy_raw_text=disable";
+				}
+				
+				iframe.style.width = "100%";
+				
+				if (!mainIframe) {
+					// Use first message iframe as Body to host all messages
+					iframe.style.display = "none";
+
+					selecteMessagesTab.appendChild(iframe);
+					mainIframe = iframe;
+				} else {
+					// All other messages to be scraped from their iframe and then iframe closed
+					let br = document.createElement("br");
+					document.body.appendChild(br);
+					document.body.appendChild(iframe);
+					iframe.style.height = iframe.scrollHeight + "px";
+					iframe.scrolling = "auto";
+					iframe.className = "traceViewerIframe";
+					iframe.style.display = "none";
+				}
+				
+				iframe.addEventListener("load", function() {
+
+					let messageDiv = document.createElement('div');
+					let message = {messageNumber: parseInt(messageId), object: messageDiv, messageStartOperation: messageStartOperation, messageEndOperation: messageEndOperation,};
+					messageStyling(messageDiv);
+					if (messageStatus != "OK") {
+						messageDiv.style.borderColor = "red"
+					}
+					if (iframe == mainIframe) {
+						// Check if main frame is a HL7 message:
+						//console.log("DOES THIS = HL7???? ",iframe.contentDocument.getElementsByTagName("div")[0].innerHTML.trim().substring(0,3));
+						if  (iframe.contentDocument.getElementsByTagName("div")[0].innerHTML.trim().substring(0,3) == "HL7") {
+							//console.log("MAIN IFRAME:", mainIframe.contentDocument.getElementsByTagName("body")[0].innerHTML);
+							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							mainIframe.style.display = "";
+							
+							// Add buttons to main iframe
+							addButtonBar(mainIframe.contentDocument);
+							buttonBarStyle(mainIframe.contentDocument);
+							
+							minimiseAllButton(mainIframe.contentDocument);
+							wrapRowsButton(mainIframe.contentDocument);
+							shareButton(mainIframe.contentDocument);
+							textCompareBtn(mainIframe.contentDocument);
+							compareLegendButtons(mainIframe.contentDocument);
+							
+							mainIframe.style.width = "99%";
+							mainIframe.style.height = "95%";
+							/// BUTTON BAR CREATE?
+
+							
+							scrollBarStyle(mainIframe.contentDocument);
+							
+						} else {
+							let unknownElement = document.createElement("div")
+							unknownElement.innerText = "*The first message is not a HL7 message. This situation is yet to be catered for.";
+							messageDiv.appendChild(unknownElement);
+							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes);
+							//messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+						}
+						
+						//messageDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
+						
+						// mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(messageDiv);
+					} else {
+						messageDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
+					}
+					
+						
+
+					messageHeading = '<a style="color: red; padding: 10px"">#' + String(messageSearchNumber) + ' ' + messageCreated + '</a><br><a style="padding: 10px">' + messageStartOperation + ' ----> ' + messageEndOperation + '</a>';
+					messageDiv.innerHTML = messageHeading + messageDiv.innerHTML;
+					
+					let closeButton = document.createElement('btn');
+					buttonStyling(closeButton);
+					closeButton.style.backgroundColor = "pink";
+					closeButton.title = "Close";
+					closeButton.style.right = "15px";
+					closeButton.innerText = "x";
+					closeButton.style.marginRight = "5px";
+					closeButton.style.top = "5px";
+					closeButton.style.position = "absolute";
+					closeButton.style.zIndex = "1"
+					
+					
+					closeButton.addEventListener('click', () => {
+						closeButton.parentNode.style.display = "none";
+						// Uncheck box?
+						// remove message from messageArray and sortedMessageArray
+						
+
+						//console.log("messageDiv element to be removed: ", messageDiv);
+						message.object.parentElement.removeChild(message.object);					
+						// Remove from the array
+						messageArray = messageArray.filter(obj => {
+						  return obj.messageNumber !== parseInt(messageId);
+						})
+						sortedMessageArray = sortedMessageArray.filter(obj => {
+						  return obj.messageNumber !== parseInt(messageId);
+						})
+						
+						
+					})
+					
+					messageDiv.appendChild(closeButton);
+					
+					let minimiseBtn = minimiseButton(mainIframe.contentDocument, messageDiv);
+					messageDiv.appendChild(minimiseBtn);
+					
+					messageArray.push(message);
+
+					messageDiv.id = messageId;
+					
+					messageAppend(message);
+					
+					let copyRawTextBtn = copyRawTextButton(mainIframe.contentDocument, messageId);
+
+					messageDiv.appendChild(copyRawTextBtn);
+										
+					if (iframe != mainIframe) {
+						iframe.parentNode.removeChild(iframe);
+					}
+				});
+			
+			} else {
+				e.target.value = "unchecked"
+				let messageDiv = messageArray.filter(obj => {
+				  return obj.messageNumber === parseInt(messageId);
+				})
+				messageDiv[0].object.parentElement.removeChild(messageDiv[0].object);
+				console.log("message array, pre deleted", messageArray);
+				
+				// Remove from the array
+				messageArray = messageArray.filter(obj => {
+				  return obj.messageNumber !== parseInt(messageId);
+				})
+				console.log("message array, post deleted", messageArray);
+				
+			}
+		}	
+
+	});
+
+});
+
+function messageAppend(message) {
+	/// Appends message to the mainIframe
+	
+	// Sort the message array
+	if (messageArray.length > 1) {
+		sortedMessageArray = messageArray.sort((a, b) => {
+			return  b.messageNumber - a.messageNumber;
+		});
+	}
+
+	// Append message to the page in correct place.
+	for (let x = 0; x < sortedMessageArray.length; x++) {
+		if (sortedMessageArray[x] == message) {
+			try {
+				mainIframe.contentDocument.getElementsByTagName("body")[0].insertBefore(sortedMessageArray[x].object, sortedMessageArray[x+1].object);
+			} catch {
+				mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(sortedMessageArray[x].object);
+			}
+		}
+	}
+	
+	// Append first message
+	if ((sortedMessageArray.length == 0) && (messageArray[0] == message)) {
+		mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(message.object)
+		sortedMessageArray.push(message.object);
+	}
+	try {
+		mainIframe.contentDocument.dispatchEvent(addExpansionEvent);
+		mainIframe.contentDocument.dispatchEvent(addMouseOverCompare);
+	} catch {
+		
+	}
+	
+}
+
+
+function fullTraceDisplayOff() {
+	/// Switches the selecteMessagesTab tab off
+	selecteMessagesTab.style.display = "none";
+	fullTraceHeader.className = "tabGroupButtonOff";
+}
+
+
+function fullTraceDisplayOn() {
+	/// Switches the selecteMessagesTab tab on
+	selecteMessagesTab.style.display = "";
+	fullTraceHeader.className = "tabGroupButtonOn";
+	headerDetails.style.display = "none";
+	bodyDetails.style.display = "none";
+	bodyContents.style.display = "none";
+	traceContent.style.display = "none";
+	headerHeaderDetails.className = "tabGroupButtonOff";
+	headerBodyDetails.className = "tabGroupButtonOff";
+	headerBodyContents.className = "tabGroupButtonOff";
+	traceContent.className = "tabGroupButtonOff";
+}
+
+
+/*
+/// RESIZE WINDOW EXPERIMENT
+
+var isResizing = false,
+    lastDownX = 0;
+
+$(function () {
+    var container = $('#container'),
+        left = $('#left_panel'),
+        right = $('#right_panel'),
+        handle = $('#drag');
+
+    handle.on('mousedown', function (e) {
+        isResizing = true;
+        lastDownX = e.clientX;
+    });
+
+    $(document).on('mousemove', function (e) {
+        // we don't want to do anything if we aren't resizing.
+        if (!isResizing) 
+            return;
+        
+        var offsetRight = container.width() - (e.clientX - container.offset().left);
+
+        left.css('right', offsetRight);
+        right.css('width', offsetRight);
+    }).on('mouseup', function (e) {
+        // stop resizing
+        isResizing = false;
+    });
+});
+*/

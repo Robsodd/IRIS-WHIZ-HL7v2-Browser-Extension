@@ -1,0 +1,15 @@
+{
+  "name": "IRIS/Ensemble Interface Analyst Helper",
+  "description": "Enhances the HL7 V2 experience in Intersystems IRIS/Ensemble.",
+  "version": "1.5.1",
+  "manifest_version": 3,
+  "permissions": ["scripting", "tabs", "tabGroups", "background", "storage", "contextMenus", "bookmarks"],
+  "host_permissions": ["*://*/"],
+  "options_page": "options.html",
+  "background": {
+	"service_worker": "background.js"
+	},
+  "action": {
+	"default_popup": "popup.html"  
+  }
+ }

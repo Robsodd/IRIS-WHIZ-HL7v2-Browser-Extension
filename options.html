@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>My Test Extension Options</title>
+<link rel="stylesheet" href="options.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+<br>
+<div id="status"></div>
+<div style="text-align: center"><h1>Options Page</h1></div>
+
+<br><hr><br>
+<div class="row">
+  <div class="column"></div>
+	<div class="column">
+		<div class="form-container">
+			  <!-- <input type="checkbox" name="Bookmarks" id="Bookmarks" value="Bookmarks">
+			  <label for="Bookmarks">Bookmarks</label> - <i>creates a bookmark folder with links to your instances and namespaces</i><br>-->
+			  <div class="form-group">
+				<h2 class="title">Enable Features</h2>
+					<h3>Tab Groups</h3>
+					<input type="checkbox" name="AutoTab" id="AutoTab" value="AutoTab">
+					<label for="AutoTab">AutoTab</label> - <i>adds tabs to their corresponding instance tab group on page creation/update</i><br>
+					<input type="checkbox" name="AutoTab - NameSpace" id="AutoTabNameSpace" value="AutoTabNameSpace">
+					<label for="AutoTabNameSpace">AutoTab - Sort By Namespace</label> - <i>further sort tab groups into namespaces</i><br>
+					<input type="checkbox" name="CSS" id="CSS" value="CSS">
+					<label for="CSS">Custom Header Colours</label> - <i>Adjusts the colour of the header on your instances</i><br>
+					<!-- <input type="checkbox" name="MessageSearch" id="MessageSearch" value="MessageSearch">
+					<label for="MessageSearch">Message Search</label> - <i>Allows right click contect menu on message fields. Must be a 'Full Contents' view and not 'Raw Contents'.</i><br> -->
+					<h3>Message Viewer Page</h3>
+					<input type="checkbox" name="MVSortOrder" id="MVSortOrder" value="MVSortOrder">
+					<label for="MVSortOrder">Sort Order Oldest First as default</label> - <i>When checked automatically changes the Sort By dropdown to Oldest First on page load.</i><br>
+					<input type="checkbox" name="MVTimeFormat" id="MVTimeFormat" value="MVTimeFormat">
+					<label for="MVTimeFormat">Time format Complete as default</label> - <i>When checked automatically changes the Time Format dropdown to Complete on page load.</i><br>
+					<h3>Other Features:</h3>
+					<input type="checkbox" name="HomepageReports" id="HomepageReports" value="HomepageReports">
+					<label for="HomepageReports">Home Page Reports</label> - <i>Loads poorly business components on the homepage of each namespace.</i><br>
+					
+			  </div>
+			  <!-- <input type="checkbox" name="ContextMenu" id="ContextMenu" value="ContextMenu">
+			   <label for="ContextMenu">ContextMenu</label> - <i>enables message search via right click context menu on 'Full Contents' message viewer </i><br><br> -->
+			  <!-- <input type="submit" id="saveSettings" value="Update"> -->
+			<div class="form-group">
+				<button class="btn signup" id="saveSettings">Update</button>
+			</div>
+
+		</div>
+	</div>
+  <div class="column"></div>
+</div>
+
+<br><hr>
+
+<div class="row">
+  <div class="column"></div>
+	<div class="column">
+		<div class="form-container">
+
+			<div class="form-group">
+				
+				<h2 class="title">Instances</h2>
+				Add or edit your instances of intersystems healthshare here. 
+				<br>
+				Specified Instances and Namespaces are required for some features to work.
+				<br>
+			</div>
+			<div class="form-group">
+				<select id="InstanceSelect">
+					<option value="NewInstance">Add New</option>
+				</select>  <span id="refreshInstances" class="material-symbols-outlined">cached</span>
+			</div>
+			<div class="form-group">
+				<label for = "InstanceName">Instance Name</label><br>
+				<div id="ValidateInstanceName" style="color: red"> </div>
+				<input type="text" name="InstanceName" id="InstanceName"><br>
+			</div>
+			<div class="form-group">
+				<label for = "InstanceURL">DNS</label> - <i>Just the DNS, no thrills! e.g. cheddar.cheese.milk.cow  NOT https://cheddar.cheese.milk.cow/farmer_jo</i><br>
+				<div id="ValidateInstanceURL" style="color: red"> </div>
+				<input type="text" name="InstanceURL" id="InstanceURL"><br>
+			</div>
+			<div class="form-group">
+				<label for = "InstanceColour">Colour</label><br>
+				<div id="ValidateInstanceColour" style="color: orange"> </div>
+				<select id="InstanceColour">
+					<option value="gray">gray</option>
+					<option value="blue">blue</option>
+					<option value="red">red</option>
+					<option value="yellow">yellow</option>
+					<option value="green">green</option>
+					<option value="pink">pink</option>
+					<option value="purple">purple</option>
+					<option value="cyan">cyan</option>
+					<option value="orange">orange</option>
+				</select><br><br>
+			</div>
+			<div class="form-group">
+				<h4 class="sub-title">Namespace</h4>
+			</div>
+			<div class="form-group">
+				<label for = "NamespaceSelect">Choose Namespace:</label><br>
+				<select id="NamespaceSelect">
+					<option value="NewNamespace">Add New</option>
+				</select><br>
+			</div>
+			<div class="form-group">
+				<label for = "NamespaceName">Namespace Name</label> - <i>Name as will appear in the tabs</i><br>
+				<div id="ValidateNamespaceName" style="color: red"> </div>
+				<input type="text" name="NamespaceName" id="NamespaceName"></br>
+			</div>
+			<div class="form-group">
+				<label for = "NamespaceSlug">Slug</label> - <i>Namespace name as it appear in the url e.g. /my_adt_namespace/</i><br>
+				<div id="ValidateNamespaceSlug" style="color: red"> </div>
+				<input type="text" name="NamespaceSlug" id="NamespaceSlug"></br>
+			</div>
+			<div class="form-group">
+				<button class="btn signup" id="saveInstance">Save</button>
+			</div>
+		
+		</div>
+	</div>
+  <div class="column"></div>
+</div>
+<br><hr>
+<div class="row">
+  <div class="column"></div>
+	<div class="column">
+		<div class="form-container">
+
+		
+			<div class="form-group">
+				<h2 class="title">Import/Export</h2>
+				Copy/paste the text below to share with colleagues. Click import to replace your saved instances.
+				<br>
+				Avoid editing this text unless you're comfortable with JSON.
+			</div>
+			 <div class="form-group">
+				<label for="export">Instances Object:</label></br>
+
+				<textarea id="export" name="export" rows="4" cols="50"></textarea>
+			</div>
+			<div class="form-group">
+				<button class="btn signup" id="import">Import</button>
+			</div>
+
+		
+	</div>
+	</div>
+	<div class="column"></div>
+  
+</div>
+
+<br><hr>
+
+<div class="row">
+  <div class="column"></div>
+	<div class="column">
+		<div class="form-container">
+			<div class="form-group">
+				<h2 class="title">ReadMe File:</h2>
+				<div id="readme"></div>
+			</div>
+		</div>
+	</div>
+	<div class="column"></div>
+</div>
+
+<script src="options.js"></script>
+<script src="options.css"></script>
+</body>
+</html>
