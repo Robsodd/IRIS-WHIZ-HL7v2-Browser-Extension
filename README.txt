@@ -1,4 +1,14 @@
-VERSION 1.5.1
+VERSION 1.5.1 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+
+---- Description:
+
+Originally created to make the differences between TEST and PRODUCTION instances more immediately obvious, features were added to enhance and make easier; message searching, message comparison and monitoring productions.
+
+This web browser extension is best suited to Interface analysts working with HL7 v2 messages.
+
+This code is made available as is and will not be supported. Please see License.txt for full details.
+
+
 
 ---- Installation & Set Up:
 
@@ -158,6 +168,7 @@ Allows user to scroll through previous criteria and click them to add them back 
 The history will contain the full HTML element object however only VDoc Segment Field, VDoc Property Path and Header criterion will automatically be applied to the current search criteria when clicked. 
 Clicking incompatible criteria will result in an error message.
 Useful if you've resubmitted a message and want to recall the criteria you used to find it in the first place.
+
 
 
 ---- Updates
