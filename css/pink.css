@@ -1,0 +1,23 @@
+
+:root {
+  --main-colour: 237,47,209;
+  --highlight-colour: 0,0,0;
+  --link-colour: 0,255,216;
+}
+
+.portalTitle {
+	background: rgb(var(--main-colour)) !important;
+
+}
+
+.stdTitle {
+    background: rgb(var(--main-colour)) !important;
+}
+
+.portalTitleInfoLabel {
+	color: rgb(var(--highlight-colour)) !important;
+}
+
+.portalTitleLink {
+	color: rgb(var(--link-colour)) !important;
+}
