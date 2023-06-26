@@ -1,0 +1,28 @@
+
+:root {
+  --main-colour: 0,102,255;
+  --highlight-colour: 255,255,255;
+  --link-colour: 0,255,216;
+}
+.portalTitle {
+	background: rgb(var(--main-colour)) !important;
+
+}
+
+.stdTitle {
+    background: rgb(var(--main-colour)) !important;
+}
+
+.portalTitleInfoLabel {
+	color: rgb(var(--highlight-colour)) !important;
+}
+
+.portalTitleLink {
+	color: rgb(var(--link-colour)) !important;
+	
+}
+
+/* for iris */
+#header {
+	background: rgb(var(--main-colour)) !important;
+}
