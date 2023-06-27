@@ -12,6 +12,16 @@ This code is made available as is and will not be supported. Please see License.
 
 ---- Installation & Set Up:
 
+Follow the instructions in the tutorial video below:
+
+https://youtu.be/cxpMFfGYGu0
+
+Or
+
+Download from GitHub: https://github.com/Robsodd/RDUH-Intersystems-HL7v2-Browser-Extension
+
+Unzip the downloaded folder.
+
 In your browser navigate to the extension settings. 
 
 Enable developer mode.
