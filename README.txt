@@ -1,4 +1,4 @@
-VERSION 1.6
+VERSION 1.6.0
 
 ---- Installation & Set Up:
 
@@ -44,6 +44,8 @@ Finally, enable your desired features using the checkbox form at the top of this
 16. Message Viewer Page - Order by Oldest
 17. Message Viewer Page - Complete Date
 18. Message Viewer Page - Extended Criteria Search History 
+19. Message Viewer Page - Share Search
+20. Multiple Message Scroll
 
 
 
@@ -159,8 +161,43 @@ The history will contain the full HTML element object however only VDoc Segment 
 Clicking incompatible criteria will result in an error message.
 Useful if you've resubmitted a message and want to recall the criteria you used to find it in the first place.
 
+-- 19. Message Viewer Page - Share Search
+
+Creates a 'Share Search' button on the Message Viewer page. 
+When clicked, the current search criteria is saved in the Saved Searches and the current URL with the Saved Search's name appended as a query param is copied to the clipboard.
+Navigate to this new URL and it will automatically open the saved search. The browser prompts you to delete the saved search - this is so your Saved Searches dropdown doesn't get filled, though you don't have to delete the Saved Search if you don't want to.
+Saved Searches are the current datetime prepended with zz.
+Useful for sharing search results with colleages.
+
+-- 20. Multiple Message Scroll
+
+When viewing any page where the extension has added multiple messages and there are horizontal scrollbars, hold CTRL and then scroll. This will scroll all message scrollbars at the same time.
+Useful for comparing multiple messages at the same time.
+
 
 ---- Updates
+
+
+22/08/2023 Updates:
+
+Feature Added: Share Search
+
+Creates a 'Share Search' button on the Message Viewer page. 
+When clicked, the current search criteria is saved in the Saved Searches and the current URL with the Saved Search's name appended as a query param is copied to the clipboard.
+Navigate to this new URL and it will automatically open the saved search. The browser prompts you to delete the saved search - this is so your Saved Searches dropdown doesn't get filled, though you don't have to delete the Saved Search if you don't want to.
+Saved Searches are the current datetime prepended with zz.
+Useful for sharing search results with colleages.
+
+
+Feature Added: Multiple Message Scroll
+
+When viewing any page where the extension has added multiple messages and there are horizontal scrollbars, hold CTRL and then scroll. This will scroll all message scrollbars at the same time.
+Useful for comparing multiple messages at the same time.
+
+
+BugFix: Search History no longer empties prematurely.
+BugFix: Search History no longer breaks the Message Viewer page's extension funcitonality if opened before first search is performed.
+
 
 06/06/2023 Updates:
 
