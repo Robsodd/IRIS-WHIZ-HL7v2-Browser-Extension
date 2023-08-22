@@ -9,6 +9,10 @@ let traceContent;
 
 
 window.addEventListener("load", function() {
+	
+	//Scrollbar test:
+	
+	
 	chrome.storage.local.get({
 		TimeFormat: false,
 		SortOrder: false,		
@@ -273,6 +277,9 @@ window.addEventListener("load", function() {
 function messageAppend(message) {
 	/// Appends message to the mainIframe
 	
+	syncScrolling(mainIframe.contentDocument, message.object);
+	
+	
 	// Sort the message array
 	if (messageArray.length > 1) {
 		sortedMessageArray = messageArray.sort((a, b) => {
@@ -303,7 +310,9 @@ function messageAppend(message) {
 		
 	}
 	
+	
 }
+
 
 
 function fullTraceDisplayOff() {
@@ -326,6 +335,9 @@ function fullTraceDisplayOn() {
 	headerBodyContents.className = "tabGroupButtonOff";
 	traceContent.className = "tabGroupButtonOff";
 }
+
+
+
 
 
 /*

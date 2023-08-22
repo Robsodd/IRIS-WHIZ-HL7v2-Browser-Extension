@@ -4,7 +4,7 @@ console.log("Criteria Cache Script Loaded");
 let numberOfCriterionToCache = 10;
 let extendedCriteria;
 let extendedCriteriaClone;
-let criterionCache = [];
+let criterionCache = []; // Copy of storage criterion cache
 let criterion = [];
 let searchDateTime;
 let searchButton;
@@ -22,7 +22,7 @@ let modalContent;
 function getCriterionCache() {
 	chrome.storage.local.get(['CriterionCache'], function(cache) {
 		criterionCache = [];
-		if (cache == undefined) {
+		if (cache.CriterionCache == undefined) {
 			criterionCache = [];
 		} else {
 			for (let i = 0; i < cache.CriterionCache.length; i++) {
@@ -31,6 +31,9 @@ function getCriterionCache() {
 				criterionCache[i].div.innerHTML = "<div><h3>" + cache.CriterionCache[i].datetime.formatted + " - " + cache.CriterionCache[i].tieInfo.instance + "/ " +  cache.CriterionCache[i].tieInfo.namespace + "</h3></div>" + cache.CriterionCache[i].data.amended;
 			}
 		}
+		searchButton.addEventListener("click", function() { 
+		saveCache();
+	});
 		//console.log("Cache retreived:", cache, criterionCache);
 	});
 }
@@ -92,9 +95,9 @@ function saveCache() {
 	
 	if (duplicate) {
 		//console.log("Duplicate detected");
-		chrome.storage.local.set({CriterionCache: criterionCache,}, function() {
+		//chrome.storage.local.set({CriterionCache: criterionCache,}, function() {
 			//console.log('Saved criterionCache is set to:',  criterionCache);
-		});
+		//});
 	} else {
 		
 		// Limit criterionCache to numberOfCriterionToCache, delete oldest
@@ -139,9 +142,7 @@ window.addEventListener("load", function() {
 	getCriterionCache();
 	extendedCriteria = document.getElementById("extendedCriteriaTable");
 	searchButton = document.getElementById("command_searchButton");
-	searchButton.addEventListener("click", function() { 
-		saveCache();
-	});
+	
 	createModal();
 });
 
@@ -167,7 +168,7 @@ function createModal() {
 	buttonStyling(modalBtn);
 	modalBtn.style.backgroundColor = "#05c705";
 	modalBtn.style.position = "absolute";
-	modalBtn.style.marginRight = "5px";
+	modalBtn.style.marginLeft = "5px";
 	modalBtn.style.bottom = "5px";
 	modalBtn.innerText = "Search History";
 
@@ -489,45 +490,5 @@ function searchForward(element, array) {
 		}
 	}
 	return array
-}
-
-/// Return datetime object
-function getDate() {
-	let newDate = new Date();
-	let y = String(newDate.getFullYear());
-	let m = newDate.getMonth() + 1;
-	if (m < 10) {
-		m = "0" + String(m);
-	} else {
-		m = String(m);
-	}
-	let d = newDate.getDate();
-	if (d < 10) {
-		d = "0" + String(d);
-	} else {
-		d = String(d);
-	}
-	let h = newDate.getHours();
-	if (h < 10) {
-		h = "0" + String(h);
-	} else {
-		h = String(h);
-	}
-	let min = newDate.getMinutes();
-	if (min < 10) {
-		min = "0" + String(min);
-	} else {
-		min = String(min)
-	}
-	let sec = newDate.getSeconds();
-	if (sec < 10) {
-		sec = "0" + String(sec);
-	} else {
-		sec = String(sec);
-	}
-	let datetime = y + m + d + h + min + sec;
-	let formatted = d + "/" + m  + "/" + y  + " " + h  + ":" + min + ":" + sec;
- 	
-	return {"raw": datetime, "formatted": formatted}
 }
 

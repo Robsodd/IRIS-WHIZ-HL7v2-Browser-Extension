@@ -420,7 +420,12 @@ const pdfViewer = {
 						id: "pdf_viewer",
 				}
 				
-
+const saveMessageViewer = {
+						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
+						allFrames: true,
+						js: ["save_message_viewer.js"],
+						id: "save_message_viewer",
+				}
 				
 const utils = {
 						matches: ["*://*/csp/*",],
@@ -442,7 +447,7 @@ function update_content_scripts() {
 			chrome.scripting.unregisterContentScripts().then(() => {
 				
 				chrome.scripting.registerContentScripts(
-				[ utils, messageSearch, schemaExpansion, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer],
+				[ utils, messageSearch, schemaExpansion, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer, saveMessageViewer],
 					() => { 
 						
 						if (settings.HomepageReports) {

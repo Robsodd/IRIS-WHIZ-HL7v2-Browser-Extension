@@ -37,7 +37,34 @@ try {
 } catch (e) {
 	console.log("Error", e);
 }
- 
+
+let statusDiv 
+
+window.addEventListener("load", function() { 
+	statusDiv = document.createElement("div");
+	let zen1 = document.getElementById("zen1");
+	if (zen1 == undefined) {
+		
+	} else {
+		statusDiv.id = "status"
+		zen1.prepend(statusDiv);
+		statusDiv.style.position = "absolute";
+		statusDiv.style.top = "50px";
+		statusDiv.style.padding = "15px 10px";
+		statusDiv.style.color = "#fff";
+		statusDiv.style.fontWeight = "400";
+		statusDiv.style.letterSpacing = "1px";
+		statusDiv.style.borderRadius = "5px";
+		//statusDiv.style.border = "2px solid #e7e7e7";
+		statusDiv.style.width = "50%";
+		statusDiv.style.textAlign = "center";
+		statusDiv.style.marginLeft = "25%";
+		statusDiv.style.marginRight = "auto";
+		statusDiv.style.zIndex = "3";
+		statusDiv.style.display = "none";
+	}	
+});
+
 
 // EVENT FOR TRIGGERING THE EXPANSION CONTENT SCRIPT
 let addExpansionEvent; // The custom event that will be created
@@ -207,6 +234,7 @@ function copyRawTextButtonBar(Document) {
 	copyRawBtn.style.position = ""
 	
 	copyRawBtn.innerText = "Copy Raw Text";
+	copyRawBtn.title = "Copy Raw Text version of this message";
 	
 	copyRawBtn.addEventListener('click', () => {
 		let messageNumber = currentUrl.split("&HeaderId=")[1];
@@ -234,6 +262,7 @@ function expandSchemaButton(Document) {
 	expandSchemaBtn.style.position = ""
 	//expandSchemaBtn.className = "commandButton"
 	expandSchemaBtn.innerText = "Expand All"
+	expandSchemaBtn.title = "Expand all segments as schema"
 	expandSchemaBtn.addEventListener('click', () => {
 		console.log("schema button clicked");
 		if (clicked) {
@@ -272,6 +301,7 @@ function messageImportBtn(Document) {
 	messageImportBtn.style.margin = "5px"
 	messageImportBtn.style.position = ""
 	messageImportBtn.innerText = "Import Message"
+	messageImportBtn.title = "Import Message from a Full Contents tab"
 	messageImportBtn.addEventListener('click', () => {
 		// When there is a "click"
 		compareDropDownSelect = Document.getElementById("compareDropDown")
@@ -621,7 +651,7 @@ function getDomain(url) {
 	return domain
 }
 
-const scrollBarString = `
+var scrollBarString = `
 	.MsgOutline::-webkit-scrollbar {
   height: 15px;
 }
@@ -645,10 +675,36 @@ const scrollBarString = `
 }
 `
 
+const scrollBarStringHighlight = `
+	.MsgOutline::-webkit-scrollbar {
+  height: 15px;
+}
+
+/* Track */
+.MsgOutline::-webkit-scrollbar-track {
+  /*box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);*/
+  background: #f0f0f0;
+  border-radius: 3px;
+}
+ 
+/* Handle */
+.MsgOutline::-webkit-scrollbar-thumb {
+  background: #252525; 
+  border-radius: 3px;
+}
+
+/* Handle on hover */
+.MsgOutline::-webkit-scrollbar-thumb:hover {
+  background: lightGrey; 
+}
+`
+
+let scrollBarStyleObject
+
 function scrollBarStyle(Document) {
-	const style = Document.createElement('style');
-	style.textContent = scrollBarString;
-	Document.head.append(style);
+	scrollBarStyleObject = Document.createElement('style');
+	scrollBarStyleObject.textContent = scrollBarString;
+	Document.head.append(scrollBarStyleObject);
 }
 
 const buttonBarString = `
@@ -687,5 +743,153 @@ function addButtonBar(Document) {
 		bar.id = "buttonBar";
 		bar.className = "buttonBar";
 		Document.body.insertBefore(bar, Document.body.firstChild);
+	}
+}
+
+
+
+/// Return datetime object
+function getDate() {
+	let newDate = new Date();
+	let y = String(newDate.getFullYear());
+	let m = newDate.getMonth() + 1;
+	if (m < 10) {
+		m = "0" + String(m);
+	} else {
+		m = String(m);
+	}
+	let d = newDate.getDate();
+	if (d < 10) {
+		d = "0" + String(d);
+	} else {
+		d = String(d);
+	}
+	let h = newDate.getHours();
+	if (h < 10) {
+		h = "0" + String(h);
+	} else {
+		h = String(h);
+	}
+	let min = newDate.getMinutes();
+	if (min < 10) {
+		min = "0" + String(min);
+	} else {
+		min = String(min)
+	}
+	let sec = newDate.getSeconds();
+	if (sec < 10) {
+		sec = "0" + String(sec);
+	} else {
+		sec = String(sec);
+	}
+	let datetime = y + m + d + h + min + sec;
+	let formatted = d + "/" + m  + "/" + y  + " " + h  + ":" + min + ":" + sec;
+ 	
+	return {"raw": datetime, "formatted": formatted}
+}
+
+
+function successAlert(displayText) {
+	var status = document.getElementById('status');
+			status.textContent = displayText;
+			status.style.background = "green"
+			status.style.display = "block"
+			setTimeout(function() {
+			status.textContent = '';
+			status.style.display = "none"
+			}, 2000);
+}
+
+
+function errorAlert(displayText) {
+	var status = document.getElementById('status');
+			status.textContent = displayText;
+			status.style.background = "red"
+			status.style.display = "block"
+			setTimeout(function() {
+			status.textContent = '';
+			status.style.display = "none"
+			}, 2000);
+}
+
+// Syncs scrolling for MsgOutline class
+function syncScrolling(Document, object) {
+	function keypress() {
+		let ctrl = window.event.ctrlKey
+		console.log("keydown triggered");
+		if (ctrl) {
+			scrollBarStyleObject.textContent = scrollBarStringHighlight;
+		} else {
+			scrollBarStyleObject.textContent = scrollBarString;
+		}
+	}
+	document.addEventListener("keydown", function() {
+		keypress();
+	});
+	
+	document.addEventListener("keyup", function() {
+		keypress();
+	});
+	
+	Document.addEventListener("keydown", function() {
+		keypress();
+	});
+	
+	Document.addEventListener("keyup", function() {
+		keypress();
+	});
+	// Hold CTRL to scroll all message boxes simultaneously 
+	object.addEventListener("mousedown", function() {
+		console.log("Mouse down on element!");
+		let divsArray = Document.getElementsByClassName("MsgOutline");
+		console.log("divsArray -- ", divsArray);
+		let ctrl = window.event.ctrlKey
+		if (ctrl) {
+		console.log("mousedown + ctrl");
+		object.onscroll = function() { 
+		  for (let x = 0; x < divsArray.length; x ++) {
+			if (divsArray[x] != object) {
+				syncScroll(object, divsArray[x])
+			}
+		  }
+		 }
+	  } else {
+			 console.log("mousedown - ctrl");
+			object.onscroll = function() { };
+	  
+	  }
+	});
+	
+	// Remove scroll link on mouseup
+	object.addEventListener("mouseup", function() {
+		console.log("Mouse up on element!");
+		let divsArray = Document.getElementsByClassName("MsgOutline");
+		console.log("divsArray -- ", divsArray);
+		for (let x = 0; x < divsArray.length; x ++) {
+			object.onscroll = function() { };
+		}
+	});
+	
+	// For synchronising the message scrollbars when CTRL is held
+	function syncScroll(from, to)
+	{
+		console.log("synScroll!");
+		var sfh = from.scrollHeight - from.clientHeight,
+			sth = to.scrollHeight - to.clientHeight;
+		var sfw = from.scrollWidth - from.clientWidth,
+			stw = to.scrollWidth - to.clientWidth;
+
+		if (sfh < 1) {
+		} else {
+			var ph = from.scrollTop / sfh * 100;
+		  to.scrollTop = (sth / 100) * ph;
+		
+		}
+		
+		if (sfw < 1) {
+		} else {
+		  var pw = from.scrollLeft / sfw * 100;
+			to.scrollLeft = (stw / 100) * pw;
+		}
 	}
 }

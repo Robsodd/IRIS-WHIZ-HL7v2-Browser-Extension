@@ -269,6 +269,7 @@ function messageAppend() {
 		console.log("sortedMessageArray", String(sortedMessageArray.length), sortedMessageArray);
 		console.log("messageArray", String(messageArray.length), messageArray);
 		for (let x = 0; x < sortedMessageArray.length; x++) {
+			syncScrolling(mainIframe.contentDocument, sortedMessageArray[x].object);
 			mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(sortedMessageArray[x].object)
 			console.log("!!!!!!!!!!!!!!!!!!!!!mainIframe append child!!!!!!!!!!!!!!!!!!!!!");
 		}

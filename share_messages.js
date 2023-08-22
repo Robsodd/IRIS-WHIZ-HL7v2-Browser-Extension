@@ -117,6 +117,8 @@ function add_message_to_page(param_message) {
 
 function messageAppend(message) {
 	
+	
+	syncScrolling(document, message.object);
 	// Cycle through array. 
 	//console.log("messageArray", messageArray, messageArray[0].messageNumber);
 	if (messageArray.length > 1) {

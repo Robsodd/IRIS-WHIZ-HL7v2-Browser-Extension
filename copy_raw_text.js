@@ -17,7 +17,6 @@ if (currentUrl.includes("VisualTrace.zen")) {
 		
 		addButtonBar(document);
 		buttonBarStyle(document);
-	
 		copyRawTextButtonBar(document);
 	}
 }
@@ -36,8 +35,6 @@ function copyRaw(messageNumber) {
 	iframe.style.position = "fixed";
 	iframe.style.top = "0px";
 	iframe.id = String(messageNumber) + "RAWTEXT";
-	
-
 	
 	iframe.addEventListener("load", function() {
 		let copyText = iframe.contentDocument.querySelector("body > pre").innerText;
@@ -78,6 +75,7 @@ function messageRequest(theUrl, messageNumber) {
 			textArea.style.position = "fixed";
 			textArea.style.top = "0px";
 			textArea.id = String(messageNumber) + "RAWTEXT";
+			
 			try {
 				document.execCommand('copy');
 			} catch (err) {
