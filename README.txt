@@ -1,5 +1,9 @@
 VERSION 1.6.0
 
+This is a browser extension that enhances the InterSystems Ensemble/Iris web experience for healthcare Interface Analysts.
+
+Originally created to make the difference between production and test instances obvious, it evolved to include additional features to help monitor productions, search for and compare HL7 messages and more.
+
 ---- Installation & Set Up:
 
 In your browser navigate to the extension settings. 
