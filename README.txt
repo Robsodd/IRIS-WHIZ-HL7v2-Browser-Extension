@@ -71,7 +71,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 
 
 
-#### <a name="auto-tab">01. AutoTab</a>
+#### <a name="auto-tab"></a>01. AutoTab
 
 Organises your tabs into coloured Tab Groups by Ensemble Instance for easy identification in the browser. Requires the instances object to have been built using the Instances tool in the extension options page.
 This feature can help you to organise Test and Production instances into groups in your browser to prevent confusion.
