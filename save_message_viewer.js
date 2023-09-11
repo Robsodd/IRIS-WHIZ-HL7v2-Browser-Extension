@@ -1,4 +1,6 @@
 /// Share Message Viewer Page
+/// Share Message Viewer Page
+console.log("Share Message Viewer Script");
 
 
 const queryString = window.location.search;
@@ -25,7 +27,6 @@ window.addEventListener("load", function() {
 		saveSearch();
 	});
 
-
 	if (urlParams.has("savedSearch")) {
 		let searchID = urlParams.get('savedSearch')
 		openSearch(searchID);
@@ -35,7 +36,7 @@ window.addEventListener("load", function() {
 
 function openSearch(searchId) {
 	let selectBox = document.getElementById("control_61");
-	selectBox.value = searchId
+	selectBox.value = searchId;
 	var change = new Event('change');
 	selectBox.dispatchEvent(change);
 	let deleteButton = document.getElementById("searchDeleteTxt");
@@ -50,23 +51,23 @@ function saveSearch() {
 	let saveAsBtn = document.getElementById("saveSearchAsTxt");
 	saveAsBtn.click();
 	let date = getDate();
-	let timestamp = "zz" + date.raw
+	let timestamp = "zz" + date.raw;
 	let saveTxt = document.getElementById("control_63");
 	let copyTxt  = document.createElement("textarea");
 	let shareUrl = currentUrl.split(".zen")
 
-	shareUrl = shareUrl[0]
-	shareUrl = shareUrl + ".zen?savedSearch=" + timestamp
+	shareUrl = shareUrl[0];
+	shareUrl = shareUrl + ".zen?savedSearch=" + timestamp;
 	
-	saveTxt.value = timestamp
-	copyTxt.value = shareUrl
-	copyTxt.innerText = timestamp
+	saveTxt.value = timestamp;
+	copyTxt.value = shareUrl;
+	copyTxt.innerText = timestamp;
 	document.body.appendChild(copyTxt);
 	copyTxt.focus();
 	copyTxt.select();
 	
 	
-	var text = timestamp
+	var text = timestamp;
 	
 	try {
 		document.execCommand('copy');

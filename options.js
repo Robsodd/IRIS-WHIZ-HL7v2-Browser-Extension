@@ -529,6 +529,8 @@ function loadReadMe() {
 	
 	fetch(readMeText).then(readMe => readMe.text())
 	.then(body => {readMeDiv.innerText = body})
+	
+
 	 //.replace(/\s\s\s/g, "\n");
 }
 

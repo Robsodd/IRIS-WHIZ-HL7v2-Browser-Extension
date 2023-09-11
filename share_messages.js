@@ -18,6 +18,7 @@ uncloseAllButton(document);
 //shareButton(document);
 textCompareBtn(document);
 compareLegendButtons(document);
+searchExpandedSchemaButton(document);
 
 scrollBarStyle(document);
 
@@ -80,13 +81,13 @@ function add_message_to_page(param_message) {
 		
 		messageDiv.innerHTML = messageHeading + messageDiv.innerHTML
 
-		let closeButton = closeButtonHide(document);
-		messageDiv.appendChild(closeButton);
+		//let closeButton = closeButtonHide(document);
+		//messageDiv.appendChild(closeButton);
 		
-		let minimizeButton = minimiseButton(document, messageDiv);
-		messageDiv.appendChild(minimizeButton);
+		//let minimizeButton = minimiseButton(document, messageDiv);
+		//messageDiv.appendChild(minimizeButton);
 		
-		let copyRawTextBtn = copyRawTextButton(document, messageId)
+		//let copyRawTextBtn = copyRawTextButton(document, messageId)
 		/*
 		buttonStyling(copyRawTextBtn);
 		copyRawTextBtn.style.backgroundColor = "lightgrey";
@@ -99,6 +100,13 @@ function add_message_to_page(param_message) {
 		messageArray.push(message);
 
 		messageDiv.id = messageId;
+		
+		let messageBtnBar = messageButtonBar(document, messageDiv.id)
+		messageDiv.appendChild(messageBtnBar);
+					
+		closeButtonHide(document, messageBtnBar);
+		minimiseButton(document, messageDiv, messageBtnBar);
+		copyRawTextButton(document, messageId, messageBtnBar);
 		
 		messageAppend(message);
 		/*

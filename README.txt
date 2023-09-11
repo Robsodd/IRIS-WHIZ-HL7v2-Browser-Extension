@@ -1,5 +1,5 @@
 ***
-VERSION 1.6.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION 1.7.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -48,47 +48,74 @@ Finally, enable your desired features using the checkbox form at the top of this
 
 ## Features:
 
-[01. AutoTab](#auto-tab)
-2. AutoTab - Namespaces
-3. Instance Header Colours
-4. Message Search
-5. Open Session
-6. Selected Messages Tab on Message Viewer Page
-7. Share Link on Selected Messages Tab
-8. Full Trace Tab on Visual Trace  Page
-9. Import Message on HL7 Message Content Page
-10. Copy Raw HL7 Text
-11. Expand HL7 Schema
-12. Compare HL7 Message Fields
-13. Business Component Report
-14. Open base64 string as PDF 
+#### Browser Based 
+01. AutoTab
+02. AutoTab - Namespaces
+03. Instance Header Colours
 15. Add Bookmarks
-16. Message Viewer Page - Order by Oldest
-17. Message Viewer Page - Complete Date
-18. Message Viewer Page - Extended Criteria Search History 
-19. Message Viewer Page - Share Search
+
+
+#### Right Click Context Menu
+04. Message Search
+14. Open base64 string as PDF 
+
+
+#### Message Viewer Page
+06. Selected Messages Tab
+07. Share Link on Selected Messages Tab
+16. Order by Oldest
+17. Complete Date
+18. Extended Criteria Search History 
+19. Share Search
+
+
+#### Visual Trace Page
+08. Full Trace Tab
+21. Show Related Messages Button
+22. Hide Unrelated Messages Button
+23. FullTrace Messages Link to their SVG counterpart
+
+#### Message Content Page
+09. Import HL7 Message from another Message Content Page
+
+
+#### Various Pages (feature exists on more than one page)
+10. Copy Raw HL7 Text
+11. Expand & Search HL7 Schema   (was Expand HL7 Schema)
+12. Compare HL7 Message Fields
 20. Multiple Message Scroll
 
 
+#### Home Page 
+13. Business Component Report
 
-#### <a name="auto-tab"></a>01. AutoTab
+
+#### Extension Pop-up
+05. Extension Pop-up - Open Session         
+14. Open base64 string as PDF 
+
+
+## Feature Descriptions:
+
+
+#### 01. AutoTab
 
 Organises your tabs into coloured Tab Groups by Ensemble Instance for easy identification in the browser. Requires the instances object to have been built using the Instances tool in the extension options page.
 This feature can help you to organise Test and Production instances into groups in your browser to prevent confusion.
 
 
-#### 2. AutoTab - Namespaces
+#### 02. AutoTab - Namespaces
 
 Further organises your Tab Groups into different Namespaces. Each Namespace shares its colour with its parent Instance. Requires the instances object to have been built using the Instances tool in the extension options page.
 
 
-#### 3. Instance Header Colours
+#### 03. Instance Header Colours
 
 Colours your Instance headers for easier on-page identification of Instance. (So you don't get confused and accidentally change production when you're trying to test!) Requires the instances object to have been built using the Instances tool in the extension options page.
 This feature can help you to easily differentiate between Test and Production instances at a glance.
 
 
-#### 4. Message Search
+#### 04. Message Search
 
 Creates a context menu so you can right click on any hyperlinked message content in the Contents page in Message Viewer (Full Contents, not Raw) and create a search criterion based on that Message's schema. 
 This works using timings so may not be useful on slower computers.
@@ -96,31 +123,31 @@ Highlight the message content to search for that content. If you don't highlight
 Also works on the Visual Trace page in the Contents frame. Opens a new message search window and adds the criterion. Caution, the criterion from your previous Message Viewer search may automatically appear when opening Message Viewer from the Visual Trace page.
 
 
-#### 5. Open Session
+#### 05. Open Session
 
 Opens the Visual Trace for the provided session ID. Found on the pop-up when you click the extension icon. *You must be on the correct namespace for the session ID you wish to search for.
 Helpful for sharing a particular session with a team member or saving it for later. Potential use - save the session ID in the MSH segment of a HL7 message. Use this feature to navigate to the message quickly from a third party system.
 
 
-#### 6. Selected Messages Tab on Message Viewer Page
+#### 06. Selected Messages Tab on Message Viewer Page
 
 View the HL7 content of each selected message on the Message Viewer Page. 
 Makes comparing similar messages easier.
 
 
-#### 7. Share Link on Selected Messages Tab
+#### 07. Share Link on Selected Messages Tab
 
 Click the Share Link button to copy a link to your clipboard that will open all of the currently selected messages in a new window. 
 Useful for sharing a set of messages with a team member or saving a set of messages for later.
 
 
-#### 8. Full Trace Tab on Visual Trace  Page
+#### 08. Full Trace Tab on Visual Trace  Page
 
 Shows the HL7 content for all currently visible HL7 messages in the visual trace. 
 Useful for comparing input with output.
 
 
-#### 9. Import Message on HL7 Message Content Page
+#### 09. Import Message on HL7 Message Content Page
 
 Import a HL7 message from another open Message Content page. 
 Useful for comparing messages across environments. E.g. Test with Production
@@ -132,10 +159,14 @@ Copies the raw HL7 text of the message to your clipboard.
 Saves extra navigation to the RAW version of a message.
 
 
-#### 11. Expand HL7 Schema
+#### 11. Expand & Search HL7 Schema (was Expand HL7 Schema)
 
-Clicking on the first two columns of any HL7 message (full content view) will expand down the Segment so you can see the values next to their schema description. Clicking the expand all button available on some pages will expand all Segments.
-Can save you from having to navigate to the message's schema.
+Clicking on the first two columns of any HL7 message (full content view) will expand down the Segment so you can see the values next to their schema description. 
+
+When clicked the Search Schema button is replaced with a search bar and all schema for currently visible messages is expanded. Use the search bar to hide schema fields that don't match the current search text.
+Empty the search bar and press enter to close all expanded schema.
+
+Can save you from having to navigate to the message's schema and helps search through messages.
 
 
 #### 12. Compare HL7 Message Fields
@@ -197,12 +228,71 @@ When viewing any page where the extension has added multiple messages and there 
 Useful for comparing multiple messages at the same time.
 
 
+#### 21. Show Related Messages Button
+
+In the visual trace tab/FullTrace tab highlights messages in red that are directly related via the start or end icons on the SVG trace window to the currently selected message
+Hides messages in the FullTrace tab that are not related to this message
+
+*Note this is a best estimate based on the start and end position of each message. For simple traces this will work fine, however it may fall down on more complicated traces where multiple messages are triggered from the same processor to the same operation and responses are sent back.
+
+
+#### 22. Hide Unrelated Messages Button
+
+When the Show Related Messages button is active this button appears. When clicked it will attempt to hide any messages in the SVG window that aren't highlighted. 
+Intended to reduce visual clutter when viewing the SVG page.
+
+
+#### 23. FullTrace Messages Link to their SVG counterpart
+
+Messages in the FullTrace tab are now linked to their SVG equivalent in the Visual Trace frame. Click either and it clicks its partner. Hover over one and it and its partner will change colour slightly.
+
+This is to allow you to more easily see which message is which when there are dozens of messages. For example, an ADT feed sending to multiple systems.
+
+
+
 ## Updates
+
+
+##### 11/09/2023 Updates:
+
+__Feature added: Show Related button - Visual Trace page__
+
+Uses the selected message in the visual trace tab/FullTrace tab as a start location
+Highlights messages in red that are directly related via the start or end icons on the SVG trace window
+Hides messages in the FullTrace tab that are not related to this message
+*Note this is a best estimate based on the start and end position of each message. For simple traces this will work fine, however it may fall down on more complicated traces where multiple messages are triggered from the same processor to the same operation and responses are sent back.
+
+
+__Feature Added: Ctrl+Click message__
+
+Ctrl clicking on a message's background in the FullTrace tab will scroll that message into view in the visual trace window
+
+
+__General Visual Trace page features added:__
+
+Messages in the FullTrace tab are now linked to their SVG equivalent in the Visual Trace frame. Click either and it clicks its partner. However over one and it and its partner will change colour slightly.
+This is to allow you to more easily see which message is which when there are dozens of messages. For example, an ADT feed.
+
+
+__Feature Added: Searchable Schema (individual segments & all)__
+
+Expanding an individual segment to view its schema will now include a search bar. Type into this search bar to hide schema rows that don't include your typed text.
+Use the button bar's Search Schema button to expand all currently available schema and replace the Search Schema button with a Search Bar. Clear the search bar and press ENTER to close this Search Bar and the expanded schema.
+The individual segment's search bar won't appear when you click the button bar Search Schema button unless it was already open for that segment when you clicked Search Schema or you close and open an individual segment's Schema. Only the latest search made will apply to any segment with an individual search bar. When closing and reopening searches, no search is saved.
+
+
+__Bugfix__: Blue.css file .css extension missing. Not sure where it went but it's back now and I'll do my best to keep it here.
+__Bugfix__: Empty segments break the schema expansion. Now they will have to find another way to ruin your day.
+__BugFix__: New Search History item appears when deleting one. Sometimes a search would rise from the ashes when deleting an old search. This Phoenix has been dealt with by the appropriate wizards.
+__BugFix__: I thought changing the way buttons worked would be a good idea. It wasn't.
+__BugFix__: Searches without criteria break the Search History. Now, if you feel so inclined, you can search without criteria and it should still function as intended.
+
+
 
 
 ##### 22/08/2023 Updates:
 
-Feature Added: Share Search
+__Feature Added: Share Search__
 
 Creates a 'Share Search' button on the Message Viewer page. 
 When clicked, the current search criteria is saved in the Saved Searches and the current URL with the Saved Search's name appended as a query param is copied to the clipboard.
@@ -211,19 +301,19 @@ Saved Searches are the current datetime prepended with zz.
 Useful for sharing search results with colleages.
 
 
-Feature Added: Multiple Message Scroll
+__Feature Added: Multiple Message Scroll__
 
 When viewing any page where the extension has added multiple messages and there are horizontal scrollbars, hold CTRL and then scroll. This will scroll all message scrollbars at the same time.
 Useful for comparing multiple messages at the same time.
 
 
-BugFix: Search History no longer empties prematurely.
-BugFix: Search History no longer breaks the Message Viewer page's extension funcitonality if opened before first search is performed.
+__BugFix__: Search History no longer empties prematurely.
+__BugFix__: Search History no longer breaks the Message Viewer page's extension funcitonality if opened before first search is performed.
 
 
 ##### 06/06/2023 Updates:
 
-Feature added: Message Viewer Page - Extended Criteria Search History 
+__Feature added: Message Viewer Page - Extended Criteria Search History__
 
 Caches the Extended Criteria used when the Search button is clicked (up to 10 searches). Allows user to scroll through previous criteria and click them to add them back to the extended criteria section.
 Should help when performing similar searches across test and production environments. 

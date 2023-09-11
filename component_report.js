@@ -12,7 +12,7 @@ let poorlyBusinessComponents = []
 let ndTitle = document.getElementsByClassName("ndTitle");
 let reportTitle
 let reportDiv = document.createElement("div");
-let statusDiv = document.createElement("div");
+statusDiv = document.createElement("div");
 let completeDiv = document.createElement("div");
 let namespaces = []
 let namespaceTotal = 0

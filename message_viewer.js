@@ -1,18 +1,12 @@
 /// Message Viewer Content Script
-console.log("Trace Viewer Content Script");
-
+console.log("Message Viewer Content Script");
 
 let resultsDiv;
 let resultsMessages;
 let headerMessageTrace;
 let traceContent;
 
-
 window.addEventListener("load", function() {
-	
-	//Scrollbar test:
-	
-	
 	chrome.storage.local.get({
 		TimeFormat: false,
 		SortOrder: false,		
@@ -43,7 +37,7 @@ window.addEventListener("load", function() {
 		}
 	);
 	
-		// HEADERS & TRACE TAB CONTROLS
+	// HEADERS & TRACE TAB CONTROLS
 	resultsDiv = document.getElementById("resultsTable")
 	resultsMessages = resultsDiv.getElementsByTagName("tr")
 
@@ -59,8 +53,6 @@ window.addEventListener("load", function() {
 	headerBodyContents = document.getElementById("btn_3_82");
 	headerMessageTrace = document.getElementById("btn_4_82");
 
-
-
 	// BODY
 	tabGroupBody = document.getElementById("body_82");
 	headerDetails = document.getElementById("headerDetails");
@@ -75,30 +67,20 @@ window.addEventListener("load", function() {
 	selecteMessagesTab.id = "selecteMessagesTab";
 	selecteMessagesTab.style.height = "100%";
 	
-	
+	// Click behaviour for tabs
+	let fullTraceDisplayOffElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents, headerMessageTrace]
+	for (let i = 0; i < fullTraceDisplayOffElements.length; i++) {
+		fullTraceDisplayOffElements[i].addEventListener('click', () => {
+			fullTraceDisplayOff();
+		});
+	}
 	
 	tabGroupBody.appendChild(selecteMessagesTab);
-
-
-	headerHeaderDetails.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
-	headerBodyDetails.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
-	headerBodyContents.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
-
-	headerMessageTrace.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
 
 	fullTraceHeader.addEventListener('click', () => {
 		fullTraceDisplayOn();
 	})
 
-	
 	// This event listener triggers on row selection.
 	resultsDiv.addEventListener("change", function(e) {
 		
@@ -106,7 +88,7 @@ window.addEventListener("load", function() {
 		if (e.target.type == "checkbox") {
 			
 			let messageId = e.target.parentElement.parentElement.children[3].innerText;
-			console.log("messageID = ", messageId);
+			//console.log("messageID = ", messageId);
 			let messageSearchNumber = e.target.parentElement.parentElement.children[2].innerText;
 			let messageCreated = e.target.parentElement.parentElement.children[4].innerText;
 			let messageStatus = e.target.parentElement.parentElement.children[7].innerText;
@@ -174,11 +156,10 @@ window.addEventListener("load", function() {
 							shareButton(mainIframe.contentDocument);
 							textCompareBtn(mainIframe.contentDocument);
 							compareLegendButtons(mainIframe.contentDocument);
+							searchExpandedSchemaButton(mainIframe.contentDocument);
 							
 							mainIframe.style.width = "99%";
 							mainIframe.style.height = "95%";
-							/// BUTTON BAR CREATE?
-
 							
 							scrollBarStyle(mainIframe.contentDocument);
 							
@@ -197,8 +178,6 @@ window.addEventListener("load", function() {
 						messageDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
 					}
 					
-						
-
 					messageHeading = '<a style="color: red; padding: 10px"">#' + String(messageSearchNumber) + ' ' + messageCreated + '</a><br><a style="padding: 10px">' + messageStartOperation + ' ----> ' + messageEndOperation + '</a>';
 					messageDiv.innerHTML = messageHeading + messageDiv.innerHTML;
 					
@@ -206,16 +185,12 @@ window.addEventListener("load", function() {
 					buttonStyling(closeButton);
 					closeButton.style.backgroundColor = "pink";
 					closeButton.title = "Close";
-					closeButton.style.right = "15px";
 					closeButton.innerText = "x";
-					closeButton.style.marginRight = "5px";
-					closeButton.style.top = "5px";
-					closeButton.style.position = "absolute";
+					closeButton.style.marginLeft = "-35px";
 					closeButton.style.zIndex = "1"
 					
-					
 					closeButton.addEventListener('click', () => {
-						closeButton.parentNode.style.display = "none";
+						closeButton.parentNode.parentNode.style.display = "none";
 						// Uncheck box?
 						// remove message from messageArray and sortedMessageArray
 						
@@ -233,20 +208,17 @@ window.addEventListener("load", function() {
 						
 					})
 					
-					messageDiv.appendChild(closeButton);
-					
-					let minimiseBtn = minimiseButton(mainIframe.contentDocument, messageDiv);
-					messageDiv.appendChild(minimiseBtn);
-					
 					messageArray.push(message);
-
 					messageDiv.id = messageId;
-					
 					messageAppend(message);
 					
-					let copyRawTextBtn = copyRawTextButton(mainIframe.contentDocument, messageId);
-
-					messageDiv.appendChild(copyRawTextBtn);
+					// Add buttons to messageDiv
+					let messageBtnBar = messageButtonBar(mainIframe.contentDocument, messageDiv.id)
+					messageDiv.appendChild(messageBtnBar);
+					messageBtnBar.appendChild(closeButton);
+					//closeButtonHide(mainIframe.contentDocument, messageBtnBar);
+					minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
+					copyRawTextButton(mainIframe.contentDocument, messageId, messageBtnBar);
 										
 					if (iframe != mainIframe) {
 						iframe.parentNode.removeChild(iframe);
@@ -259,13 +231,13 @@ window.addEventListener("load", function() {
 				  return obj.messageNumber === parseInt(messageId);
 				})
 				messageDiv[0].object.parentElement.removeChild(messageDiv[0].object);
-				console.log("message array, pre deleted", messageArray);
+				//console.log("message array, pre deleted", messageArray);
 				
 				// Remove from the array
 				messageArray = messageArray.filter(obj => {
 				  return obj.messageNumber !== parseInt(messageId);
 				})
-				console.log("message array, post deleted", messageArray);
+				//console.log("message array, post deleted", messageArray);
 				
 			}
 		}	
@@ -274,11 +246,11 @@ window.addEventListener("load", function() {
 
 });
 
+
 function messageAppend(message) {
 	/// Appends message to the mainIframe
 	
 	syncScrolling(mainIframe.contentDocument, message.object);
-	
 	
 	// Sort the message array
 	if (messageArray.length > 1) {
@@ -314,7 +286,6 @@ function messageAppend(message) {
 }
 
 
-
 function fullTraceDisplayOff() {
 	/// Switches the selecteMessagesTab tab off
 	selecteMessagesTab.style.display = "none";
@@ -335,40 +306,3 @@ function fullTraceDisplayOn() {
 	headerBodyContents.className = "tabGroupButtonOff";
 	traceContent.className = "tabGroupButtonOff";
 }
-
-
-
-
-
-/*
-/// RESIZE WINDOW EXPERIMENT
-
-var isResizing = false,
-    lastDownX = 0;
-
-$(function () {
-    var container = $('#container'),
-        left = $('#left_panel'),
-        right = $('#right_panel'),
-        handle = $('#drag');
-
-    handle.on('mousedown', function (e) {
-        isResizing = true;
-        lastDownX = e.clientX;
-    });
-
-    $(document).on('mousemove', function (e) {
-        // we don't want to do anything if we aren't resizing.
-        if (!isResizing) 
-            return;
-        
-        var offsetRight = container.width() - (e.clientX - container.offset().left);
-
-        left.css('right', offsetRight);
-        right.css('width', offsetRight);
-    }).on('mouseup', function (e) {
-        // stop resizing
-        isResizing = false;
-    });
-});
-*/

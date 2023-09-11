@@ -46,7 +46,7 @@ function deleteCache() {
 }
 
 // Save cache to local storage
-function saveCache() {
+function saveCache(skipCurrent) {
 
 	/// Copy the criteria section
 	let extendedCriteriaTable = document.getElementById("extendedCriteriaTable");
@@ -114,8 +114,11 @@ function saveCache() {
 				}
 		}
 		criterionCache.unshift(currentCriteriaObject);
-		savedCache.unshift(currentCriteriaObject);
-		
+		if (skipCurrent) {
+			// Used when deleting from cache
+		} else {
+			savedCache.unshift(currentCriteriaObject);
+		}
 		//console.log("criterionCache, current object added", criterionCache);
 		//console.log("saveCache", savedCache);
 		chrome.storage.local.set({CriterionCache: savedCache,}, function() {
@@ -195,20 +198,23 @@ function createModal() {
 		modalContent.style.overflow = "auto";
 		modalContent.innerHTML = "<h3>Extended Criteria Search History</h3>";
 		modal.appendChild(modalContent);
-
+		
+		
+		let btnBar = messageButtonBar(document, "modalBtnBar");
+		
 		// Adds close button that hides parent modal when clicked
-		let closeButton = closeButtonHide(document);
+		let closeButton = closeButtonHide(document, btnBar);
 		closeButton.addEventListener('click', () => {
-			closeButton.parentElement.parentElement.style.display = "none";
+			closeButton.parentElement.parentElement.parentElement.style.display = "none";
 		});
-		modalContent.appendChild(closeButton);
+		modalContent.appendChild(btnBar);
 
 		// Iterate through criterionCache and create divs
 		for (let i = 0; i < criterionCache.length; i++) {
 			globalIncrement++
-			//console.log(criterionCache[i]); /// Currently no DIV here? Why???
+
 			modalContent.appendChild(criterionCache[i].div);
-			//console.log("criterionCache[", i,"]",criterionCache[i]);
+
 			if (criterionCache[i].div.style.margin != "20px") {
 				criterionCache[i].div.style.border = "1px grey solid";
 				criterionCache[i].div.style.borderRadius = "5px";
@@ -217,19 +223,22 @@ function createModal() {
 				criterionCache[i].div.style.padding = "10px";
 				criterionCache[i].div.style.position = "relative";
 				criterionCache[i].div.className = "criterion_" + String(globalIncrement);
+				criterionCache[i].div.id = criterionCache[i].div.className
+				
+				let criterionBtnBar = messageButtonBar(document, criterionCache[i].div.id);
 				
 				// Add close buttons to crieterion elements
-				let closeButton = closeButtonDelete(document);
+				let closeButton = closeButtonDelete(document, criterionBtnBar);
 				closeButton.addEventListener('click', () => {			
-					//console.log("criterionCache before delete",criterionCache);
+					console.log("criterionCache before delete",criterionCache);
 					for (let x = 0; x < criterionCache.length; x++) {
-						if (closeButton.parentElement.childNodes[1].id.includes(criterionCache[x].datetime.raw)) {
+						if (criterionBtnBar.parentElement.childNodes[1].id.includes(criterionCache[x].datetime.raw)) {
 							//skip, the criterion object is identical to one in the cache							
-							//console.log("DELETE MATCH!");
+							console.log("DELETE MATCH!");
 							criterionCache.splice(x,1);
-							//console.log("criterionCache after delete",criterionCache);
+							console.log("criterionCache after delete",criterionCache);
 							// Save changes
-							saveCache();
+							saveCache(true);
 							break
 						} else {
 
@@ -237,7 +246,7 @@ function createModal() {
 					}
 					
 				})
-				criterionCache[i].div.appendChild(closeButton);
+				criterionCache[i].div.appendChild(criterionBtnBar);
 			}
 			//console.log("criterionCache[", i,"].div.childNodes", criterionCache[i].div.childNodes);
 			// Add hover and click behaviour to criterion elements
@@ -245,22 +254,27 @@ function createModal() {
 				//console.log("criterionCache[", i,"].div.childNodes[", x, criterionCache[i].div.childNodes[x]);
 				if (criterionCache[i].div.childNodes[x].tagName == "TABLE") {
 					//criterionCache[i].div.childNodes[x].style.background = "red";
-					for (let z = 0; z < criterionCache[i].div.childNodes[x].childNodes[0].childNodes.length; z++) {
-						criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].style.background = "rgba(255,255,255,1)";
-						criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].style.cursor = "pointer";
-						
-						criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].addEventListener("mouseenter", function(event) {
-							addHoverLogic(event.target, event.target);
-						});
-						
-						criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].addEventListener("mouseleave", function(event) {
-							removeHoverLogic(event.target, event.target);
-						});
-						
-						criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].addEventListener("click", function(event) {
-							addClickLogic(event.target);
-						});
-						
+					console.log(criterionCache[i].div.childNodes[x]);
+					try {
+						for (let z = 0; z < criterionCache[i].div.childNodes[x].childNodes[0].childNodes.length; z++) {
+							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].style.background = "rgba(255,255,255,1)";
+							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].style.cursor = "pointer";
+							
+							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].addEventListener("mouseenter", function(event) {
+								addHoverLogic(event.target, event.target);
+							});
+							
+							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].addEventListener("mouseleave", function(event) {
+								removeHoverLogic(event.target, event.target);
+							});
+							
+							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].addEventListener("click", function(event) {
+								addClickLogic(event.target);
+							});
+							
+						}
+					} catch {
+						// Blank search conditions
 					}
 				}
 			}
