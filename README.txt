@@ -48,7 +48,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 
 ## Features:
 
-[1. AutoTab](/#auto-tab)
+[01. AutoTab](#auto-tab)
 2. AutoTab - Namespaces
 3. Instance Header Colours
 4. Message Search
@@ -71,7 +71,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 
 
 
-#### [1. AutoTab](#auto-tab)
+#### <a name="auto-tab">01. AutoTab</a>
 
 Organises your tabs into coloured Tab Groups by Ensemble Instance for easy identification in the browser. Requires the instances object to have been built using the Instances tool in the extension options page.
 This feature can help you to organise Test and Production instances into groups in your browser to prevent confusion.
