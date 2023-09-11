@@ -16,3 +16,8 @@
     background: rgb(var(--main-colour)) !important;
 }
 
+/* for iris */
+#header {
+	background: rgb(var(--main-colour)) !important;
+}
+
