@@ -263,16 +263,11 @@ Hides messages in the FullTrace tab that are not related to this message
 *Note this is a best estimate based on the start and end position of each message. For simple traces this will work fine, however it may fall down on more complicated traces where multiple messages are triggered from the same processor to the same operation and responses are sent back.
 
 
-__Feature Added: Ctrl+Click message__
-
-Ctrl clicking on a message's background in the FullTrace tab will scroll that message into view in the visual trace window
-
-
 __General Visual Trace page features added:__
 
 Messages in the FullTrace tab are now linked to their SVG equivalent in the Visual Trace frame. Click either and it clicks its partner. However over one and it and its partner will change colour slightly.
 This is to allow you to more easily see which message is which when there are dozens of messages. For example, an ADT feed.
-
+Ctrl clicking on a message's background in the FullTrace tab will scroll that message into view in the visual trace window
 
 __Feature Added: Searchable Schema (individual segments & all)__
 
