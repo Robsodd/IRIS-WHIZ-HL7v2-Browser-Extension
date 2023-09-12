@@ -264,6 +264,9 @@ Legend also now styled a bit better. May be tough to see on smaller screens but 
 To update, copy your instance object from the options screen, download the latest version and paste your instance object back into the options page.
 
 
+__Updated Name__: Thought it needed something a touch shorter. Did a picture and an Icon. It'll do.
+
+
 ##### 11/09/2023 Updates:
 
 Version 1.7.0
