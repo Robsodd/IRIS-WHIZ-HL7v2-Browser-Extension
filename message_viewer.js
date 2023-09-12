@@ -68,9 +68,16 @@ window.addEventListener("load", function() {
 	selecteMessagesTab.style.height = "100%";
 	
 	// Click behaviour for tabs
-	let fullTraceDisplayOffElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents, headerMessageTrace]
-	for (let i = 0; i < fullTraceDisplayOffElements.length; i++) {
-		fullTraceDisplayOffElements[i].addEventListener('click', () => {
+	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents, headerMessageTrace]
+	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents, traceContent] // Order must match above array
+	
+	for (let i = 0; i < fullTraceDisplayTabElements.length; i++) {
+		fullTraceDisplayTabElements[i].addEventListener('click', (e) => {
+			console.log("ELEM CLICKED: ", fullTraceDisplayTabElements[i], fullTraceDisplayBodyElements[i]);
+			console.log("currentTarget", e.currentTarget);
+			e.currentTarget.setAttribute("class", "tabGroupButtonOn");
+			fullTraceDisplayBodyElements[i].style.display = "";
+			// THE RELATED DIV .style.display = "";
 			fullTraceDisplayOff();
 		});
 	}
@@ -304,5 +311,5 @@ function fullTraceDisplayOn() {
 	headerHeaderDetails.className = "tabGroupButtonOff";
 	headerBodyDetails.className = "tabGroupButtonOff";
 	headerBodyContents.className = "tabGroupButtonOff";
-	traceContent.className = "tabGroupButtonOff";
+	headerMessageTrace.className = "tabGroupButtonOff"; //.setAttribute("class", "tabGroupButtonOff");
 }

@@ -44,6 +44,7 @@ function fullTraceDisplayOn() {
 	headerBodyContents.className = "tabGroupButtonOff";
 }
 
+
 /// TRACE BODY:
 let iframeCounter = 0;
 let messageIframesLoaded = 0;
@@ -77,9 +78,12 @@ window.addEventListener("load", function() {
 	
 	fullTrace.appendChild(newiframe)
 	
+	
 	fullTraceHeader.addEventListener('click', () => {
 		fullTraceDisplayOn();
 	})
+	
+	/*
 	headerHeaderDetails.addEventListener('click', () => {
 		fullTraceDisplayOff();
 	});
@@ -89,6 +93,22 @@ window.addEventListener("load", function() {
 	headerBodyContents.addEventListener('click', () => {
 		fullTraceDisplayOff();
 	});
+	*/
+	
+		// Click behaviour for tabs
+	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents]
+	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents] // Order must match above array
+	
+	for (let i = 0; i < fullTraceDisplayTabElements.length; i++) {
+		fullTraceDisplayTabElements[i].addEventListener('click', (e) => {
+			console.log("ELEM CLICKED: ", fullTraceDisplayTabElements[i], fullTraceDisplayBodyElements[i]);
+			console.log("currentTarget", e.currentTarget);
+			e.currentTarget.setAttribute("class", "tabGroupButtonOn");
+			fullTraceDisplayBodyElements[i].style.display = "";
+			// THE RELATED DIV .style.display = "";
+			fullTraceDisplayOff();
+		});
+	}
 	
 	fillFullTraceTab();
 	

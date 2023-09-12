@@ -1,5 +1,5 @@
 ***
-VERSION 1.7.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION 1.7.1 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -252,8 +252,21 @@ This is to allow you to more easily see which message is which when there are do
 
 ## Updates
 
+##### 12/09/2023 Updates:
+
+Version 1.7.1
+
+__BugFix__: Header/Body/ContentsTrace tabs does not reappear if they were the last thing and first thing clicked on after clicking on Selected Messages/FullTrace tabs. This is fixed. Hoozah! Thanks for the feedback Anonymous reviewer
+
+__Updated Legend__: Legend now closes on most clicks outside/on the legend. Some pages contain other iframes where it's not possible for clicks to close it. I think it's good enough as is. Hide Legend button still appears for ease of use. 
+Legend also now styled a bit better. May be tough to see on smaller screens but I think the ease of use outweighs this issue. Again, thanks for the feedback Anonymous reviewer! Don't be afraid to update your review :D
+
+To update, copy your instance object from the options screen, download the latest version and paste your instance object back into the options page.
+
 
 ##### 11/09/2023 Updates:
+
+Version 1.7.0
 
 __Feature added: Show Related button - Visual Trace page__
 
@@ -263,11 +276,16 @@ Hides messages in the FullTrace tab that are not related to this message
 *Note this is a best estimate based on the start and end position of each message. For simple traces this will work fine, however it may fall down on more complicated traces where multiple messages are triggered from the same processor to the same operation and responses are sent back.
 
 
+__Feature Added: Ctrl+Click message__
+
+Ctrl clicking on a message's background in the FullTrace tab will scroll that message into view in the visual trace window
+
+
 __General Visual Trace page features added:__
 
 Messages in the FullTrace tab are now linked to their SVG equivalent in the Visual Trace frame. Click either and it clicks its partner. However over one and it and its partner will change colour slightly.
 This is to allow you to more easily see which message is which when there are dozens of messages. For example, an ADT feed.
-Ctrl clicking on a message's background in the FullTrace tab will scroll that message into view in the visual trace window
+
 
 __Feature Added: Searchable Schema (individual segments & all)__
 
@@ -286,6 +304,8 @@ __BugFix__: Searches without criteria break the Search History. Now, if you feel
 
 
 ##### 22/08/2023 Updates:
+
+Version 1.6.0
 
 __Feature Added: Share Search__
 

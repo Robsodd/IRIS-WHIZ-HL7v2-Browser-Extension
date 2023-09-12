@@ -684,47 +684,57 @@ function shareButton(Document) {
 
 
 function compareLegendButtons(Document) {
-	let compareLegendDiv = Document.createElement("div");
 	
+	let compareLegendDiv
+	let showLegendBtn
+	let hideLegendBtn
+	
+	compareLegendDiv = Document.createElement("div");
+		
 
 	let legendTitle = Document.createElement("div");
 	legendTitle.innerText = "TEXT COMPARE LEGEND";
 	legendTitle.style.color = "white";
 	legendTitle.style.backgroundColor = "black";
+	legendTitle.style.padding = "8px";
 	
 	let legendExactMatch = Document.createElement("div");
 	legendExactMatch.innerText = "Field name match, value match";
 	legendExactMatch.style.color = "white";
 	legendExactMatch.style.backgroundColor = "green";
+	legendExactMatch.style.padding = "8px";
 
 	let legendCopyMatch = Document.createElement("div");
 	legendCopyMatch.innerText = "Field name mismatch, value match";
 	legendCopyMatch.style.color = "blue";
 	legendCopyMatch.style.backgroundColor = "lightgreen";
+	legendCopyMatch.style.padding = "8px";
 
 	let legendNoMatch = Document.createElement("div");
 	legendNoMatch.innerText = "Field name match - value mismatch";
 	legendNoMatch.style.color = "white";
 	legendNoMatch.style.backgroundColor = "red";
+	legendNoMatch.style.padding = "8px";
 
 	let legendPartialMatch = Document.createElement("div");
 	legendPartialMatch.innerText = "Field name mismatch - value partial match";
 	legendPartialMatch.style.color = "blue";
 	legendPartialMatch.style.backgroundColor = "yellow";
+	legendPartialMatch.style.padding = "8px";
 	
 	let legendSegmentMatch = Document.createElement("div");
 	legendSegmentMatch.innerText = "Segment name match - field raw text match";
 	legendSegmentMatch.style.color = "blue";
 	legendSegmentMatch.style.backgroundColor = "white";
-	legendSegmentMatch.style.border = "3px solid green";
-	legendSegmentMatch.style.marginTop = "3px";
+	legendSegmentMatch.style.border = "6px solid green";
+	legendSegmentMatch.style.padding = "4px";
 
 	let legendSegmentMisMatch = Document.createElement("div");
 	legendSegmentMisMatch.innerText = "Segment name match - field raw text mismatch";
 	legendSegmentMisMatch.style.color = "blue";
 	legendSegmentMisMatch.style.backgroundColor = "white";
-	legendSegmentMisMatch.style.border = "3px solid red";
-	legendSegmentMisMatch.style.marginTop = "3px";
+	legendSegmentMisMatch.style.border = "6px solid red";
+	legendSegmentMisMatch.style.padding = "4px";
 	
 	compareLegendDiv.appendChild(legendTitle);	
 	compareLegendDiv.appendChild(legendExactMatch);
@@ -736,24 +746,30 @@ function compareLegendButtons(Document) {
 
 	compareLegendDiv.style.position = "absolute";
 	compareLegendDiv.style.display = "none";
-
-	compareLegendDiv.style.bottom = "-130";
+	
+	compareLegendDiv.style.backgroundColor = "#ffffff";
+	compareLegendDiv.style.border = "5px black solid";
+	
+	compareLegendDiv.style.top = "10px";
 	compareLegendDiv.style.right = "0";
 	compareLegendDiv.style.zIndex = "3";
+	compareLegendDiv.style.overflow = "visible";
+	
 		
-	let hideLegendBtn = Document.createElement('btn');
-	let showLegendBtn = Document.createElement('btn');
+	hideLegendBtn = Document.createElement('btn');
+	showLegendBtn = Document.createElement('btn');
 		
 	buttonStyling(hideLegendBtn);
 	hideLegendBtn.style.backgroundColor = "gray";
 	hideLegendBtn.style.color = "white";
-	hideLegendBtn.style.margin = "5px"
-	hideLegendBtn.style.position = "sticky"
+	hideLegendBtn.style.margin = "10px"
+	hideLegendBtn.style.display = "inline-table"
 	hideLegendBtn.innerText = "Hide Legend";
 	hideLegendBtn.addEventListener('click', () => {
 		compareLegendDiv.style.display = "none";
 		showLegendBtn.style.display = "";
 	})
+
 
 	buttonStyling(showLegendBtn);
 	showLegendBtn.style.backgroundColor = "gray";
@@ -774,8 +790,24 @@ function compareLegendButtons(Document) {
 	let buttonBar = Document.getElementById("buttonBar");
 	buttonBar.appendChild(compareLegendDiv);
 	buttonBar.appendChild(liShowLegendBtn);
+	showLegendBtn.id = "showLegendBtn"
+	Document.addEventListener("click", function(e) {
+		hideLegend(e);
+	})
+	document.addEventListener("click", function(e) {
+		hideLegend(e);
+	})
+	
+	function hideLegend(e) {
+		if (e.target == showLegendBtn) {
+			// Do nothing
+		} else if (compareLegendDiv.style.display === "") {
+			hideLegendBtn.click();
+		}
+	}
 	
 }
+
 
 
 
