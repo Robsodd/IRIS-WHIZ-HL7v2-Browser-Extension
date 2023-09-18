@@ -49,50 +49,50 @@ Finally, enable your desired features using the checkbox form at the top of this
 ## Features:
 
 #### Browser Based 
-01. AutoTab
-02. AutoTab - Namespaces
-03. Instance Header Colours
-15. Add Bookmarks
+01 AutoTab
+02 AutoTab - Namespaces
+03 Instance Header Colours
+15 Add Bookmarks
 
 
 #### Right Click Context Menu
-04. Message Search
-14. Open base64 string as PDF 
+04 Message Search
+14 Open base64 string as PDF 
 
 
 #### Message Viewer Page
-06. Selected Messages Tab
-07. Share Link on Selected Messages Tab
-16. Order by Oldest
-17. Complete Date
-18. Extended Criteria Search History 
-19. Share Search
+06 Selected Messages Tab
+07 Share Link on Selected Messages Tab
+16 Order by Oldest
+17 Complete Date
+18 Extended Criteria Search History 
+19 Share Search
 
 
 #### Visual Trace Page
-08. Full Trace Tab
-21. Show Related Messages Button
-22. Hide Unrelated Messages Button
-23. FullTrace Messages Link to their SVG counterpart
+08 Full Trace Tab
+21 Show Related Messages Button
+22 Hide Unrelated Messages Button
+23 FullTrace Messages Link to their SVG counterpart
 
 #### Message Content Page
-09. Import HL7 Message from another Message Content Page
+09 Import HL7 Message from another Message Content Page
 
 
 #### Various Pages (feature exists on more than one page)
-10. Copy Raw HL7 Text
-11. Expand & Search HL7 Schema   (was Expand HL7 Schema)
-12. Compare HL7 Message Fields
-20. Multiple Message Scroll
+10 Copy Raw HL7 Text
+11 Expand & Search HL7 Schema   (was Expand HL7 Schema)
+12 Compare HL7 Message Fields
+20 Multiple Message Scroll
 
 
 #### Home Page 
-13. Business Component Report
+13 Business Component Report
 
 
 #### Extension Pop-up
-05. Extension Pop-up - Open Session         
-14. Open base64 string as PDF 
+05 Extension Pop-up - Open Session         
+14 Open base64 string as PDF 
 
 
 ## Feature Descriptions:
