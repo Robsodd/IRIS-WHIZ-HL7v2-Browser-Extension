@@ -34,12 +34,13 @@ function copyRaw(messageNumber) {
 	iframe.style.display = "none";
 	iframe.style.position = "fixed";
 	iframe.style.top = "0px";
+	iframe.setAttribute("sandbox", "allow-same-origin");
 	iframe.id = String(messageNumber) + "RAWTEXT";
 	
 	iframe.addEventListener("load", function() {
 		let copyText = iframe.contentDocument.querySelector("body > pre").innerText;
 		const textArea = document.createElement("textarea");
-		
+		console.log("copytext",copyText);
 		textArea.value = copyText;
 		document.body.appendChild(textArea);
 

@@ -19,7 +19,8 @@ let namespaceTotal = 0
 let namespaceSearchResponse
 let namespaceCount = 0
 
-for (let i = 0; i < ndTitle.length; i++) {
+let ndTitleLength1 = ndTitle.length;
+for (let i = 0; i < ndTitleLength1; i++) {
 	if (ndTitle[i].innerText == "Did you know?") {
 		reportTitle = ndTitle[i];
 		reportTitle.innerText = "Erroring Components:";
@@ -61,8 +62,9 @@ function extractProductionStatuses(iframe) {
 		let namespaceSectionHeader = document.createElement("div");
 		
 		namespaceSectionHeader.addEventListener("click", function() {
-			iframe.style.display = ""
-			for (let x = 0; x < iframe.iframeComponents.length; x ++) {
+			iframe.style.display = "";
+			let length = iframe.iframeComponents.length;
+			for (let x = 0; x < length; x ++) {
 				iframe.iframeComponents[x].div.remove();
 				poorlyBusinessComponents = poorlyBusinessComponents.filter(function(item) {
 					return item !== iframe.iframeComponents[x]
@@ -81,8 +83,8 @@ function extractProductionStatuses(iframe) {
 		
 		reportDiv.appendChild(namespaceSectionHeader);
 	}
-	
-	for (let x = 0; x < ellipses.length; x ++) {
+	let ellipsesLength = ellipses.length;
+	for (let x = 0; x < ellipsesLength; x ++) {
 		
 		ellipses[x].componentName = ellipses[x].previousSibling.innerHTML
 		let statusObject = getStatus(ellipses[x])
@@ -187,7 +189,8 @@ function attachComponent(component) {
 
 function getInstanceNumber(instanceDomain) {
 	/// Get instance number so you don't have to iterate through every time
-	for (var i = 0; i < instances.length; i ++ ){
+	let instancesLength = instances.length;
+	for (var i = 0; i < instancesLength; i ++ ){
 		if (instanceDomain.includes(instances[i].url)) {
 			return i;
 		}
@@ -255,7 +258,8 @@ function ensemble(ndDidYou) {
 	ndDidYou.appendChild(reportDiv);
 
 	links = document.getElementsByClassName("ndLink");
-	for (let x = 0; x < links.length; x ++) { 
+	let linksLength = links.length;
+	for (let x = 0; x < linksLength; x ++) { 
 		if (links[x].href.includes("EnsPortal.ProductionConfig.zen") && (links[x].parentNode.previousSibling.previousSibling.innerText.includes("Running"))) {
 			namespaceTotal ++
 			namespaces.push({
@@ -266,8 +270,8 @@ function ensemble(ndDidYou) {
 		}
 	}
 
-	
-	for (let i = 0; i < namespaces.length; i ++) {
+	let namespacesLength = namespaces.length;
+	for (let i = 0; i < namespacesLength; i ++) {
 		namespaceCount ++
 		let iframe = document.createElement("iframe");	
 		iframe.iframeComponents = []
@@ -305,8 +309,8 @@ function ensemble(ndDidYou) {
 function iris() {
 	// Iris
 	ndTitle = document.getElementsByClassName("titleRow");
-	
-	for (let i = 0; i < ndTitle.length; i++) {
+	let ndTitleLength = ndTitle.length;
+	for (let i = 0; i < ndTitleLength; i++) {
 		if (ndTitle[i].innerText == "Did you know?") {
 			reportTitle = ndTitle[i];
 			reportTitle.innerText = "Erroring Components:";
@@ -336,7 +340,8 @@ function iris() {
 	linksContainer = document.getElementById("messagePanel");
 	links = linksContainer.getElementsByClassName("ndLink");
 	console.log("LINKS:", links);
-	for (let x = 0; x < links.length; x ++) { 
+	let linksLength = links.length;
+	for (let x = 0; x < linksLength; x ++) { 
 		if (links[x].href.includes("EnsPortal.ProductionConfig.zen") && (links[x].parentNode.previousElementSibling.innerText.includes("Running"))) {
 			namespaceTotal ++
 			namespaces.push({
@@ -347,8 +352,8 @@ function iris() {
 		}
 	}
 
-
-	for (let i = 0; i < namespaces.length; i ++) {
+	let namespacesLength = namespaces.length; 
+	for (let i = 0; i < namespacesLength; i ++) {
 		namespaceCount ++
 		let iframe = document.createElement("iframe");	
 		iframe.iframeComponents = []
@@ -402,7 +407,8 @@ function irisExtractProductionStatuses(iframe) {
 		
 		namespaceSectionHeader.addEventListener("click", function() {
 			iframe.style.display = ""
-			for (let x = 0; x < iframe.iframeComponents.length; x ++) {
+			let iframeComponentsLength = iframe.iframeComponents.length;
+			for (let x = 0; x < iframeComponentsLength; x ++) {
 				iframe.iframeComponents[x].div.remove();
 				poorlyBusinessComponents = poorlyBusinessComponents.filter(function(item) {
 					return item !== iframe.iframeComponents[x]
@@ -421,8 +427,8 @@ function irisExtractProductionStatuses(iframe) {
 		
 		reportDiv.appendChild(namespaceSectionHeader);
 	}
-	
-	for (let x = 0; x < ellipses.length; x ++) {
+	let ellipsesLength = ellipses.length;
+	for (let x = 0; x < ellipsesLength; x ++) {
 		
 		ellipses[x].componentName = ellipses[x].previousSibling.innerHTML
 		let statusObject = getStatus(ellipses[x])

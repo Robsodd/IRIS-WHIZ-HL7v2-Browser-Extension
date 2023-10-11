@@ -5,7 +5,6 @@
 <title>My Test Extension Options</title>
 <link rel="stylesheet" href="options.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-<script type="module" src="https://md-block.verou.me/md-block.js"></script>
 </head>
 <body>
 
@@ -42,7 +41,13 @@
 					<h3>Other Features:</h3>
 					<input type="checkbox" name="HomepageReports" id="HomepageReports" value="HomepageReports">
 					<label for="HomepageReports">Home Page Reports</label> - <i>Loads poorly business components on the homepage of each namespace.</i><br>
-					
+					<input type="checkbox" name="ButtonsShow" id="ButtonsShow" value="ButtonsShow">
+					<label for="ButtonsShow">Show Buttons</label> - <i>Default to show the buttons in the button bar so you don't have to click the IRIS Whizz button.</i><br>
+					<input type="text" name="BookmarkFolderName" id="BookmarkFolderName" value="TIE Links">
+					<label for="HomepageReports">Bookmark Folder Name</label> - <i>Set the name of the bookmark folder for your instances.</i><br>
+					<input type="text" name="ChatGPTKey" id="ChatGPTKey" value="">
+					<label for="ChatGPTKey">Generate Message Chat GPT Key</label> - <i>Add your Chat GPT API Key here to enable the Chat GPT Generate HL7 Message box when testing a production component.</i><br>
+	
 			  </div>
 			  <!-- <input type="checkbox" name="ContextMenu" id="ContextMenu" value="ContextMenu">
 			   <label for="ContextMenu">ContextMenu</label> - <i>enables message search via right click context menu on 'Full Contents' message viewer </i><br><br> -->
@@ -165,9 +170,7 @@
 		<div class="form-container">
 			<div class="form-group">
 				<h2 class="title">ReadMe File:</h2>
-				<md-block>
-				<div ><md-block id="readme"></md-block></div>
-				
+				<div id="readme"></div>
 			</div>
 		</div>
 	</div>

@@ -1,10 +1,13 @@
 /// Javascript Utils
 console.log("Utils loaded");
 
+let settings
+
 
 let currentUrl = window.location.href;
+
 let stubUrl;
-let currentNamespace;
+let currentURLBeforeCSP
 
 let messageArray = [];
 let sortedMessageArray = [];
@@ -24,8 +27,9 @@ let bodyContents;
 
 try {
 	stubUrl = currentUrl.split("EnsPortal");
+	currentURLBeforeCSP = currentURL.split("/csp/");
 } catch (e) {
-	console.log("Error", e);
+	//console.log("Error", e);
 }
 
 let schemaTable;
@@ -35,8 +39,10 @@ try {
 	schemaTable = document.querySelector("body > table:nth-child(1) > tbody");
 	schemaTableStyle = document.querySelector("body > table:nth-child(1)");
 } catch (e) {
-	console.log("Error", e);
+	//console.log("Error", e);
 }
+
+
 
 let statusDiv;
 
@@ -109,6 +115,33 @@ enableTextCompareEvent = document.createEvent("HTMLEvents");
 enableTextCompareEvent.initEvent("enableTextCompare", true, true);
 enableTextCompareEvent.eventName = "enableTextCompare";
 
+
+let searchSegmentsEvent; // The custom event that will be created
+searchSegmentsEvent = document.createEvent("HTMLEvents");
+searchSegmentsEvent.initEvent("searchSegments", true, true);
+searchSegmentsEvent.eventName = "searchSegments";
+
+
+let searchExpandedSchemaEvent; // The custom event that will be created
+searchExpandedSchemaEvent = document.createEvent("HTMLEvents");
+searchExpandedSchemaEvent.initEvent("searchExpandedSchema", true, true);
+searchExpandedSchemaEvent.eventName = "searchExpandedSchema";
+
+
+// EVENT FOR TRIGGERING THE categoryList script
+let categoryListEvent; // The custom event that will be created
+categoryListEvent = document.createEvent("HTMLEvents");
+categoryListEvent.initEvent("categoryList", true, true);
+categoryListEvent.eventName = "categoryList";
+
+// EVENT FOR TRIGGERING THE category list selection
+let categoryListSelectionEvent; // The custom event that will be created
+categoryListSelectionEvent = document.createEvent("HTMLEvents");
+categoryListSelectionEvent.initEvent("categoryListSelection", true, true);
+categoryListSelectionEvent.eventName = "categoryListSelection";
+
+
+
 function buttonStyling(buttonObject) {
 	/// Default button styling
 	buttonObject.style.zIndex = "2";
@@ -137,11 +170,19 @@ function messageStyling(object){
 // Button bar for individual messages
 function messageButtonBar(Document, messageId) {
 	let messageBtnBar = Document.createElement('div');
+	//messageBtnBar.style.backgroundColor = "black";
 	messageBtnBar.style.position = "sticky";
 	messageBtnBar.style.bottom = "100%";
 	messageBtnBar.style.left = "100%";	
 	messageBtnBar.style.width = "max-content";
 	messageBtnBar.id = "buttonBar" + String(messageId);
+	
+	//messageBtnBar.addEventListener("click", function(e) {
+		//for (let i = 0; i < self.childElementCount; i++) {
+			//self.children[i].style.display = "";
+		//}
+	//})
+	
 	return messageBtnBar
 }
 
@@ -149,12 +190,8 @@ function messageButtonBar(Document, messageId) {
 function closeButtonHide(Document, messageBtnBar) {
 	
 	let closeBtnHide = Document.createElement('btn');
-	closeBtnHide.style.backgroundColor = "pink";
-	closeBtnHide.style.paddingLeft = "3px";
-	closeBtnHide.style.paddingRight = "3px";
-	closeBtnHide.style.border = "solid 1px black";
-	closeBtnHide.style.cursor = "pointer";
-	closeBtnHide.style.marginLeft = "-35px";
+	closeBtnHide.classList.add("closeBtnHide");
+	
 	closeBtnHide.title = "Close";
 	closeBtnHide.innerText = "x";
 	closeBtnHide.addEventListener('click', () => {
@@ -168,14 +205,8 @@ function closeButtonHide(Document, messageBtnBar) {
 function closeButtonDelete(Document, messageBtnBar) {
 	
 	let closeBtnDelete = Document.createElement('btn');
-	closeBtnDelete.style.backgroundColor = "pink";
-	closeBtnDelete.style.paddingLeft = "3px";
-	closeBtnDelete.style.paddingRight = "3px";
-	closeBtnDelete.style.border = "solid 1px black";
-	closeBtnDelete.style.cursor = "pointer";
-	closeBtnDelete.style.position = "absolute";
-	closeBtnDelete.style.top = "10px";
-	closeBtnDelete.style.right = "10px";
+	closeBtnDelete.classList.add("closeBtnDelete");
+
 	closeBtnDelete.title = "Close";
 	closeBtnDelete.innerText = "x";
 	closeBtnDelete.addEventListener('click', () => {
@@ -188,58 +219,51 @@ function closeButtonDelete(Document, messageBtnBar) {
 
 function copyRawTextButton(Document, messageId, messageBtnBar) {
 	
-	let copyRawTextButton = document.createElement('btn');
-		copyRawTextButton.style.backgroundColor = "lightgrey";
-		copyRawTextButton.style.paddingLeft = "4px";
-		copyRawTextButton.style.paddingRight = "4px";
-		copyRawTextButton.style.border = "solid 1px black";
-		copyRawTextButton.style.cursor = "pointer";
-		copyRawTextButton.style.marginLeft = "-137px";
-		copyRawTextButton.title = "copyRawText";
-		copyRawTextButton.innerText = "Copy Raw Text";
+	let copyRawTextBtn = document.createElement('btn');
+		copyRawTextBtn.classList.add("copyRawTextBtn");
+		
+		copyRawTextBtn.title = "copyRawText";
+		copyRawTextBtn.innerText = "Copy Raw Text";
 					
-		copyRawTextButton.addEventListener('click', () => {
+		copyRawTextBtn.addEventListener('click', () => {
 			copyRawText.messageNumber = String(messageId);
 			Document.dispatchEvent(copyRawText);
 		})
-	messageBtnBar.appendChild(copyRawTextButton);
+	messageBtnBar.appendChild(copyRawTextBtn);
 	
 }
 
 function minimiseButton(Document, messageDiv, messageBtnBar) {
-	let minimiseButton = Document.createElement('btn');
-	minimiseButton.style.backgroundColor = "lightblue";
-	minimiseButton.style.paddingLeft = "4px";
-	minimiseButton.style.paddingRight = "4px";
-	minimiseButton.style.border = "solid 1px black";
-	minimiseButton.style.cursor = "pointer";
-	minimiseButton.style.marginLeft = "-35px";
-	minimiseButton.title = "Minimise";
-	minimiseButton.innerText = "-";
-	minimiseButton.addEventListener('click', () => {
+	let minimiseBtn = Document.createElement('btn');
+	
+	minimiseBtn.classList.add("minimiseBtn");
+	
+	minimiseBtn.title = "Minimise";
+	minimiseBtn.innerText = "-";
+	minimiseBtn.addEventListener('click', () => {
 		let tables = messageDiv.getElementsByTagName("table")
-		
-		for (let i = 0; i < tables.length; i ++) {
+		let l = tables.length;
+		for (let i = 0; i < l; i ++) {
 			if (tables[i].style.display == "none") {
 				tables[i].style.display = "";
-				minimiseButton.set = "";
+				minimiseBtn.set = "";
 			} else {
 				tables[i].style.display = "none";
-				minimiseButton.set = "minimised";
+				minimiseBtn.set = "minimised";
 			}
 		}
 	})
-	console.log("buttonBar", messageBtnBar, messageDiv.id);
-	messageBtnBar.appendChild(minimiseButton);
+	//console.log("buttonBar", messageBtnBar, messageDiv.id);
+	messageBtnBar.appendChild(minimiseBtn);
 }	
+
+
 
 function copyRawTextButtonBar(Document) {
 	let copyRawBtn = Document.createElement('btn');
 
-	buttonStyling(copyRawBtn);
-	copyRawBtn.style.backgroundColor = "lightgrey";
-	copyRawBtn.style.margin = "5px"
-	copyRawBtn.style.position = ""
+	copyRawBtn.classList.add("whizButton");
+	copyRawBtn.classList.add("copyRawBtn");
 	
 	copyRawBtn.innerText = "Copy Raw Text";
 	copyRawBtn.title = "Copy Raw Text version of this message";
@@ -261,15 +285,15 @@ function copyRawTextButtonBar(Document) {
 
 function expandSchemaButton(Document) {
 	let expandSchemaBtn = Document.createElement('btn');
-	buttonStyling(expandSchemaBtn);
-	expandSchemaBtn.style.backgroundColor = "DodgerBlue";
-	expandSchemaBtn.style.color = "white";
-	expandSchemaBtn.style.margin = "5px";
+	
+	expandSchemaBtn.classList.add("whizButton");
+	expandSchemaBtn.classList.add("expandSchemaBtn");
+
 	expandSchemaBtn.style.position = "";
 	expandSchemaBtn.innerText = "Expand All";
 	expandSchemaBtn.title = "Expand all segments as schema";
 	expandSchemaBtn.addEventListener('click', () => {
-		console.log("schema button clicked");
+		//console.log("schema button clicked");
 		if (clicked) {
 			clicked = false;
 			Document.dispatchEvent(contractSchemaEvent);
@@ -289,9 +313,12 @@ function expandSchemaButton(Document) {
 }
 function messageImportBtn(Document) {
 	
+	let div = document.createElement('div');
+	
 	let compareDropDown = document.createElement('select');
 	compareDropDown.name = "compareDropDown";
 	compareDropDown.id = "compareDropDown";
+	compareDropDown.style.display = "none";
 	compareDropDown.addEventListener('click', () => { 
 		while (compareDropDown.options.length > 0) {
 			compareDropDown.remove(0);
@@ -300,94 +327,104 @@ function messageImportBtn(Document) {
 		Document.dispatchEvent(messageTabSearchEvent);
 	} );
 	
-	let messageImportBtn = Document.createElement('btn');
-	buttonStyling(messageImportBtn);
-	messageImportBtn.style.backgroundColor = "DarkTurquoise";
-	messageImportBtn.style.color = "white";
-	messageImportBtn.style.margin = "5px";
-	messageImportBtn.style.position = "";
-	messageImportBtn.innerText = "Import Message";
-	messageImportBtn.title = "Import Message from a Full Contents tab";
-	messageImportBtn.addEventListener('click', () => {
-		// When there is a "click"
-		compareDropDownSelect = Document.getElementById("compareDropDown");
-		messageTabGetMessage(compareDropDownSelect.value);
-		
+	compareDropDown.addEventListener('change', (e) => { 
+		console.log("e", e);
+		if (e.target.value == "Choose a tab") {
+			return
+		}
+		//console.log(messageTabGetMessage(compareDropDown.value))
+		messageTabGetMessage(compareDropDown.value);
 		/// TODO - swap this delay for a proper promise on the messageTabGetMessage!!!
 		delay(500).then(() => {
 			Document.dispatchEvent(addMouseOverCompare);
 		});
+		compareDropDown.style.display = "none";		
+	});
+	
+	let messageImportBtn = Document.createElement('btn');
+	
+	//compareDropDown.classList.add("whizButton");
+	messageImportBtn.classList.add("whizButton");
+	messageImportBtn.classList.add("messageImportBtn");
+	
+	messageImportBtn.innerText = "Import Message";
+	messageImportBtn.title = "Import Message from a Full Contents tab";
+	messageImportBtn.addEventListener('click', () => {
+		if (compareDropDown.style.display != "none") {
+			compareDropDown.style.display = "none";
+			return
+		}
+		if (compareDropDown.options.length == 0) {
+			let tabOption = document.createElement("option");
+			tabOption.setAttribute('value', "Choose a tab");
+			let optionText = document.createTextNode("Choose a tab");
+			tabOption.appendChild(optionText);
+			compareDropDown.appendChild(tabOption);
+		}
+		compareDropDown.value = "Choose a tab";
+		compareDropDown.style.display = "";
+		
+		// When there is a "click"
+		//compareDropDownSelect = Document.getElementById("compareDropDown");
+		//messageTabGetMessage(compareDropDown.value);
+		
+		
 		
 	})
 	
+	div.append(messageImportBtn);
+	div.append(compareDropDown);
+	
 	let li = Document.createElement('li');
-	li.append(messageImportBtn);
-	li.append(compareDropDown);
+	li.append(div);
 	let buttonBar = Document.getElementById("buttonBar");
 	buttonBar.appendChild(li);
 }
 let mouseoverEnabled = false
 function textCompareBtn(Document) {
-	let textCompareButton = Document.createElement('btn');
-	buttonStyling(textCompareButton);
-	textCompareButton.style.backgroundColor = "salmon";
-	textCompareButton.style.color = "white";
+	let textCompareBtn = Document.createElement('btn');
+	//buttonStyling(textCompareButton);
 	
-	textCompareButton.style.paddingLeft = "4px";
-	textCompareButton.style.paddingRight = "4px";
-	textCompareButton.style.border = "solid 1px black";
+	textCompareBtn.classList.add("whizButton");
+	textCompareBtn.classList.add("textCompareBtn");
 	
-	textCompareButton.style.cursor = "pointer";
-	textCompareButton.style.position = "sticky";
-	textCompareButton.style.bottom = "5px";
+	textCompareBtn.title = "Hover mouse over segments and fields to perform comparison.";
+	textCompareBtn.innerText = "Enable Text Compare";
 	
-	textCompareButton.style.right = "5px";
-	textCompareButton.style.marginLeft = "5px";
-	textCompareButton.title = "Hover mouse over segments and fields to perform comparison.";
-	textCompareButton.innerText = "Enable Text Compare";
-	
-	textCompareButton.addEventListener('click', () => {
+	textCompareBtn.addEventListener('click', () => {
 		if (mouseoverEnabled) {
 			Document.dispatchEvent(disableTextCompareEvent);
 			mouseoverEnabled = false;
-			textCompareButton.style.backgroundColor = "#df663d";
-			textCompareButton.innerText = "Enable Text Compare";
+			textCompareBtn.style.backgroundColor = "#df663d";
+			textCompareBtn.innerText = "Enable Text Compare";
 		} else {
 			Document.dispatchEvent(enableTextCompareEvent);
 			mouseoverEnabled = true;
-			textCompareButton.style.backgroundColor = "salmon";
-			textCompareButton.innerText = "Disable Text Compare";
+			textCompareBtn.style.backgroundColor = "salmon";
+			textCompareBtn.innerText = "Disable Text Compare";
 		}
 	})
 	//Document.getElementsByTagName("body")[0].appendChild(minimiseAllButton);
 	let li = Document.createElement('li');
-	li.append(textCompareButton);
+	li.append(textCompareBtn);
 	let buttonBar = Document.getElementById("buttonBar");
 	buttonBar.appendChild(li);
 }
 
 function minimiseAllButton(Document) {
-	let minimiseAllButton = Document.createElement('btn');
-	buttonStyling(minimiseAllButton);
-	
-	minimiseAllButton.style.backgroundColor = "darkblue";
-	minimiseAllButton.style.color = "white";
-	minimiseAllButton.style.paddingLeft = "4px";
-	minimiseAllButton.style.paddingRight = "4px";
-	minimiseAllButton.style.border = "solid 1px black";
-	minimiseAllButton.style.cursor = "pointer";
-	minimiseAllButton.style.position = "sticky";
-	minimiseAllButton.style.bottom = "5px";
-	minimiseAllButton.style.right = "5px";
-	minimiseAllButton.style.marginLeft = "5px";
-	
-	minimiseAllButton.title = "Minimise All";
-	minimiseAllButton.innerText = "Minimise All";
+	let minimiseAllBtn = Document.createElement('btn');
+
+	minimiseAllBtn.classList.add("whizButton");
+	minimiseAllBtn.classList.add("minimiseAllBtn");
+
+	minimiseAllBtn.title = "Minimise All";
+	minimiseAllBtn.innerText = "Minimise All";
 	
 	
-	minimiseAllButton.addEventListener('click', () => {
+	minimiseAllBtn.addEventListener('click', () => {
 		let buttons = Document.getElementsByTagName('btn');
-		for (let i =0; i < buttons.length; i++) {
+		let l = buttons.length;
+		for (let i =0; i < l; i++) {
 			if (buttons[i].title == "Minimise") {
 				if (buttons[i].set == "minimised") {
 					// Button only built to minimise.
@@ -399,7 +436,7 @@ function minimiseAllButton(Document) {
 		}
 	})
 	let li = Document.createElement('li');
-	li.append(minimiseAllButton);
+	li.append(minimiseAllBtn);
 	let buttonBar = Document.getElementById("buttonBar")
 	buttonBar.appendChild(li);
 }
@@ -410,21 +447,16 @@ let wrapOverflowX = ""
 
 function wrapRowsButton(Document) {
 	/// Adds button to enable wrapping of table rows
-	let wrapRowsButton = Document.createElement('btn');
+	let wrapRowsBtn = Document.createElement('btn');
+	
+	wrapRowsBtn.classList.add("whizButton");
+	wrapRowsBtn.classList.add("wrapRowsBtn");
+	
+	wrapRowsBtn.title = "Allow text in message segments to wrap to next line.";
+	wrapRowsBtn.innerText = "Wrap Rows";
 
-	buttonStyling(wrapRowsButton);
-	wrapRowsButton.style.backgroundColor = "green";
-	wrapRowsButton.style.color = "white";
 	
-	wrapRowsButton.style.cursor = "pointer";
-	wrapRowsButton.style.position = "sticky";
-	wrapRowsButton.style.bottom = "5px";
-	
-	wrapRowsButton.title = "Allow text in message segments to wrap to next line.";
-	wrapRowsButton.innerText = "Wrap Rows";
-	wrapRowsButton.style.marginLeft = "5px";
-	
-	wrapRowsButton.addEventListener('click', () => {
+	wrapRowsBtn.addEventListener('click', () => {
 
 		let tableData = Document.getElementsByTagName("td");
 
@@ -437,63 +469,47 @@ function wrapRowsButton(Document) {
 			wrapWidth = "";
 			wrapOverflowX = "auto";
 		}
-
-		for (let i = 0; i < tableData.length; i++) {
+		let l = tableData.length;
+		for (let i = 0; i < l; i++) {
 			tableData[i].style.display = wrapSetting;
 		}
 		let EDIDocumentTable = Document.getElementsByClassName("EDIDocumentTable");
-
-		for (let i = 0; i < EDIDocumentTable.length; i++) {
+		let l2 = EDIDocumentTable.length;
+		for (let i = 0; i < l2; i++) {
 			EDIDocumentTable[i].style.width = wrapWidth;
 			EDIDocumentTable[i].parentElement.style.overflowX = wrapOverflowX;
 		}
 	});
 	
 	let li = Document.createElement('li');
-	li.append(wrapRowsButton);
+	li.append(wrapRowsBtn);
 	let buttonBar = Document.getElementById("buttonBar");
 	buttonBar.appendChild(li);
 }
 
 
 function showRelatedButton(messageDocument) {
-	let showRelatedButton = messageDocument.createElement('btn');
-	buttonStyling(showRelatedButton);
+	let showRelatedBtn = messageDocument.createElement('btn');
+
+	showRelatedBtn.classList.add("whizButton");
+	showRelatedBtn.classList.add("showRelatedBtn");
 	
-	showRelatedButton.style.backgroundColor = "turquoise";
-	showRelatedButton.style.paddingLeft = "4px";
-	showRelatedButton.style.paddingRight = "4px";
-	showRelatedButton.style.border = "solid 1px black";
-	showRelatedButton.style.cursor = "pointer";
-	showRelatedButton.style.position = "sticky";
-	showRelatedButton.style.bottom = "5px";
-	showRelatedButton.style.right = "105px";
-	showRelatedButton.style.marginLeft = "5px";
-	
-	showRelatedButton.title = "Show messages related to the highlighted message";
-	showRelatedButton.innerText = "Show Related";
+	showRelatedBtn.title = "Show messages related to the highlighted message";
+	showRelatedBtn.innerText = "Show Related";
 	
 	let li = messageDocument.createElement('li');
-	li.append(showRelatedButton);
+	li.append(showRelatedBtn);
 	let buttonBar = messageDocument.getElementById("buttonBar")
 	buttonBar.appendChild(li);
-	return showRelatedButton
+	return showRelatedBtn
 }
 
 let hideUnrelatedBtn
 function hideUnrelatedButton(messageDocument) {
 	hideUnrelatedBtn = messageDocument.createElement('btn');
-	buttonStyling(hideUnrelatedBtn);
 	
-	hideUnrelatedBtn.style.backgroundColor = "cream";
-	hideUnrelatedBtn.style.paddingLeft = "4px";
-	hideUnrelatedBtn.style.paddingRight = "4px";
-	hideUnrelatedBtn.style.border = "solid 1px black";
-	hideUnrelatedBtn.style.cursor = "pointer";
-	hideUnrelatedBtn.style.position = "sticky";
-	hideUnrelatedBtn.style.bottom = "5px";
-	hideUnrelatedBtn.style.right = "105px";
-	hideUnrelatedBtn.style.marginLeft = "5px";
+	hideUnrelatedBtn.classList.add("whizButton");
+	hideUnrelatedBtn.classList.add("hideUnrelatedBtn");
 	
 	hideUnrelatedBtn.title = "Hide Visual Trace messages that are unrelated to the current view";
 	hideUnrelatedBtn.innerText = "Hide Unrelated";
@@ -510,18 +526,11 @@ function hideUnrelatedButton(messageDocument) {
 function searchExpandedSchemaButton(Document) {
 	let searchDiv = Document.createElement('div');
 	let searchExpandedSchemaBtn = Document.createElement('btn');
-	buttonStyling(searchExpandedSchemaBtn);
 	
-	searchExpandedSchemaBtn.style.backgroundColor = "aqua";
-	searchExpandedSchemaBtn.style.paddingLeft = "4px";
-	searchExpandedSchemaBtn.style.paddingRight = "4px";
-	searchExpandedSchemaBtn.style.border = "solid 1px black";
-	searchExpandedSchemaBtn.style.cursor = "pointer";
-	searchExpandedSchemaBtn.style.position = "sticky";
-	searchExpandedSchemaBtn.style.bottom = "5px";
-	searchExpandedSchemaBtn.style.right = "105px";
-	searchExpandedSchemaBtn.style.marginLeft = "5px";
-	searchExpandedSchemaBtn.style.display = "";
+	searchExpandedSchemaBtn.classList.add("whizButton");
+	searchExpandedSchemaBtn.classList.add("searchExpandedSchemaBtn");
+
+	//searchExpandedSchemaBtn.style.display = "";
 	
 	searchExpandedSchemaBtn.title = "Expand schema and enable search mode";
 	searchExpandedSchemaBtn.innerText = "Search Schema";
@@ -539,47 +548,22 @@ function searchExpandedSchemaButton(Document) {
 	searchInput.style.display = "none";
 	searchlabel.style.display = "none";
 	
+	searchDiv.appendChild(searchExpandedSchemaBtn);
 	searchDiv.appendChild(searchlabel);
 	searchDiv.appendChild(searchInput);
-	searchDiv.appendChild(searchExpandedSchemaBtn);
 	
+	const keys = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft", "Control", "Shift"]
+	let highlighted = false;
 	searchInput.addEventListener('keyup', function(e) { 
-		//iterate through rows, hide if text not found
-		let schemaRows = Document.getElementsByClassName("searchableSchema");
-		if (e.target.value == '') {
-			if (e.key == "Enter") {
-				searchExpandedSchemaBtn.style.display = ""
-				searchInput.style.display = "none";
-				searchlabel.style.display = "none";
-				Document.dispatchEvent(contractSchemaEvent);
-			}
-			for (let i = 0; i < schemaRows.length; i++) {
-				schemaRows[i].style.display = '';
-			}
-		} else {
-			
-			// Allows search with spaces
-			let textSearch = e.target.value.toLowerCase()
-			textSearch = textSearch.replace(/\s/gm, " ");
-			
-			for (let i = 0; i < schemaRows.length; i++) {
-				
-				// Allows search with spaces
-				let tableValue = schemaRows[i].innerText.toLowerCase()
-				tableValue = tableValue.replace(/\s/gm, " ");
-				
-				if (tableValue.includes(textSearch)) {
-					schemaRows[i].style.display = '';
-				} else {
-					schemaRows[i].style.display = 'none';
-				}
-			}
-		}
-		
+		searchExpandedSchemaEvent.keyUpEvent = e;
+		searchExpandedSchemaEvent.searchInput = searchInput;
+		searchExpandedSchemaEvent.searchlabel = searchlabel;
+		searchExpandedSchemaEvent.searchExpandedSchemaBtn = searchExpandedSchemaBtn;
+		Document.dispatchEvent(searchExpandedSchemaEvent);
 	});
 	
 	searchExpandedSchemaBtn.addEventListener('click', () => {
-		searchExpandedSchemaBtn.style.display = "none";
+		//searchExpandedSchemaBtn.style.display = "none";
 		searchInput.style.display = "";
 		searchlabel.style.display = "";
 		expandSchemaEvent.schemaSearch = true
@@ -587,6 +571,7 @@ function searchExpandedSchemaButton(Document) {
 		searchInput.focus();
 		
 	})
+	
 	let li = Document.createElement('li');
 	li.append(searchDiv);
 	let buttonBar = Document.getElementById("buttonBar");
@@ -594,27 +579,24 @@ function searchExpandedSchemaButton(Document) {
 	
 }
 
+
+function escapeRegExp(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
+}
+
 function uncloseAllButton(Document) {
 	let reopenButton = Document.createElement('btn');
-	buttonStyling(reopenButton);
 	
-	reopenButton.style.backgroundColor = "red";
-	reopenButton.style.color = "white";
-	reopenButton.style.paddingLeft = "4px";
-	reopenButton.style.paddingRight = "4px";
-	reopenButton.style.border = "solid 1px black";
-	reopenButton.style.cursor = "pointer";
-	reopenButton.style.position = "sticky";
-	reopenButton.style.bottom = "5px";
-	reopenButton.style.right = "105px";
-	reopenButton.style.marginLeft = "5px";
+	reopenButton.classList.add("whizButton");
+	reopenButton.classList.add("reopenButton");
 	
 	reopenButton.title = "Reopen Closed";
 	reopenButton.innerText = "Reopen Closed";
 	
 	reopenButton.addEventListener('click', () => {
 		let buttons = Document.getElementsByTagName('btn');
-		for (let i =0; i < buttons.length; i++) {
+		let l = buttons.length;
+		for (let i =0; i < l; i++) {
 			if (buttons[i].title == "Close") {
 				buttons[i].parentNode.parentNode.style.display = "";
 			}
@@ -623,7 +605,8 @@ function uncloseAllButton(Document) {
 		// Full Trace tab
 		if (messageArray.length > 0) {
 			currentRelated = "" // for Show Related button
-			for (let i =0; i < messageArray.length; i++) { 
+			let length = messageArray.length;
+			for (let i =0; i < length; i++) { 
 				messageArray[i].svgComponent.style.stroke = "";
 				messageArray[i].svgComponent.style.strokeWidth = "";
 			}
@@ -636,21 +619,19 @@ function uncloseAllButton(Document) {
 }
 
 function shareButton(Document) {
-	let shareButton = Document.createElement('btn');
-	buttonStyling(shareButton);
+	let shareBtn = Document.createElement('btn');
+	//buttonStyling(shareButton);
 	
-	shareButton.style.backgroundColor = "purple";
-	shareButton.style.color = "white";
-	shareButton.style.position = "sticky";
-	shareButton.style.bottom = "5px";
-	shareButton.style.marginLeft = "5px";
+	shareBtn.classList.add("whizButton");
+	shareBtn.classList.add("shareBtn");
 	
-	shareButton.title = "Create a link that can be shared with other extension users";
-	shareButton.innerText = "Copy Share Link";
+	shareBtn.title = "Create a link that can be shared with other extension users";
+	shareBtn.innerText = "Copy Share Link";
 	
-	shareButton.addEventListener('click', () => {
+	shareBtn.addEventListener('click', () => {
 		let shareLink = stubUrl[0] + "EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=";
-		for (let i = 0; i < sortedMessageArray.length; i++) {
+		let l = sortedMessageArray.length;
+		for (let i = 0; i < l; i++) {
 			let messageParams = "&m=" + String(sortedMessageArray[i].messageNumber) + "&s=" + encodeURIComponent(sortedMessageArray[i].messageStartOperation) + "&e=" + encodeURIComponent(sortedMessageArray[i].messageEndOperation);
 			if (i == 0) {
 				// Page url is based on the first message.
@@ -675,7 +656,7 @@ function shareButton(Document) {
 		
 	})
 	let li = Document.createElement('li');
-	li.append(shareButton);
+	li.append(shareBtn);
 	let buttonBar = Document.getElementById("buttonBar");
 	buttonBar.appendChild(li);
 		
@@ -759,21 +740,19 @@ function compareLegendButtons(Document) {
 	hideLegendBtn = Document.createElement('btn');
 	showLegendBtn = Document.createElement('btn');
 		
-	buttonStyling(hideLegendBtn);
-	hideLegendBtn.style.backgroundColor = "gray";
-	hideLegendBtn.style.color = "white";
-	hideLegendBtn.style.margin = "10px"
-	hideLegendBtn.style.display = "inline-table"
+		
+	hideLegendBtn.classList.add("whizButton");
+	hideLegendBtn.classList.add("hideLegendBtn");
+	
 	hideLegendBtn.innerText = "Hide Legend";
 	hideLegendBtn.addEventListener('click', () => {
 		compareLegendDiv.style.display = "none";
 		showLegendBtn.style.display = "";
 	})
 
+	showLegendBtn.classList.add("whizButton");
+	showLegendBtn.classList.add("showLegendBtn");
 
-	buttonStyling(showLegendBtn);
-	showLegendBtn.style.backgroundColor = "gray";
-	showLegendBtn.style.color = "white";
 	showLegendBtn.innerText = "Show Legend";
 	showLegendBtn.addEventListener('click', () => {
 		if (compareLegendDiv.style.display == "") {
@@ -808,6 +787,162 @@ function compareLegendButtons(Document) {
 	
 }
 
+
+
+function searchSegmentsButton(Document) {
+	let searchDiv = Document.createElement('div');
+	let searchSegmentsBtn = Document.createElement('btn');
+	
+	searchSegmentsBtn.classList.add("whizButton");
+	searchSegmentsBtn.classList.add("searchSegmentsBtn");
+	
+	searchSegmentsBtn.id = "searchSegmentsBtn";
+	searchSegmentsBtn.title = "Search Segments";
+	searchSegmentsBtn.innerText = "Search Segments";
+	
+	let searchlabel = Document.createElement('label');
+	let searchInput = Document.createElement('input');
+	
+	searchInput.setAttribute('id', 'searchSegmentsInput');
+	searchInput.setAttribute('name', 'search');
+	searchInput.setAttribute('type', 'text');
+	searchInput.setAttribute('placeholder', 'Search Segments & Values');
+	
+	searchInput.title = "Press ENTER when blank to exit search mode";
+	
+	searchInput.style.display = "none";
+	searchlabel.style.display = "none";
+	
+	searchDiv.appendChild(searchSegmentsBtn);
+	searchDiv.appendChild(searchlabel);
+	searchDiv.appendChild(searchInput);
+	
+	
+	searchSegmentsBtn.addEventListener('click', () => {	
+		searchSegmentsBtn.style.display = "none";
+		searchInput.style.display = "";
+		searchlabel.style.display = "";
+		expandSchemaEvent.schemaSearch = true
+		searchInput.focus();
+	})
+	
+	searchInput.addEventListener('keyup', function(e) { 
+		searchSegmentsEvent.keyUpEvent = e;
+		searchSegmentsEvent.searchInput = searchInput;
+		searchSegmentsEvent.searchlabel = searchlabel;
+		searchSegmentsEvent.searchSegmentsBtn = searchSegmentsBtn;
+		Document.dispatchEvent(searchSegmentsEvent);
+		
+	});
+	
+	let li = Document.createElement('li');
+	li.append(searchDiv);
+	let buttonBar = Document.getElementById("buttonBar");
+	buttonBar.appendChild(li);
+		
+}
+
+let schemaModeFull = false;
+function schemaModeButton(Document) {
+	let schemaModeBtn = Document.createElement('btn');
+	
+	schemaModeBtn.classList.add("whizButton");
+	schemaModeBtn.classList.add("schemaModeButton");
+	
+	schemaModeBtn.title = "Toggle Schema between messages known values and full schema";
+	
+	schemaModeBtn.innerText = "Schema Mode: Known";
+	
+	schemaModeBtn.addEventListener('click', () => {
+		let expandors = document.getElementsByClassName("toggleSchema");
+		if (schemaModeFull == false) {
+			schemaModeFull = true;
+			schemaModeBtn.innerText = "Schema Mode: Full";
+			schemaModeBtn.style.backgroundColor = "darkred";
+			for (let i = 0; i < expandors.length; i++){ 
+				expandors[i].style.backgroundColor = "darkred";
+			}
+			
+		} else {
+			schemaModeFull = false
+			schemaModeBtn.innerText = "Schema Mode: Known";
+			schemaModeBtn.style.backgroundColor = "orange";
+			for (let i = 0; i < expandors.length; i++){ 
+				expandors[i].style.backgroundColor = "orange";
+			}
+		}
+	})
+	let li = Document.createElement('li');
+	li.append(schemaModeBtn);
+	let buttonBar = Document.getElementById("buttonBar")
+	buttonBar.appendChild(li);
+}
+
+function namespaceCategorySearchButton(Document) {
+	let namespaceCategorySearchBtn = Document.createElement('btn');
+
+	namespaceCategorySearchBtn.classList.add("whizButton");
+	namespaceCategorySearchBtn.classList.add("namespaceCategorySearchBtn");
+	
+	namespaceCategorySearchBtn.title = "Show all active productions across all namespaces and enable a joined category search.";
+	namespaceCategorySearchBtn.innerText = "Active Production Category Search";
+	
+	
+	
+	let namespaceCategoryDropDown = document.createElement('select');
+	namespaceCategoryDropDown.name = "namespaceCategoryDropDown";
+	namespaceCategoryDropDown.id = "namespaceCategoryDropDown";
+	namespaceCategoryDropDown.className = "namespaceCategoryDropDown";
+	namespaceCategoryDropDown.title = "Select a category to show all active productions using this category. *"
+	
+	
+	let namespaceCategoryDropDownLabel = document.createElement('Label');
+	namespaceCategoryDropDownLabel.id = "namespaceCategoryDropDownLabel";
+	namespaceCategoryDropDownLabel.style.display = "none";
+	namespaceCategoryDropDownLabel.innerText = "Active Production Category Search:"
+	namespaceCategoryDropDownLabel.title = "Select a category to show all active productions using this category."
+	namespaceCategoryDropDownLabel.className = "dgmAction";
+	
+	let loading = document.createElement('option');
+	let optionText = document.createTextNode("Fetching active productions:    ");
+	loading.appendChild(optionText);
+	namespaceCategoryDropDown.appendChild(loading);
+	
+	namespaceCategoryDropDown.addEventListener('change', (e) => { 
+		console.log("e", e);
+		categoryListSelectionEvent.optionValue = e.target.value
+		Document.dispatchEvent(categoryListSelectionEvent);
+	});
+	
+	namespaceCategorySearchBtn.addEventListener('click', (e) => {
+		namespaceCategorySearchBtn.style.display = "none";
+		namespaceCategoryDropDown.style.display = "inherit";
+		namespaceCategoryDropDownLabel.style.display = "inherit";
+		//categoryListEvent.optionValue = e.target.value
+		Document.dispatchEvent(categoryListEvent);
+	});
+	
+	let li = Document.createElement('li');
+	li.append(namespaceCategorySearchBtn);
+	li.append(namespaceCategoryDropDownLabel);
+	li.append(namespaceCategoryDropDown);
+	let bar = Document.getElementById("namespaceCategorySearchBar")
+	bar.appendChild(li);
+	return
+}
+
+function createNamespaceCategorySearchBar(Document) {
+	let diagramHeader = Document.getElementById("diagramHeader");
+	let currentPageHeaderTables = diagramHeader.querySelectorAll("table");
+	currentPageHeaderTables = currentPageHeaderTables[0]
+	let categorySearchCell = currentPageHeaderTables.rows[0].insertCell(4);
+	
+	let bar = Document.createElement("ul");
+	bar.className = "namespaceCategorySearchBar";
+	bar.id = "namespaceCategorySearchBar";
+	
+	categorySearchCell.appendChild(bar);
+}
 
 
 
@@ -880,24 +1015,9 @@ function scrollBarStyle(Document) {
 	Document.head.append(scrollBarStyleObject);
 }
 
-const buttonBarString = `
-.buttonBar {
-  list-style-type: none;
-  text-align: center;
-  margin: 0;
-  padding: 0;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.buttonBar li {
-  display: inline-block;
-  margin: 5px;
-}
-`
 
 function buttonBarStyle(Document) {
+	return
 	const style = Document.createElement('style');
 	if (Document.getElementById("buttonBarStyle")) {
 		// Skip
@@ -909,15 +1029,80 @@ function buttonBarStyle(Document) {
 }
 
 function addButtonBar(Document) {
+	let currentPageTitle = document.title
+	console.log("currentPageTitle", currentPageTitle);
+	if (currentPageTitle.includes("Login")) {
+		throw new Error("Prevent buttonBar loading on Login page");
+	}
 	if (Document.getElementById("buttonBar")) {
 		// Skip
 	} else {
-		const bar = Document.createElement('ul');
+		let bar = Document.createElement('ul');
 		bar.id = "buttonBar";
 		bar.className = "buttonBar";
+		//bar.style.backgroundColor = "black";
+		
+		let displayButton = Document.createElement('button');
+		displayButton.classList.add("whizButton");
+		displayButton.classList.add("displayBarBtn");
+		displayButton.style.display = "inherit";
+		displayButton.title = "Display IRIS Whiz Buttons";
+		displayButton.innerText = "IRIS Whiz";
+		displayButton.id = "whiz"
+		bar.append(displayButton);
+		let minimiseButtonBarBtn = minimiseButtonBarButton(Document, bar);
+		// children[0].className
+		displayButton.addEventListener("click", function(e) {
+			bar.style.boxShadow = "inset 0 0 100px 100px rgba(255, 255, 255, 0.6)";
+			bar.style.border = "1px grey solid"
+			minimiseButtonBarBtn.style.display = "inherit";
+			displayButton.style.display = "none";
+			let buttons = bar.getElementsByClassName("whizButton");
+			for (let i = 0; i < buttons.length; i++) {
+				if ((buttons[i].classList.contains("whizButton")) && (buttons[i].id != "whiz")) {
+					buttons[i].style.display = "inherit";
+				}
+			}
+		})		
+	
 		Document.body.insertBefore(bar, Document.body.firstChild);
+		chrome.storage.local.get({
+			settings: {},
+			}
+			,	function(stored) {
+				if (stored.settings.ButtonsShow) {
+					displayButton.click();
+				}
+			}
+		);
 	}
 }
+
+
+function minimiseButtonBarButton(Document, bar) {
+	let minimiseButtonBarBtn = Document.createElement('btn');
+	
+	minimiseButtonBarBtn.classList.add("minimiseButtonBarBtn");
+
+	minimiseButtonBarBtn.title = "Minimise Button Bar";
+	minimiseButtonBarBtn.innerText = "-";
+	minimiseButtonBarBtn.addEventListener('click', () => {
+		minimiseButtonBarBtn.style.display = "none";
+		bar.style.boxShadow = "";
+		let buttons = bar.getElementsByClassName("whizButton");
+		for (let i = 0; i < buttons.length; i++) {
+			if ((buttons[i].classList.contains("whizButton")) && (buttons[i].id != "whiz")) {
+				buttons[i].style.display = "none";
+			} else if (buttons[i].id == "whiz") {
+				buttons[i].style.display = "inherit";
+			}
+		}
+		bar.style.border = "none";
+	})
+	//console.log("buttonBar", messageBtnBar, messageDiv.id);
+	bar.appendChild(minimiseButtonBarBtn);
+	return minimiseButtonBarBtn
+}	
 
 
 
@@ -989,7 +1174,7 @@ function errorAlert(displayText) {
 function syncScrolling(Document, object) {
 	function keypress() {
 		let ctrl = window.event.ctrlKey
-		console.log("keydown triggered");
+		//console.log("keydown triggered");
 		if (ctrl) {
 			scrollBarStyleObject.textContent = scrollBarStringHighlight;
 		} else {
@@ -1013,21 +1198,22 @@ function syncScrolling(Document, object) {
 	});
 	// Hold CTRL to scroll all message boxes simultaneously 
 	object.addEventListener("mousedown", function() {
-		console.log("Mouse down on element!");
+		//console.log("Mouse down on element!");
 		let divsArray = Document.getElementsByClassName("MsgOutline");
-		console.log("divsArray -- ", divsArray);
+		//console.log("divsArray -- ", divsArray);
 		let ctrl = window.event.ctrlKey;
 		if (ctrl) {
-		console.log("mousedown + ctrl");
+		//console.log("mousedown + ctrl");
 		object.onscroll = function() { 
-		  for (let x = 0; x < divsArray.length; x ++) {
-			if (divsArray[x] != object) {
-				syncScroll(object, divsArray[x])
+			let length = divsArray.length;
+			for (let x = 0; x < length; x ++) {
+				if (divsArray[x] != object) {
+					syncScroll(object, divsArray[x])
+				}
 			}
-		  }
-		 }
+		}
 	  } else {
-			 console.log("mousedown - ctrl");
+			//console.log("mousedown - ctrl");
 			object.onscroll = function() { };
 	  
 	  }
@@ -1035,10 +1221,11 @@ function syncScrolling(Document, object) {
 	
 	// Remove scroll link on mouseup
 	object.addEventListener("mouseup", function() {
-		console.log("Mouse up on element!");
+		//console.log("Mouse up on element!");
 		let divsArray = Document.getElementsByClassName("MsgOutline");
-		console.log("divsArray -- ", divsArray);
-		for (let x = 0; x < divsArray.length; x ++) {
+		//console.log("divsArray -- ", divsArray);
+		let l = divsArray.length
+		for (let x = 0; x < l; x ++) {
 			object.onscroll = function() { };
 		}
 	});
@@ -1046,7 +1233,7 @@ function syncScrolling(Document, object) {
 	// For synchronising the message scrollbars when CTRL is held
 	function syncScroll(from, to)
 	{
-		console.log("synScroll!");
+		//console.log("synScroll!");
 		var sfh = from.scrollHeight - from.clientHeight,
 			sth = to.scrollHeight - to.clientHeight;
 		var sfw = from.scrollWidth - from.clientWidth,
@@ -1066,3 +1253,7 @@ function syncScrolling(Document, object) {
 		}
 	}
 }
+
+
+
+

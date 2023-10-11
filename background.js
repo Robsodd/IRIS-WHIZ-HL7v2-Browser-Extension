@@ -6,10 +6,13 @@ let settings = {
 			AutoTab: false,
 			AutoTabNameSpace: false,
 			CSS: false,
+			BookmarkFolderName: "TIE Links",
 		}
 
 // Get the instances object on Extension load
-chrome.storage.local.get(['instances'], function(stored) {
+chrome.storage.local.get({
+			instances: {},
+		}, function(stored) {
 	if (stored == undefined) {
 		instances = []
 	} else {
@@ -20,15 +23,13 @@ chrome.storage.local.get(['instances'], function(stored) {
 
 // Get the settings object on Extension load
 chrome.storage.local.get({
-			AutoTab: false,
-			AutoTabNameSpace: false,
-			CSS: false,
-		}, function(stored_settings) {
-			if (stored_settings == undefined) {
-				//console.log("Instances Storage Updated", stored_settings);
+			settings: {},
+		}, function(stored) {
+			if (stored == undefined) {
+				console.log("Settings Storage Undefined", stored_settings);
 			} else {
 				//console.log("Instances Storage Updated", stored_settings);
-				settings = stored_settings
+				settings = stored.settings
 			}
 });
 
@@ -39,7 +40,7 @@ chrome.storage.local.get({
 
 // When changes are made to the Instances object on the settings page, make them here also.
 chrome.storage.onChanged.addListener(function(changes, areaName) {
-	console.log("Storage Updated, retrieving updated objects");
+	//console.log("Storage Updated, retrieving updated objects", changes);
 	if (areaName == "local") {
 		chrome.storage.local.get(['instances'], function(stored) {
 			if (stored == undefined) {
@@ -52,15 +53,14 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
 			}
 		});
 		chrome.storage.local.get({
-			AutoTab: false,
-			AutoTabNameSpace: false,
-			CSS: false,
+			settings: {},
 		}, function(stored_settings) {
 			if (stored_settings == undefined) {
 				//console.log("Instances Storage Updated", stored_settings);
 			} else {
 				//console.log("Instances Storage Updated", stored_settings);
-				settings = stored_settings
+				settings = stored_settings.settings
+				createBookmarks();
 			}
 		});
 		
@@ -84,9 +84,9 @@ chrome.tabs.onCreated.addListener(function(tab) {
 /// AutoTab V3
 function AutoTab(tab) {
 	// Get AutoTab setting
-	chrome.storage.local.get({AutoTab: false}, function(settings) {
-		if (settings.AutoTab) {
-			console.log("Automatically adding tab to relevant tab group");
+	chrome.storage.local.get({settings}, function(stored) {
+		if (stored.settings.AutoTab) {
+			//console.log("Automatically adding tab to relevant tab group");
 			let tab_group = identify_tab_group(tab)
 			//console.log(tab_group);
 			if (tab_group) {
@@ -96,7 +96,8 @@ function AutoTab(tab) {
 				chrome.tabGroups.query({windowId: tab.windowId})
 				.then((current_window_groups) => {		
 					// Check to see if a relevant group exists
-					for (let i = 0; i < current_window_groups.length; i++) {
+					let current_window_groupsLength = current_window_groups.length;
+					for (let i = 0; i < current_window_groupsLength; i++) {
 						//console.log("current_window_groups[i]: ", current_window_groups[i]);
 						//console.log("tab_group.name: ", tab_group.name);
 						if (current_window_groups[i].title == tab_group.name) {
@@ -107,7 +108,7 @@ function AutoTab(tab) {
 							// Add Tab to Tab Group
 							chrome.tabs.group({groupId: current_window_groups[i].id, tabIds: tab.id})
 							.catch((error) => {
-								console.log("Could not add tab to a tab group: ", error); 
+								//console.log("Could not add tab to a tab group: ", error); 
 							})
 							return true
 						}
@@ -127,12 +128,13 @@ function identify_tab_group(tab) {
 	var tabId = tab.id
 	var groupId = tab.groupId
 	let match = false
-	console.log("Current URL: ", tab.url);
-	for (let i = 0; i < instances.length; i ++ ){
+	//console.log("Current URL: ", tab.url);
+	let instancesLength = instances.length;
+	for (let i = 0; i < instancesLength; i ++ ){
 		if (match) {
 			break			
 		}
-		console.log("Instance URL: ", instances[i].url)
+		//console.log("Instance URL: ", instances[i].url)
 		if (!url.includes(instances[i].url)) {
 				// URL not found
 		}
@@ -140,7 +142,8 @@ function identify_tab_group(tab) {
 		{
 			if (settings.AutoTabNameSpace) {
 				//console.log(instances[i].name + "= TRUE")
-				for (let x = 0; x < instances[i].namespaces.length; x ++ ){
+				let namespacesLength = instances[i].namespaces.length;
+				for (let x = 0; x < namespacesLength; x ++ ){
 					if (match) {
 						break			
 					}
@@ -208,24 +211,59 @@ function createTabGroup(tabId, tab_group) {
 
 /// Bookmarks V1
 // Create bookmarks on extension load.
-chrome.bookmarks.search({title: 'TIE Links'})
+function createBookmarks() {
+	chrome.bookmarks.search( {"title": settings.BookmarkFolderName})
 	.then((bookmark) => {
 		
-		
+		//console.log("bookmark", bookmark);
 		//console.log("bookmark:" , bookmark)
 		if (bookmark.length > 0) {
+			let bookmarkID = bookmark[0].id
+			//console.log(bookmarkID);
+			chrome.bookmarks.getSubTree(
+			bookmarkID
+			).then((bookmarkRoot) => {
+				//console.log("bookmarkRoot", bookmarkRoot);
+				if (bookmarkRoot[0].children.length > 1) {
+					// Bookmark folder created and filled
+				} else {
+					// Bookmark folder created but empty
+					//console.log("attempt to create bookmarks!");
+					let instancesLength = instances.length;
+					for (var i = 0; i < instancesLength; i ++) {
+						let bookmarkID = bookmark[0].id
+						chrome.bookmarks.create(
+							{'parentId': bookmarkID, 'title': String(i)}, // Bit hacky but it was an easy way to pass i with the promise...
+						).then((groupFolder) => {
+							let namespacesLength = instances[groupFolder.title].namespaces.length;
+							for (var x = 0; x < namespacesLength; x ++ ){
+								chrome.bookmarks.create(
+									{'parentId': groupFolder.id, 'title': instances[groupFolder.title].namespaces[x].name, 'url': 'http://'+instances[groupFolder.title].url + ':57772/csp/healthshare/' + instances[groupFolder.title].namespaces[x].namespace + '/EnsPortal.ProductionConfig.zen?'},
+								);
+							}
+							// Update the groupFolder folder name.
+							let changes = {title: instances[groupFolder.title].name}
+							chrome.bookmarks.update(
+								String(groupFolder.id), changes,
+							);
+							
+						});	
+					}
+				}
+			});
 			//console.log('Bookmark folder found', bookmark);		
 		} else {
 			//console.log('Bookmark folder not found', bookmark);		
 			chrome.bookmarks.create(
-				{'parentId': "1", title: 'TIE Links'},
+				{'parentId': "1", title: settings.BookmarkFolderName},
 			).then((bookmarkRoot) => {
-			;
-			for (var i = 0; i < instances.length; i ++) {
+			let instancesLength = instances.length;
+			for (var i = 0; i < instancesLength; i ++) {
 				chrome.bookmarks.create(
 					{'parentId': bookmarkRoot.id, 'title': String(i)}, // Bit hacky but it was an easy way to pass i with the promise...
 				).then((groupFolder) => {
-					for (var x = 0; x < instances[groupFolder.title].namespaces.length; x ++ ){
+					let namespacesLength = instances[groupFolder.title].namespaces.length;
+					for (var x = 0; x < namespacesLength; x ++ ){
 						chrome.bookmarks.create(
 							{'parentId': groupFolder.id, 'title': instances[groupFolder.title].namespaces[x].name, 'url': 'http://'+instances[groupFolder.title].url + ':57772/csp/healthshare/' + instances[groupFolder.title].namespaces[x].namespace + '/EnsPortal.ProductionConfig.zen?'},
 						);
@@ -241,6 +279,8 @@ chrome.bookmarks.search({title: 'TIE Links'})
 			});
 		}
 	});
+	
+}
 
 
 
@@ -254,7 +294,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 /// Search item context menu
 function search_item_context_menu() {
-	console.log("searchItem context menu created");
+	//console.log("searchItem context menu created");
 	chrome.contextMenus.create({
 		"id": "searchItem",
 		"title": "Search in message viewer",
@@ -284,7 +324,7 @@ function search_item_context_menu() {
 
 /// PDF Viewer context menu
 function pdf_viewer_context_menu() {
-	console.log("pdfViewer context menu created");
+	//console.log("pdfViewer context menu created");
 	chrome.contextMenus.create({
 		"id": "pdfViewer",
 		"title": "Open as PDF",
@@ -294,7 +334,7 @@ function pdf_viewer_context_menu() {
 
 
 chrome.contextMenus.onClicked.addListener(function(clickData, tab){
-		console.log("Menu Clicked", clickData);
+		//console.log("Menu Clicked", clickData);
 	  
 		// Context Menu - Maessage Search option
 		if (clickData.menuItemId.includes("searchItem")){
@@ -303,21 +343,21 @@ chrome.contextMenus.onClicked.addListener(function(clickData, tab){
 			let searchTriggerURL = searchTriggerDomain[0] + "EnsPortal.MessageViewer.zen"
 			
 			let search_type = clickData.menuItemId
-			console.log("linkUrl", clickData.linkUrl);
-			console.log("selectionText", clickData.selectionText);
+			//console.log("linkUrl", clickData.linkUrl);
+			//console.log("selectionText", clickData.selectionText);
 			let value = clickData.selectionText
 			let str = clickData.linkUrl
 			let schema = str.slice(str.indexOf("SS:")+3, str.indexOf("%3A"))
 			let segment = str.slice(str.indexOf("%3A")+3, str.indexOf("%3A")+6)
 			let field = str.slice(str.lastIndexOf("#")+1)
-			console.log("schema", schema);
-			console.log("segment", segment);
-			console.log("field", field);
+			//console.log("schema", schema);
+			//console.log("segment", segment);
+			//console.log("field", field);
 		  
 			// If already on Message Search Page, trigger Search
 			if (clickData.pageUrl.includes("EnsPortal.MessageViewer.zen")) {
 				chrome.tabs.sendMessage(tab.id, {type: "message_search", schema: schema, segment: segment, field: field, value: value, search_type: search_type}, function(response) {
-					console.log("response", response);
+					//console.log("response", response);
 				});
 			// Else, open new Message Search Page and trigger search there
 			} else {
@@ -331,7 +371,7 @@ chrome.contextMenus.onClicked.addListener(function(clickData, tab){
 			}
 		} else if (clickData.menuItemId.includes("pdfViewer")) {
 			chrome.tabs.sendMessage(tab.id, {type: "pdf_viewer", selectionText: clickData.selectionText}, function(response) {
-					console.log("response", response);
+					//console.log("response", response);
 			});
 		}
 	});
@@ -356,6 +396,17 @@ const schemaExpansion = {
 						allFrames: true,
 						js: ["schema_expansion.js"],
 						id: "schema_expansion",
+				}
+				
+const segmentSearch = {
+						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*",],
+						excludeMatches: [
+											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
+											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*",
+										],
+						allFrames: true,
+						js: ["segment_search.js"],
+						id: "segment_search",
 				}
 const textCompare = {
 						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*",],
@@ -408,6 +459,9 @@ const componentReport = {
 									"*://*/csp/sys/%25CSP.Portal.Home.zen*",
 									"*://*/csp/sys/UtilHome.csp",
 								],
+						excludeMatches: [
+											"*://*/csp/*/*disableComponentReport=true",
+										],
 						allFrames: false,
 						js: ["component_report.js"],
 						id: "component_report",
@@ -429,37 +483,70 @@ const saveMessageViewer = {
 				
 const utils = {
 						matches: ["*://*/csp/*",],
+						excludeMatches: [
+											"*://*/csp/*/*disableNamespaceCategorySearch=true",
+										],
 						allFrames: true,
 						js: ["utils.js"],
 						id: "utils",
 						runAt: "document_start",
 				}
+				
+const messageGenerator = {
+						matches: ["*://*/csp/*/EnsPortal.Dialog.TestingService.cls*",],
+						allFrames: true,
+						js: ["message_generator.js"],
+						id: "messageGenerator",
+}
+
+const namespaceCategorySearch = {
+						matches: ["*://*/csp/*/EnsPortal.ProductionConfig.zen*",],
+						excludeMatches: [
+											"*://*/csp/*/*disableNamespaceCategorySearch=true",
+										],
+						allFrames: true,
+						js: ["namespace_category_search.js"],
+						id: "namespaceCategorySearch",
+}
+				
+const customCss = {
+						matches: ["*://*/csp/*",],
+						allFrames: true,
+						css: ["css/custom.css"],
+						id: "customCSS",
+}
+
+const buttonCss = {
+						matches: ["*://*/csp/*",],
+						allFrames: true,
+						css: ["css/button.css"],
+						id: "buttonCSS",
+}
 
 /// Add Content Scripts functionality
 function update_content_scripts() {
 
 	chrome.storage.local.get({
-		CSS: false,
-		HomepageReports: false,
-		},	function(settings) {
-			console.log("Content Script Settings: ", settings);							
+		settings: {},
+		},	function(storage) {
+			//console.log("Content Script Settings: ", settings);							
 
 			chrome.scripting.unregisterContentScripts().then(() => {
 				
 				chrome.scripting.registerContentScripts(
-				[ utils, messageSearch, schemaExpansion, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer, saveMessageViewer],
+				[ utils, namespaceCategorySearch, messageGenerator, messageSearch, schemaExpansion, segmentSearch, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer, saveMessageViewer, customCss, buttonCss],
 					() => { 
 						
-						if (settings.HomepageReports) {
+						if (storage.settings.HomepageReports) {
 							chrome.scripting.registerContentScripts(
 								[componentReport],
 								() => { 
-									console.log("Homepage Reports Loaded")
+									//console.log("Homepage Reports Loaded")
 								});
 						}
 						
 						
-						console.log("Generic Content Scripts Loaded");
+						//console.log("Generic Content Scripts Loaded");
 					});
 
 				
@@ -468,10 +555,11 @@ function update_content_scripts() {
 				
 				
 				// Add instance specific content scripts
-				if (settings.CSS) {
+				if (storage.settings.CSS) {
 					chrome.storage.local.get(['instances'], function(stored) {
 						let instances = stored.instances
-						for (var i = 0; i < instances.length; i ++ ){
+						let instancesLength = instances.length;
+						for (var i = 0; i < instancesLength; i ++ ){
 							let scriptId = instances[i].name + "CSS"
 							let colour = "css/" + instances[i].colour + ".css"
 							let url = "*://" + String(instances[i].url) + "/*"
@@ -484,7 +572,7 @@ function update_content_scripts() {
 									id: scriptId,
 							}],
 							() => { 
-								console.log("CSS Content Script Added");
+								//console.log("CSS Content Script Added");
 							});
 
 								
@@ -501,7 +589,6 @@ function update_content_scripts() {
 
 
 
-
 // Listen for Message to get all Message Tabs
 // Iterate through current tabs
 // Get the MESSAGE tabs
@@ -514,11 +601,11 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.runtime.onMessage.addListener(
 		function(request, sender, sendResponse) {
-			console.log("REQUEST TYPE: ", request.type, request);
+			//console.log("REQUEST TYPE: ", request.type, request);
 			
 			// Process on-page context menu message searches
 			if (request.type == "message_tab_search") {
-				console.log("message_tab_search triggered");
+				//console.log("message_tab_search triggered");
 				//update_dateTime(request.search_type);
 				//add_criterion(request);
 				
@@ -526,8 +613,9 @@ chrome.runtime.onMessage.addListener(
 				chrome.tabs.query({currentWindow: true})
 					.then((tabs) => {
 						if (!tabs.length) return;
-						let matching_tabs = []										
-						for (let i = 0; i < tabs.length; i++) {
+						let matching_tabs = [];
+						let tabsLength = tabs.length;
+						for (let i = 0; i < tabsLength; i++) {
 							if (tabs[i].id == sender.tab.id) {
 								// Don't return the tab that the request comes from
 							} else {
@@ -552,10 +640,10 @@ chrome.runtime.onMessage.addListener(
 			}
 			else if (request.type == "message_tab_get_message") {
 				
-				console.log("Sending request for tab's message: Tab ID =", request.tabId, typeof(parseInt(request.tabId)));
+				//console.log("Sending request for tab's message: Tab ID =", request.tabId, typeof(parseInt(request.tabId)));
 				// Send message to this TAB ID to return the Tab's parsed Message table
 				chrome.tabs.sendMessage(parseInt(request.tabId), {type: "message_tab_get_message"}).then((get_message_response) => {
-					console.log("message_tab_get_message response from content script: ", get_message_response);
+					//console.log("message_tab_get_message response from content script: ", get_message_response);
 					sendResponse({response: "Message Retrieved", results: get_message_response.response});
 				});
 				

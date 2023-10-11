@@ -1,5 +1,5 @@
 ***
-VERSION 1.7.1 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION 1.8.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -49,50 +49,58 @@ Finally, enable your desired features using the checkbox form at the top of this
 ## Features:
 
 #### Browser Based 
-01 AutoTab
-02 AutoTab - Namespaces
-03 Instance Header Colours
-15 Add Bookmarks
+01. AutoTab
+02. AutoTab - Namespaces
+03. Instance Header Colours
+15. Add Bookmarks
 
 
 #### Right Click Context Menu
-04 Message Search
-14 Open base64 string as PDF 
+04. Message Search
+14. Open base64 string as PDF 
 
 
 #### Message Viewer Page
-06 Selected Messages Tab
-07 Share Link on Selected Messages Tab
-16 Order by Oldest
-17 Complete Date
-18 Extended Criteria Search History 
-19 Share Search
+06. Selected Messages Tab
+07. Share Link on Selected Messages Tab
+16. Order by Oldest
+17. Complete Date
+18. Extended Criteria Search History 
+19. Share Search
 
 
 #### Visual Trace Page
-08 Full Trace Tab
-21 Show Related Messages Button
-22 Hide Unrelated Messages Button
-23 FullTrace Messages Link to their SVG counterpart
+08. Full Trace Tab
+21. Show Related Messages Button
+22. Hide Unrelated Messages Button
+23. FullTrace Messages Link to their SVG counterpart
 
 #### Message Content Page
-09 Import HL7 Message from another Message Content Page
+09. Import HL7 Message from another Message Content Page
+28. Schema Mode
 
 
 #### Various Pages (feature exists on more than one page)
-10 Copy Raw HL7 Text
-11 Expand & Search HL7 Schema   (was Expand HL7 Schema)
-12 Compare HL7 Message Fields
-20 Multiple Message Scroll
+10. Copy Raw HL7 Text
+11. Expand & Search HL7 Schema   (was Expand HL7 Schema)
+12. Compare HL7 Message Fields
+20. Multiple Message Scroll
+26. Segment Search
+27. Hide Iris Whiz Buttons Until Needed
 
 
 #### Home Page 
-13 Business Component Report
+13. Business Component Report
+
+
+#### Production Page
+24. ChatGPT Powered Test Message Generator
+25. Active Production Category Search
 
 
 #### Extension Pop-up
-05 Extension Pop-up - Open Session         
-14 Open base64 string as PDF 
+05. Extension Pop-up - Open Session         
+14. Open base64 string as PDF 
 
 
 ## Feature Descriptions:
@@ -164,7 +172,7 @@ Saves extra navigation to the RAW version of a message.
 Clicking on the first two columns of any HL7 message (full content view) will expand down the Segment so you can see the values next to their schema description. 
 
 When clicked the Search Schema button is replaced with a search bar and all schema for currently visible messages is expanded. Use the search bar to hide schema fields that don't match the current search text.
-Empty the search bar and press enter to close all expanded schema.
+Empty the search bar and press enter to close all expanded schema. Press enter to highlight matching copy in the message.
 
 Can save you from having to navigate to the message's schema and helps search through messages.
 
@@ -191,9 +199,10 @@ Helpful for checking messages with embedded PDFs.
 
 #### 15. Bookmarks
 
-Adds a 'TIE Links' folder of bookmarks for easy navigation to your instances and namespaces. If you edit your namespaces you'll need to delete the folder and refresh extension to create the bookmarks again. Requires the instances object to have been built using the Instances tool in the extension options page.
+Adds a 'TIE Links' folder of bookmarks for easy navigation to your instances and namespaces. If you edit your namespaces you'll need to delete the folder and rename it in the settings to create the bookmarks again. Requires the instances object to have been built using the Instances tool in the extension options page.
 Helpful for speedy navigation to the correct instance/namespace.
-*If you've added new namespaces you'll need to delete (or rename if you've added other bookmarks that you want to keep) the current bookmarks folder for a new one to be created.
+
+Update the folder name in the settings to recreate the bookmark folder with your desired name. I've not auto-deleted the old one in case people add other bookmarks to this folder. You have been warned.
 
 
 #### 16. Message Viewer Page - Order by Oldest
@@ -249,6 +258,52 @@ Messages in the FullTrace tab are now linked to their SVG equivalent in the Visu
 This is to allow you to more easily see which message is which when there are dozens of messages. For example, an ADT feed sending to multiple systems.
 
 
+#### 24. ChatGPT Powered Test Message Generator
+
+Use ChatGPT to generate you a test HL7 message. The prompt will appear on the Test window on the production page as long as you have input an API Key to the ChatGPT API key setting of the Options page.
+
+You need to select a schema and a doc type and it will automatically generate you a prompt. Edit the prompt as you please and then click the Generate to call ChatGPT. 
+
+
+#### 25. Active Production Category Search
+
+On productions a button appears next to the Category dropdown. Clicking this button loads active productions onto the page, gathers their category lists and complies them into a dropdown. Choosing a category from this dropdown will cause all productions with matching categories to show on the page with this Category filter applies to them. Any categories on the starting production page are prefixed with *. This is for ease of identification. Choosing a category that is not on the starting production page will not update the starting production page.
+
+Note it only shows ACTIVE productions. That is, productions shown as Running on your %SYS homepage.
+
+This is useful for seeing workflows for a particular category across namespaces. It's a little slow if you have a lot of productions, but it works pretty well. 
+
+
+#### 26.  Segment Search
+
+Hide segments that don't match your current search criteria. You can search specific segments by prepending your search with \SEGMENT\YOUR SEARCH HERE
+e.g. 
+\OBX\151570
+
+Bonus points if you know which Rosetta Terminology vitals that references.
+
+That example will only hide OBX segments, leaving other segments still visible. Useful for searching for specific OBX-3 values but leaving the OBR/PID/MSH etc.. segments showing. 
+
+Please remember to use back slashes. This also renders back slashes useless for search purposes. Sorry.
+
+
+#### 27. Hide Iris Whiz Buttons Until Needed
+
+Added an IRIS WHIZ button to maximise/minimise the button bar as needed. This is the bar that appears on Full Trace tab, Message Contents Tab and Selected Messages Tab and contains Text Compare, Schema Search etc.
+
+Choose on the option page whether you want the button bar to be expanded on page load. Default is buttons are hidden. It also looks more fancy now. You're welcome.
+
+
+
+#### 28. Schema Mode
+
+Toggle the Schema Mode using the… Schema Mode button! 
+
+Default behaviour for expanding schema only shows the known schema that is available in the Title of the field - the bit where you hover your mouse over the fields. 
+
+Toggle the button and it will look up the schema using the link in the segment element. This is slow, especially when used in conjunction with the Searching features. Therefore I've limited it to the Contents view. WARNING! It will continue to work if you import messages to this view. Unless you like to watch the world burn, don't use the Full Schema option if you have many messages imported into your page. 
+
+
 
 ## Updates
 
@@ -265,6 +320,88 @@ To update, copy your instance object from the options screen, download the lates
 
 
 __Updated Name__: Thought it needed something a touch shorter. Did a picture and an Icon. It'll do.
+
+
+##### 11/10/2023 Updates:
+
+Version 1.8.0
+
+__Feature Updated__:
+
+Stored instances export now includes all current settings. You can still import your old instances object, it will be immediately updated to the new version on import. Save this somewhere safe! This was probably more work than it was worth.
+
+__Behaviour Change__: Bookmark folder is not automatically created. Now gets created when editing the settings according to the name chosen in the new Bookmark Folder Name setting. Yes, it is very fancy now.
+
+__Bugfix__: Rule editor in Iris does not have coloured header. This now highlights. Excellent. 
+
+__Feature Added__: ChatGPT Powered Test Message Generator.
+
+When sending a test message on a production page you can now use ChatGPT to generate you a HL7 message. The prompt will appear as long as you have input an API Key to the ChatGPT API key setting of the Options page.
+
+You need to select a schema and a doc type and it will automatically generate you a prompt. Edit the prompt as you please and then click the Generate to call ChatGPT. 
+
+
+__Feature Added__: On Schema search you can now press enter to highlight matching copy. 
+
+Highlighting the text on keypress proved too slow when several messages were open and highlighting on enter seemed an acceptable compromise. Enter remains the exit key when the search bar is blank. 
+
+When searching individual segments text is automatically highlighted. Segment search highlighting takes priority sometimes, depends how it's feeling.
+
+
+__Feature Added__: Active Production Category Search
+
+On productions a button appears next to the Category dropdown. Clicking this button loads active productions onto the page, gathers their category lists and complies them into a dropdown. Choosing a category from this dropdown will cause all productions with matching categories to show on the page with this Category filter applies to them. Any categories on the starting production page are prefixed with *. This is for ease of identification. Choosing a category that is not on the starting production page will not update the starting production page.
+
+Note it only shows ACTIVE productions. That is, productions shown as Running on your %SYS homepage.
+
+This is useful for seeing workflows for a particular category across namespaces. It's a little slow if you have a lot of productions, but it works pretty well. 
+
+
+__Feature Added__: Segment Search.
+
+Hide segments that don't match your current search criteria. You can search specific segments by prepending your search with \SEGMENT\YOUR SEARCH HERE
+e.g. 
+\OBX\151570
+
+Bonus points if you know which Rosetta Terminology vitals that references.
+
+That example will only hide OBX segments, leaving other segments still visible. Useful for searching for specific OBX-3 values but leaving the OBR/PID/MSH etc.. segments showing. 
+
+Please remember to use back slashes. This also renders back slashes useless for search purposes. Sorry.
+
+
+__Feature Added__: Hide Iris Whiz Buttons Until Needed
+
+Added an IRIS WHIZ button to maximise/minimise the button bar as needed. This is the bar that appears on Full Trace tab, Message Contents Tab and Selected Messages Tab and contains Text Compare, Schema Search etc.
+
+Choose on the option page whether you want the button bar to be expanded on page load. Default is buttons are hidden. It also looks more fancy now. You're welcome.
+
+
+__Feature Added__: Bookmark Folder Name setting
+
+A new text input in the settings adds ability to recreate the bookmark folder with your desired name. I've not auto-deleted the old one in case people add other bookmarks to this folder. You have been warned.
+
+
+__Feature added__: Schema Mode on Message Contents pages.
+
+You can now toggle Schema Mode using the… Schema Mode button! The current behaviour for expanding schema only shows the known schema that is available in the Title of the field - the bit where you hover your mouse over the fields. The new version can look up the schema using the link in the segment element. This is slow, especially when used in conjunction with the Searching features. Therefore I've limited it to the Contents view. WARNING! It will continue to work if you import messages to this view. Unless you like to watch the world burn, don't use the Full Schema option if you have many messages imported into your page. 
+
+
+__Update__: Minor speed increases. Nobody will notice. Yay.
+
+
+##### 12/09/2023 Updates:
+
+Version 1.7.1
+
+__BugFix__:
+Header/Body/ContentsTrace tabs does not reappear if they were the last thing and first thing clicked on after clicking on Selected Messages/FullTrace tabs. This is fixed. Hoozah! Thanks for the feedback Anonymous reviewer
+
+__Updated Legend__:
+Legend now closes on most clicks outside/on the legend. Some pages contain other iframes where it's not possible for clicks to close it. I think it's good enough as is. Hide Legend button still appears for ease of use. 
+Legend also now styled a bit better. May be tough to see on smaller screens but I think the ease of use outweighs this issue. Again, thanks for the feedback Anonymous reviewer! Don't be afraid to update your review :D
+
+To update, copy your instance object from the options screen, download the latest version and paste your instance object back into the options page.
 
 
 ##### 11/09/2023 Updates:

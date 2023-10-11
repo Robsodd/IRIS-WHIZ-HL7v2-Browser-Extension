@@ -10,12 +10,12 @@ document.addEventListener("messageTabSearch", function(e) {
 
 document.addEventListener("disableTextCompare", function(e) {
 	mouseoverEnabled = false;
-	console.log("DisablingTextCompare ", mouseoverEnabled);
+	//console.log("DisablingTextCompare ", mouseoverEnabled);
 });
 
 document.addEventListener("enableTextCompare", function(e) {
 	mouseoverEnabled = true;
-	console.log("EnablingTextCompare ", mouseoverEnabled);
+	//console.log("EnablingTextCompare ", mouseoverEnabled);
 });
 
 if (currentUrl.includes("&btns=disable")) {
@@ -33,12 +33,19 @@ if (currentUrl.includes("&btns=disable")) {
 }
 
 function messageTabSearch(compareDropDown) {
-	console.log("messageTabSearch");
+	//console.log("messageTabSearch");
 	chrome.runtime.sendMessage({type: "message_tab_search"}).then((response) => {
-		console.log(response);
+		//console.log(response);
+		if (compareDropDown.options.length == 0) {
+			let tabOption = document.createElement("option");
+			tabOption.setAttribute('value', "Choose a tab");
+			let optionText = document.createTextNode("Choose a tab");
+			tabOption.appendChild(optionText);
+			compareDropDown.appendChild(tabOption);
+		}
 		
 		for (let tab in response.results) {
-			console.log("tab", response.results[tab]);
+			//console.log("tab", response.results[tab]);
 			let tabOption = document.createElement("option");
 			let value = response.results[tab].instance + " - " + response.results[tab].namespace + " - " + String(response.results[tab].messageHeaderNumber)
 			tabOption.setAttribute('value', response.results[tab].id);
@@ -53,9 +60,9 @@ function messageTabSearch(compareDropDown) {
 
 
 function messageTabGetMessage(tabId) {
-	console.log("messageTabGetMessage", String(tabId));
+	//console.log("messageTabGetMessage", String(tabId));
 	chrome.runtime.sendMessage({type: "message_tab_get_message", tabId: tabId}).then((response) => {
-		console.log(response);
+		//console.log(response);
 		
 		var htmlObject = document.createElement('div');
 		htmlObject.innerHTML = JSON.parse(response.results);
@@ -64,26 +71,27 @@ function messageTabGetMessage(tabId) {
 		document.body.appendChild(htmlObject);
 		document.dispatchEvent(addExpansionEvent);
 	});
+	return "done"
 }
 
 // Message Handler
 chrome.runtime.onMessage.addListener(
 	function(request, sender, sendResponse) {
-		console.log("messageTabGetMessage received", request);
+		//console.log("messageTabGetMessage received", request);
 		// Process request for message
 		if (request.type == "message_tab_get_message") {
-			console.log("messageTabGetMessage triggered");
+			//console.log("messageTabGetMessage triggered");
 			let returnSchemaTable = document.querySelector("body > table.EDIDocumentTable");
 			let returnDetails = document.querySelector("body > table:nth-child(2)");
 			
 			
 			let parsed = returnDetails.outerHTML + returnSchemaTable.outerHTML // + JSON.stringify(returnDetails.innerHTML)
 			parsed = JSON.stringify(parsed);
-			console.log("returnSchemaTable ", parsed);
+			//console.log("returnSchemaTable ", parsed);
 			sendResponse({response: parsed});
 			return true
 		} else {
-			console.log("text_compare request type unknown?");
+			//console.log("text_compare request type unknown?");
 		}
 		return true
 });
@@ -91,7 +99,7 @@ chrome.runtime.onMessage.addListener(
 
 // Add an event listener
 document.addEventListener("addMouseOverCompare", function(e) {
-	console.log("addMouseOverCompare Listener Triggered");
+	//console.log("addMouseOverCompare Listener Triggered");
 	segmentHeaders();
 	mouseover();
 });
@@ -112,7 +120,7 @@ function segmentHeaders() {
 			let segment_header = row.cells[3].innerText
 			let segment = row.cells[4].childNodes[0].childNodes[0].childNodes[0].childNodes
 			//console.log("Segment", segment);
-
+			let segmentLength = segment.length;
 			for (let td = 0; td < segment.length; td ++) {
 				field_counter ++
 				//console.log("SEGMENT: ", segment[td]);
@@ -134,7 +142,7 @@ function segmentHeaders() {
 			embedded_fields.unshift(segment_header);
 			row.cells[3].embeddedFields = embedded_fields;
 			row.cells[3].embeddedFieldsStr = embedded_fields.toString();
-			console.log("segment header processed", row.cells[3]);
+			//console.log("segment header processed", row.cells[3]);
 			//embedded_fields.unshift(segment_header);
 			//parsed_data.push(embedded_fields);
 			
@@ -147,8 +155,8 @@ function segmentHeaders() {
 function mouseover() {
 	var aHover = document.getElementsByTagName('a');
 	var highlighted = []
-
-	for (var i = 0; i < aHover.length; ++i){
+	let aHoverLength = aHover.length;
+	for (var i = 0; i < aHoverLength; ++i){
 		//console.log(aHover[i].title);
 		
 		if  (aHover[i].parentElement.className == "EDIDocumentTableSegname") {
@@ -156,14 +164,15 @@ function mouseover() {
 				// Find and compare with other segments with this name
 				if (mouseoverEnabled) {
 					var aSearch = document.getElementsByTagName('a');
-					for (let x = 0; x < aSearch.length; x++) {
+					let aSearchLength = aSearch.length;
+					for (let x = 0; x < aSearchLength; x++) {
 						if  (aSearch[x].parentElement.className == "EDIDocumentTableSegname") {
-							console.log("segment aSearch[x]", aSearch[x]);
+							//console.log("segment aSearch[x]", aSearch[x]);
 							if (aSearch[x].parentElement.embeddedFieldsStr == event.relatedTarget.embeddedFieldsStr) {
 								aSearch[x].parentElement.nextElementSibling.firstChild.style.background = "green";
 								highlighted.push(aSearch[x].parentElement.nextElementSibling.firstChild);
 							} else if (aSearch[x].parentElement.embeddedFields[0] == event.relatedTarget.embeddedFields[0]) {
-								console.log("compare segment name: ", aSearch[x].parentElement.embeddedFields[0], event.relatedTarget.embeddedFields[0])
+								//console.log("compare segment name: ", aSearch[x].parentElement.embeddedFields[0], event.relatedTarget.embeddedFields[0])
 								aSearch[x].parentElement.nextElementSibling.firstChild.style.background = "red";
 								highlighted.push(aSearch[x].parentElement.nextElementSibling.firstChild);
 							}
@@ -175,8 +184,9 @@ function mouseover() {
 			aHover[i].addEventListener('mouseover', (event) => {
 				if (mouseoverEnabled) {
 					var aSearch = document.getElementsByTagName('a');
-					console.log(event.relatedTarget.childNodes[0].title);
-					for (let x = 0; x < aSearch.length; x++) {
+					//console.log(event.relatedTarget.childNodes[0].title);
+					let aSearchLength = aSearch.length;
+					for (let x = 0; x < aSearchLength; x++) {
 						if (event.relatedTarget.childNodes[0].title == "") {
 							// Do nothing.
 						} else {
@@ -203,15 +213,15 @@ function mouseover() {
 								aSearch[x].style.backgroundColor = "red"
 							} else if (((aSearch[x].innerText.length > 2) && (event.relatedTarget.childNodes[0].innerText.includes(aSearch[x].innerText))) || ((event.relatedTarget.childNodes[0].innerText.length > 2) && (aSearch[x].innerText.includes(event.relatedTarget.childNodes[0].innerText)))) {
 								// Fields contain similar text
-								console.log("----------START---------");
-								console.log("FOUND <a>:", aSearch[x].innerText);
-								console.log("HOVERED <a>:", event.relatedTarget.childNodes[0].innerText);
-								console.log("Found <a> innerText.Length greater than 2: ",(aSearch[x].innerText.length > 2));
-								console.log("Found <a> is inside hovered element: ",  (event.relatedTarget.childNodes[0].innerText.includes(aSearch[x].innerText)));
-								console.log("BOTH OF ABOVE OR:");
-								console.log("Hovered <a> innerText.Length greater than 2: ", (event.relatedTarget.childNodes[0].innerText.length > 2));
-								console.log("Hovered <a> is inside found <a> element: ",  (aSearch[x].innerText.includes(event.relatedTarget.childNodes[0].innerText)));
-								console.log("----------END---------");
+								//console.log("----------START---------");
+								//console.log("FOUND <a>:", aSearch[x].innerText);
+								//console.log("HOVERED <a>:", event.relatedTarget.childNodes[0].innerText);
+								//console.log("Found <a> innerText.Length greater than 2: ",(aSearch[x].innerText.length > 2));
+								//console.log("Found <a> is inside hovered element: ",  (event.relatedTarget.childNodes[0].innerText.includes(aSearch[x].innerText)));
+								//console.log("BOTH OF ABOVE OR:");
+								//console.log("Hovered <a> innerText.Length greater than 2: ", (event.relatedTarget.childNodes[0].innerText.length > 2));
+								//console.log("Hovered <a> is inside found <a> element: ",  (aSearch[x].innerText.includes(event.relatedTarget.childNodes[0].innerText)));
+								//console.log("----------END---------");
 								
 								highlighted.push(aSearch[x]);
 								aSearch[x].style.color = ""
@@ -223,7 +233,8 @@ function mouseover() {
 			});
 		}
 		aHover[i].addEventListener('mouseout', (event) => {
-			for (let z = highlighted.length; z != 0; z--) {
+			let highlightedLength = highlighted.length;
+			for (let z = highlightedLength; z != 0; z--) {
 				highlighted[z-1].style.color = ""	
 				highlighted[z-1].style.backgroundColor = ""
 				highlighted.splice(z-1, 1);
@@ -241,8 +252,8 @@ function delay(time) {
 
 function segmentSearch(event, comparedSegment) {
 	var aSearch = document.getElementsByTagName('a');
-	
-	for (let x = 0; x < aSearch.length; x++) {
+	let aSearchLength = aSearch.length;
+	for (let x = 0; x < aSearchLength; x++) {
 		if  (aSearch.parentElement.className == "EDIDocumentTableSegname") {
 			if (aSearch.embeddedFieldsStr == event.relatedTarget.embeddedFieldsStr) {
 				aSearch[x].nextElement.firstChild.style.background = "LightGreen"
@@ -251,3 +262,4 @@ function segmentSearch(event, comparedSegment) {
 		}
 	}
 }
+

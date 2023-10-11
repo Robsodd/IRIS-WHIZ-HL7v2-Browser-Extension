@@ -98,8 +98,8 @@ window.addEventListener("load", function() {
 		// Click behaviour for tabs
 	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents]
 	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents] // Order must match above array
-	
-	for (let i = 0; i < fullTraceDisplayTabElements.length; i++) {
+	let fullTraceDisplayTabElementsLength = fullTraceDisplayTabElements.length
+	for (let i = 0; i < fullTraceDisplayTabElementsLength; i++) {
 		fullTraceDisplayTabElements[i].addEventListener('click', (e) => {
 			console.log("ELEM CLICKED: ", fullTraceDisplayTabElements[i], fullTraceDisplayBodyElements[i]);
 			console.log("currentTarget", e.currentTarget);
@@ -120,8 +120,8 @@ function fillFullTraceTab() {
 	traceMessagesCount = traceIframe.getElementsByTagName("circle").length;
 	businessObjects = traceIframe.getElementsByClassName("HostTitle");
 
-	
-	for (let i = 0; i < traceMessages.length; i++) {
+	let traceMessagesLength = traceMessages.length;
+	for (let i = 0; i < traceMessagesLength; i++) {
 		
 		if (traceMessages[i].id.includes("message")) {
 			let messageId = traceMessages[i].id.split("_")[1];
@@ -252,8 +252,9 @@ function fillFullTraceTab() {
 						}
 					})
 					
-					traceMessages[i].parentElement.addEventListener('click', (e) => {				
-							for (let i = 0; i < messageArray.length; i ++) {
+					traceMessages[i].parentElement.addEventListener('click', (e) => {
+							let messageArrayLength = messageArray.length;
+							for (let i = 0; i < messageArrayLength; i ++) {
 								messageArray[i].object.setAttribute('selected',"");
 								messageArray[i].object.style.backgroundColor = "white";
 							}
@@ -290,7 +291,8 @@ function fillFullTraceTab() {
 							
 							// Select the matching trace SVG message
 							if ((messageDiv.getAttribute('selected') == "") && (e.target ==  e.currentTarget)) {
-							for (let i = 0; i < messageArray.length; i ++) {
+							let messageArrayLength = messageArray.length;
+							for (let i = 0; i < messageArrayLength; i ++) {
 								messageArray[i].object.setAttribute('selected',"");
 								messageArray[i].object.style.backgroundColor = "white"
 							}
@@ -341,7 +343,8 @@ function getMessageLocations(message) {
 	
 	// Get Starting Operation of Message
 	// Loop through elements in the message icons and find the Start Location
-	for (let eachElem = 0; eachElem < elems.length; eachElem++ ) {
+	let elemsLength = elems.length;
+	for (let eachElem = 0; eachElem < elemsLength; eachElem++ ) {
 		if (elems[eachElem].className.animVal.includes("MsgStart")) {
 			messageStartLocation = elems[eachElem].attributes.cx.value;
 		} else if ((elems[eachElem].className.animVal.includes("MsgLine")) && (messageType == "")) {
@@ -354,13 +357,14 @@ function getMessageLocations(message) {
 		}
 	}
 	// Loop trough our busines_objects and find the header for the operation that matches our Start Location
-	for (let y = 0; y < businessObjects.length; y++) {
+	let businessObjectsLength = businessObjects.length;
+	for (let y = 0; y < businessObjectsLength; y++) {
 		if ((businessObjects[y].attributes.x.value == messageStartLocation) && (businessObjects[y].textContent != "")) {
 			messageStartOperation = messageStartOperation + businessObjects[y].innerHTML;			
 		}
 	}
 	// Loop through elements in the message icons and find the End Location
-	for (let eachElem = 0; eachElem < elems.length; eachElem++ ) {
+	for (let eachElem = 0; eachElem < elemsLength; eachElem++ ) {
 		if (elems[eachElem].className.animVal.includes("MsgTerm")) {
 			messageEndLocation = parseInt(elems[eachElem].attributes.x.value) + 7;
 			yValue = parseInt(elems[eachElem].attributes.y.value);
@@ -368,7 +372,7 @@ function getMessageLocations(message) {
 	}
 	
 	// Get Ending Operation of Message
-	for (let y = 0; y < businessObjects.length; y++) {
+	for (let y = 0; y < businessObjectsLength; y++) {
 		if ((businessObjects[y].attributes.x.value == String(messageEndLocation)) && (businessObjects[y].textContent != "")) {
 			messageEndOperation = messageEndOperation + businessObjects[y].innerHTML;
 		}					
@@ -393,14 +397,16 @@ function showRelatedButtonLogic(showRelatedBtn) {
 	showRelatedBtn.addEventListener('click', () => {
 		
 		// remove lines
+		let showRelatedLinesLength = showRelatedLines.length;
 		for (let x = 0; x < showRelatedLines.length; x++) {
 			showRelatedLines[x].parentElement.removeChild(showRelatedLines[x]);
 		}
 		showRelatedLines = [];
 		
 		// Toggle if currentRelated is same as selected.
+		let messageArrayLength = messageArray.length;
 		if (currentRelated != "") {
-			for (let i =0; i < messageArray.length; i++) {
+			for (let i =0; i < messageArrayLength; i++) {
 				if (messageArray[i].object.getAttribute("selected")) {
 					if (messageArray[i] == currentRelated) {
 						currentRelated = "";
@@ -410,7 +416,7 @@ function showRelatedButtonLogic(showRelatedBtn) {
 						} else {
 							hideUnrelatedBtn.style.display = "none";
 						}
-						for (let i =0; i < messageArray.length; i++) {
+						for (let i =0; i < messageArrayLength; i++) {
 							messageArray[i].object.style.display = "";
 							messageArray[i].appended = false;
 							messageArray[i].svgComponent.style.stroke = "";
@@ -427,7 +433,7 @@ function showRelatedButtonLogic(showRelatedBtn) {
 		
 		// Hide everything
 		//let messages = messageDocument.getElementsByClassName("MsgOutline");
-		for (let i =0; i < messageArray.length; i++) {
+		for (let i =0; i < messageArrayLength; i++) {
 			if (messageArray[i].object.getAttribute("selected") != "") {
 				currentRelated = messageArray[i]
 			}
@@ -439,7 +445,7 @@ function showRelatedButtonLogic(showRelatedBtn) {
 		
 		// Find selected/highlighted SVG icon
 		let selectedMessage = traceIframe.getElementsByClassName("MsgOutlineSelect");
-		for (let i =0; i < messageArray.length; i++) {
+		for (let i =0; i < messageArrayLength; i++) {
 			let messageText = selectedMessage[0].id
 			let messageId = messageText.slice(8)
 			if (messageId == String(messageArray[i].messageNumber)) {
@@ -465,7 +471,8 @@ function getEndConnected(messageInput) {
 	
 	//console.log("getEndConnected", messageInput);
 	let lineCounter = 0;
-	for (let i = 0; i < messageArray.length; i++) {
+	let messageArrayLength = messageArray.length;
+	for (let i = 0; i < messageArrayLength; i++) {
 		// check not original or already appended.
 		if ((messageArray[i].appended == false)&& (messageInput.locationInfo.yValue < messageArray[i].locationInfo.yValue)) {
 			//console.log(messageInput.locationInfo.endLocation, messageArray[i].locationInfo.startLocation);
@@ -518,7 +525,9 @@ function getStartConnected(messageInput) {
 	let lineCounter = 0;
 	//console.log("getStartConnected", messageInput);
 	//console.log("messageArray", messageArray.length);
-	for (let i = messageArray.length - 1; i > -1; i--) {
+	
+	let messageArrayLength = messageArray.length;
+	for (let i = messageArrayLength - 1; i > -1; i--) {
 		//console.log("messageArray[", i);
 		// Ignore if already processed & ensure message is earlier
 		if ((messageArray[i].appended == false) && (messageInput.locationInfo.yValue > messageArray[i].locationInfo.yValue)) {
@@ -569,6 +578,7 @@ function messageAppend() {
 		textCompareBtn(mainIframe.contentDocument);
 		compareLegendButtons(mainIframe.contentDocument);
 		searchExpandedSchemaButton(mainIframe.contentDocument);
+		searchSegmentsButton(mainIframe.contentDocument);
 		
 		let showRelatedBtn = showRelatedButton(mainIframe.contentDocument);
 		showRelatedButtonLogic(showRelatedBtn);
@@ -581,7 +591,8 @@ function messageAppend() {
 		});
 		//console.log("sortedMessageArray", String(sortedMessageArray.length), sortedMessageArray);
 		//console.log("messageArray", String(messageArray.length), messageArray);
-		for (let x = 0; x < sortedMessageArray.length; x++) {
+		let sortedMessageArrayLength = sortedMessageArray.length;
+		for (let x = 0; x < sortedMessageArrayLength; x++) {
 			syncScrolling(mainIframe.contentDocument, sortedMessageArray[x].object);
 			mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(sortedMessageArray[x].object);
 			//console.log("!!!!!!!!!!!!!!!!!!!!!mainIframe append child!!!!!!!!!!!!!!!!!!!!!");
@@ -607,17 +618,21 @@ function hideUnrelatedLogic(hideUnrelatedBtn) {
 		let traceRuleMarker1 = traceIframeCanvas.getElementsByClassName("ruleMarker1");
 		let traceEventMarkerBack = traceIframeCanvas.getElementsByClassName("eventMarkerBack");
 		
-		for (let i = 0; i < traceG.length; i++){
+		let traceGLength = traceG.length;
+		for (let i = 0; i < traceGLength; i++){
 			traceG[i].style.display = display;
 		}
-		for (let i = 0; i < traceRuleMarker1.length; i++){
+		let traceRuleMarker1Length = traceRuleMarker1.length;
+		for (let i = 0; i < traceRuleMarker1Length; i++){
 			traceRuleMarker1[i].style.display = display;
 		}
-		for (let i = 0; i < traceEventMarkerBack.length; i++){
+		let traceEventMarkerBackLength = traceEventMarkerBack.length;
+		for (let i = 0; i < traceEventMarkerBackLength; i++){
 			traceEventMarkerBack[i].style.display = display;
 		}
 		//console.log(messageArray)
-		for (let i = 0; i < messageArray.length; i ++) {
+		let messageArrayLength = messageArray.length;
+		for (let i = 0; i < messageArrayLength; i ++) {
 			
 			if (messageArray[i].appended == true) {
 				messageArray[i].svgComponent.parentElement.style.display = "";

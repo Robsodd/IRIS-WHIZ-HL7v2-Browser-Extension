@@ -219,7 +219,8 @@ function add_criterion2(messageSearchEvent) {
 			let delay_time = 800;
 			let joinCount = 0;
 			//console.log("criterionRows", criterionRows);
-			for (let i = 0; i < criterionRows.length; i++) {
+			let criterionRowsLength = criterionRows.length;
+			for (let i = 0; i < criterionRowsLength; i++) {
 				//console.log("criterionRows[", String(i), "]", criterionRows[i]);
 				// If Row = JoinSelect then add Join Select
 				if (criterionRows[i].joinSelect) {
@@ -340,7 +341,8 @@ function remove_criterion() {
 	
 		let buttons = document.getElementsByClassName("critLink")
 		//console.log("buttons", buttons);
-		for (i = 0; i < buttons.length; i++) {
+		let buttonsLength = buttons.length;
+		for (i = 0; i < buttonsLength; i++) {
 			
 			//console.log("button title:", i, buttons[i].title);
 			if (buttons[i].title == "Remove this criterion") {

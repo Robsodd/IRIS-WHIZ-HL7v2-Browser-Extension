@@ -8,10 +8,9 @@ let traceContent;
 
 window.addEventListener("load", function() {
 	chrome.storage.local.get({
-		TimeFormat: false,
-		SortOrder: false,		
-		},	function(settings) {
-			if (settings.TimeFormat) {
+		settings: {},	
+		},	function(stored) {
+			if (stored.settings.TimeFormat) {
 				// Change time format to COMPLETE
 				let timeFormat = document.getElementById("control_27");
 				timeFormat.click();
@@ -23,7 +22,7 @@ window.addEventListener("load", function() {
 				
 			}
 			
-			if (settings.SortOrder) {
+			if (stored.settings.SortOrder) {
 				// Change SortOrder to OLDEST FIRST
 				let sortOrder = document.getElementById("control_26");
 				sortOrder.click();
@@ -70,8 +69,8 @@ window.addEventListener("load", function() {
 	// Click behaviour for tabs
 	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents, headerMessageTrace]
 	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents, traceContent] // Order must match above array
-	
-	for (let i = 0; i < fullTraceDisplayTabElements.length; i++) {
+	let fullTraceDisplayTabElementsLength = fullTraceDisplayTabElements.length;
+	for (let i = 0; i < fullTraceDisplayTabElementsLength; i++) {
 		fullTraceDisplayTabElements[i].addEventListener('click', (e) => {
 			console.log("ELEM CLICKED: ", fullTraceDisplayTabElements[i], fullTraceDisplayBodyElements[i]);
 			console.log("currentTarget", e.currentTarget);
@@ -164,6 +163,8 @@ window.addEventListener("load", function() {
 							textCompareBtn(mainIframe.contentDocument);
 							compareLegendButtons(mainIframe.contentDocument);
 							searchExpandedSchemaButton(mainIframe.contentDocument);
+							searchSegmentsButton(mainIframe.contentDocument);
+
 							
 							mainIframe.style.width = "99%";
 							mainIframe.style.height = "95%";
@@ -267,7 +268,8 @@ function messageAppend(message) {
 	}
 
 	// Append message to the page in correct place.
-	for (let x = 0; x < sortedMessageArray.length; x++) {
+	let sortedMessageArrayLength = sortedMessageArray.length;
+	for (let x = 0; x < sortedMessageArrayLength; x++) {
 		if (sortedMessageArray[x] == message) {
 			try {
 				mainIframe.contentDocument.getElementsByTagName("body")[0].insertBefore(sortedMessageArray[x].object, sortedMessageArray[x+1].object);
@@ -278,7 +280,7 @@ function messageAppend(message) {
 	}
 	
 	// Append first message
-	if ((sortedMessageArray.length == 0) && (messageArray[0] == message)) {
+	if ((sortedMessageArrayLength == 0) && (messageArray[0] == message)) {
 		mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(message.object)
 		sortedMessageArray.push(message.object);
 	}

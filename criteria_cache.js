@@ -25,7 +25,8 @@ function getCriterionCache() {
 		if (cache.CriterionCache == undefined) {
 			criterionCache = [];
 		} else {
-			for (let i = 0; i < cache.CriterionCache.length; i++) {
+			let criterionCacheLength = cache.CriterionCache.length;
+			for (let i = 0; i < criterionCacheLength; i++) {
 				criterionCache[i] = cache.CriterionCache[i];
 				criterionCache[i].div = document.createElement("div");
 				criterionCache[i].div.innerHTML = "<div><h3>" + cache.CriterionCache[i].datetime.formatted + " - " + cache.CriterionCache[i].tieInfo.instance + "/ " +  cache.CriterionCache[i].tieInfo.namespace + "</h3></div>" + cache.CriterionCache[i].data.amended;
@@ -80,7 +81,8 @@ function saveCache(skipCurrent) {
 	let duplicate = false;
 	let x = 0;
 	// Check to see if current criterion object already exists in cache
-	for (let i = 0; i < criterionCache.length; i++) {
+	let criterionCacheLength = criterionCache.length;
+	for (let i = 0; i < criterionCacheLength; i++) {
 		x++
 		//console.log("duplicate check: ", criterionCache[i].data.raw, " === ", currentCriteriaObject.data.raw, (criterionCache[i].data.raw === currentCriteriaObject.data.raw))
 		if (criterionCache[i].data.raw === currentCriteriaObject.data.raw) {
@@ -105,7 +107,8 @@ function saveCache(skipCurrent) {
 			criterionCache.pop();
 		}
 		// Add current object to the cache
-		for (let i = 0; i < criterionCache.length; i++) {
+		let criterionCacheLength2 = criterionCache.length;
+		for (let i = 0; i < criterionCacheLength2; i++) {
 			//console.log("Adding to saved cache: ", criterionCache[i]);
 			savedCache[i] = {
 				datetime: criterionCache[i].datetime, 
@@ -124,7 +127,8 @@ function saveCache(skipCurrent) {
 		chrome.storage.local.set({CriterionCache: savedCache,}, function() {
 			//console.log('Saved criterionCache is set to:',  savedCache);
 		});
-		for (let i = 0; i < savedCache.length; i++) {
+		let savedCacheLength = savedCache.length;
+		for (let i = 0; i < savedCacheLength; i++) {
 			criterionCache[i] = savedCache[i];
 			criterionCache[i].div = document.createElement("div");
 			criterionCache[i].div.innerHTML = savedCache[i].data.amended;
@@ -208,8 +212,9 @@ function createModal() {
 			closeButton.parentElement.parentElement.parentElement.style.display = "none";
 		});
 		modalContent.appendChild(btnBar);
-
+		
 		// Iterate through criterionCache and create divs
+		let criterionCacheLength = criterionCache.length;
 		for (let i = 0; i < criterionCache.length; i++) {
 			globalIncrement++
 
@@ -231,7 +236,8 @@ function createModal() {
 				let closeButton = closeButtonDelete(document, criterionBtnBar);
 				closeButton.addEventListener('click', () => {			
 					console.log("criterionCache before delete",criterionCache);
-					for (let x = 0; x < criterionCache.length; x++) {
+					let criterionCacheLength = criterionCache.length;
+					for (let x = 0; x < criterionCacheLength; x++) {
 						if (criterionBtnBar.parentElement.childNodes[1].id.includes(criterionCache[x].datetime.raw)) {
 							//skip, the criterion object is identical to one in the cache							
 							console.log("DELETE MATCH!");
@@ -250,13 +256,15 @@ function createModal() {
 			}
 			//console.log("criterionCache[", i,"].div.childNodes", criterionCache[i].div.childNodes);
 			// Add hover and click behaviour to criterion elements
-			for (let x = 0; x < criterionCache[i].div.childNodes.length; x++) {
+			let childNodesLength = criterionCache[i].div.childNodes.length;
+			for (let x = 0; x < childNodesLength; x++) {
 				//console.log("criterionCache[", i,"].div.childNodes[", x, criterionCache[i].div.childNodes[x]);
 				if (criterionCache[i].div.childNodes[x].tagName == "TABLE") {
 					//criterionCache[i].div.childNodes[x].style.background = "red";
 					console.log(criterionCache[i].div.childNodes[x]);
 					try {
-						for (let z = 0; z < criterionCache[i].div.childNodes[x].childNodes[0].childNodes.length; z++) {
+						let childNodesLength2 = criterionCache[i].div.childNodes[x].childNodes[0].childNodes.length;
+						for (let z = 0; z < childNodesLength2; z++) {
 							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].style.background = "rgba(255,255,255,1)";
 							criterionCache[i].div.childNodes[x].childNodes[0].childNodes[z].style.cursor = "pointer";
 							
@@ -287,7 +295,8 @@ function renameIds(element, datetime) {
 	if (element.id) {
 		element.id = element.id + "_" + String(datetime);
 	}
-	for (let i = 0; i < element.children.length; i++) {
+	let childrenLength = element.children.length;
+	for (let i = 0; i < childrenLength; i++) {
 		renameIds(element.children[i], String(datetime));
 	}
 }
@@ -400,7 +409,8 @@ function addCriteriaToSearch(clickedCriteria) {
 	}
 	//console.log("Clicked criterionType = ", messageSearchEvent.criterionType);
 	messageSearchEvent.criterionRows = [];
-	for (let x = 1; x < clickedCriteria.length; x++) {
+	let clickedCriteriaLength = clickedCriteria.length;
+	for (let x = 1; x < clickedCriteriaLength; x++) {
 		let row;
 		if (clickedCriteria[x].className == "conditionRow") {			
 			let innerText = clickedCriteria[x].innerText.split("\t");

@@ -33,10 +33,11 @@ async function goToTrace() {
 	/// Takes user to the given trace ID
 	let tab = await getTabID();
 	var sessionId = document.querySelector("#sessionId").value;
-	
-	for (var i = 0; i < instances["instances"].length; i ++) {
+	let instancesLength = instances["instances"].length;
+	for (var i = 0; i < instancesLength; i ++) {
 		if (tab.includes(instances["instances"][i].url)) {
-			for (var x = 0; x < instances["instances"][i].namespaces.length; x ++) {
+			let  namespacesLength = instances["instances"][i].namespaces.length;
+			for (var x = 0; x < namespacesLength; x ++) {
 				if ((tab.includes(instances["instances"][i].namespaces[x].namespace)) || (tab.includes("NAMESPACE=" + instances["instances"][i].namespaces[x].namespace.toUpperCase()))){
 					let domain = tab.split("/")[2]
 					let protocol = tab.split("/")[0]

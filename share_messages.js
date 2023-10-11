@@ -15,10 +15,10 @@ buttonBarStyle(document);
 minimiseAllButton(document);
 wrapRowsButton(document);
 uncloseAllButton(document);
-//shareButton(document);
 textCompareBtn(document);
 compareLegendButtons(document);
 searchExpandedSchemaButton(document);
+searchSegmentsButton(document);
 
 scrollBarStyle(document);
 
@@ -30,8 +30,8 @@ const urlParams = new URLSearchParams(queryString);
 let param_messages = urlParams.getAll('m')
 let param_starts = urlParams.getAll('s')
 let param_ends = urlParams.getAll('e')
-
-for (let i = 0; i < param_messages.length; i++) {
+let param_messagesLength = param_messages.length;
+for (let i = 0; i < param_messagesLength; i++) {
 	let param_message = {messageNumber: param_messages[i], messageStartOperation: param_starts[i], messageEndOperation: param_ends[i], }
 	add_message_to_page(param_message);
 	if (i == param_message.length-1) {
@@ -68,9 +68,8 @@ function add_message_to_page(param_message) {
 	iframe.className = "traceViewerIframe";
 	iframe.style.display = "none";
 	
-	
 	iframe.addEventListener("load", function() {
-		//message_iframes_loaded ++
+		// on message iframe load get data, create messageDiv and append messageDiv to page
 		let messageDiv = document.createElement('div');
 		let message = {messageNumber: parseInt(messageId), object: messageDiv};
 		messageStyling(messageDiv);
@@ -81,22 +80,6 @@ function add_message_to_page(param_message) {
 		
 		messageDiv.innerHTML = messageHeading + messageDiv.innerHTML
 
-		//let closeButton = closeButtonHide(document);
-		//messageDiv.appendChild(closeButton);
-		
-		//let minimizeButton = minimiseButton(document, messageDiv);
-		//messageDiv.appendChild(minimizeButton);
-		
-		//let copyRawTextBtn = copyRawTextButton(document, messageId)
-		/*
-		buttonStyling(copyRawTextBtn);
-		copyRawTextBtn.style.backgroundColor = "lightgrey";
-		copyRawTextBtn.style.top = "5px";
-		copyRawTextBtn.style.right = "67px";
-		copyRawTextBtn.style.position = "absolute";
-		copyRawTextBtn.title = "Copy message as raw text";
-		copyRawTextBtn.innerText = "Copy Raw";
-		*/
 		messageArray.push(message);
 
 		messageDiv.id = messageId;
@@ -109,13 +92,7 @@ function add_message_to_page(param_message) {
 		copyRawTextButton(document, messageId, messageBtnBar);
 		
 		messageAppend(message);
-		/*
-		copyRawTextBtn.addEventListener('click', () => {
-			copyRawText.messageNumber = String(messageId);
-			document.dispatchEvent(copyRawText);
-		});
-		*/
-		messageDiv.appendChild(copyRawTextBtn);
+
 		iframe.parentNode.removeChild(iframe);
 		
 	});
@@ -127,17 +104,16 @@ function messageAppend(message) {
 	
 	
 	syncScrolling(document, message.object);
-	// Cycle through array. 
-	//console.log("messageArray", messageArray, messageArray[0].messageNumber);
+	// sort messages so they can be added in the message order
 	if (messageArray.length > 1) {
 		sortedMessageArray = messageArray.sort((a, b) => {
 			return  b.messageNumber - a.messageNumber;
 		});
 	}
 	//console.log("sorted_array", sortedMessageArray);
-	for (let x = 0; x < sortedMessageArray.length; x++) {
+	let sortedMessageArrayLength = sortedMessageArray.length;
+	for (let x = 0; x < sortedMessageArrayLength; x++) {
 		//console.log("sorted array messageNumber:", sortedMessageArray[x].messageNumber);
-		
 		if (sortedMessageArray[x] == message) {
 			try {
 				document.getElementsByTagName("body")[0].insertBefore(sortedMessageArray[x].object, sortedMessageArray[x+1].object);

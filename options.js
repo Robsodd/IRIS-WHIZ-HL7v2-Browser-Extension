@@ -3,18 +3,44 @@ console.log(instances.length)
 //console.log(instances);
 let currentInstanceSelected;
 loadReadMe();
+let exportWhiz = {};
+exportWhiz.settings = {};
 
-chrome.storage.local.get(['instances'], function(stored) {
-	console.log("stored!!!!!!!!!!!!!!!!!", stored);
+exportWhiz.settings.AutoTab = false;
+exportWhiz.settings.AutoTabNameSpace = false;
+exportWhiz.settings.CSS = false;
+exportWhiz.settings.SortOrder = false;
+exportWhiz.settings.TimeFormat = false;
+exportWhiz.settings.HomepageReports = false;
+exportWhiz.settings.LastUpdated = false;
+exportWhiz.settings.BookmarkFolderName = false; 
+exportWhiz.settings.ButtonsShow = false;
+exportWhiz.settings.ChatGPTKey = "";
+
+// Export
+chrome.storage.local.get({
+			settings: [],
+			instances: [],
+			}, function(stored) {
 	if (Object.keys(stored).length === 0) {
 		instances = [];
 	} else {
 		instances = stored.instances;
-		console.log("I SHOULD NOT SEE THIS");
-		document.getElementById('export').value = JSON.stringify(instances, null, 1);
+		//document.getElementById('export').value = JSON.stringify(instances, null, 1);
+		exportString = JSON.stringify(stored, null, 1);
+		console.log("exportWhiz", exportString);
+		
+		document.getElementById('export').value = JSON.stringify(exportString, null, 1);
 	}
-	console.log("instances after!", instances);
+	/*
+	//console.log("instances after!", instances);
+	chrome.storage.local.get(['settings'], function(stored) {
+		let settings = stored.settings;
+		exportWhiz.settings = JSON.stringify(settings, null, 1);
+		document.getElementById('export').value = JSON.stringify(exportWhiz, null, 1);
 	
+	});
+	*/
 });
 
 var refresh = document.getElementById('refreshInstances');
@@ -22,13 +48,16 @@ refresh.onclick = refreshInstances();
 
 
 function refreshInstances() {
-	chrome.storage.local.get(['instances'], function(stored) {
+	chrome.storage.local.get({
+			settings: [],
+			instances: [],
+			}, function(stored) {
 		if (Object.keys(stored).length === 0) {
 			instances = [];
 		} else {
 			instances = stored.instances;
 			console.log("I SHOULD NOT SEE THIS");
-			document.getElementById('export').value = JSON.stringify(instances, null, 1);
+			document.getElementById('export').value = JSON.stringify(stored, null, 1);
 		}
 		// Remove Instances from dropdown
 		removeInstances();
@@ -42,7 +71,8 @@ function refreshInstances() {
 
 /// Get instance number so you don't have to iterate through every time
 function getInstanceNumber(instanceName) {
-	for (var i = 0; i < instances.length; i ++ ){
+	let instancesLength = instances.length;
+	for (var i = 0; i < instancesLength; i ++ ){
 		if (instanceName == instances[i].name) {
 			return i;
 		}
@@ -52,7 +82,8 @@ function getInstanceNumber(instanceName) {
 
 /// Get namespace number so you don't have to iterate through every time
 function getNamespaceNumber(instanceNumber, namespaceName) {
-	for (var i = 0; i < instances[instanceNumber].namespaces.length; i ++ ) {
+	let namespacesLength = instances[instanceNumber].namespaces.length;
+	for (var i = 0; i < namespacesLength; i ++ ) {
 		if (namespaceName == instances[instanceNumber].namespaces[i].name) {
 			return i;
 		}
@@ -68,16 +99,14 @@ function getInstances() {
 	document.getElementById('ValidateNamespaceName').innerHTML = "";
 	document.getElementById('ValidateNamespaceSlug').innerHTML = "";
 	selection = document.getElementById('InstanceSelect');
-	/*if (instances == undefined) {
-		
-	} else {*/
-		for (var i = 0; i < instances.length; i ++ ) {
-			var opt = document.createElement('option');
-			opt.value = instances[i].name;
-			opt.innerHTML = instances[i].name;
-			selection.appendChild(opt);
-		}	
-	
+
+	let instancesLength = instances.length;
+	for (var i = 0; i < instancesLength; i ++ ) {
+		var opt = document.createElement('option');
+		opt.value = instances[i].name;
+		opt.innerHTML = instances[i].name;
+		selection.appendChild(opt);
+	}	
 }
 
 /// Remove instances from instance dropdown
@@ -104,7 +133,8 @@ function validateInstanceName() {
 		let error = "";
 		let instanceSelect = document.getElementById('InstanceSelect').value;
 		let newInstanceName = document.getElementById('InstanceName').value;
-		for (var i = 0; i < instances.length; i ++ ){ 
+		let instancesLength = instances.length;
+		for (var i = 0; i < instancesLength; i ++ ){ 
 			if (instances[i].name == newInstanceName) {
 				// Is this a new instance?
 				if (instanceSelect == "NewInstance") {
@@ -137,7 +167,8 @@ function validateInstanceUrl() {
 		//console.log("newInstanceURL", newInstanceURL);
 
 		// Check URL isn't already used (trigger error)
-		for (var i = 0; i < instances.length; i ++ ){ 
+		let instancesLength = instances.length;
+		for (var i = 0; i < instancesLength; i ++ ){ 
 			if (instances[i].url == newInstanceURL) {
 				//console.log("instances[i].url", instances[i].url);
 				// Is this a new instance?
@@ -172,7 +203,8 @@ function validateInstanceColour() {
 		let newInstanceName = document.getElementById('InstanceName').value;
 		let newInstanceColour = document.getElementById('InstanceColour').value;
 		// Check Colour isn't already used (trigger error)
-		for (var i = 0; i < instances.length; i ++ ){ 
+		let instancesLength = instances.length;
+		for (var i = 0; i < instancesLength; i ++ ){ 
 			if (instances[i].colour == newInstanceColour) {
 				// Is this a new instance?
 				if (instanceSelect == "NewInstance") {
@@ -203,11 +235,13 @@ function validateNamespaceName() {
 		let instanceSelect = document.getElementById('InstanceSelect').value;
 		let namespaceSelect = document.getElementById('NamespaceSelect').value;
 		let newNamespaceName = document.getElementById('NamespaceName').value;
-		for (var i = 0; i < instances.length; i ++ ){ 
+		let instancesLength = instances.length;
+		for (var i = 0; i < instancesLength; i ++ ){ 
 			//console.log("1");
 			if (instances[i].name == instanceSelect) {
 				//console.log("2", instances[i].namespaces.length);
-				for (var x = 0; x < instances[i].namespaces.length; x++ ){
+				let namespacesLength = instances[i].namespaces.length;
+				for (var x = 0; x < namespacesLength; x++ ){
 					//console.log("3");
 					if (newNamespaceName == instances[i].namespaces[x].name) {
 						//console.log("4");
@@ -243,9 +277,11 @@ function validateNamespaceSlug() {
 		let instanceSelect = document.getElementById('InstanceSelect').value;
 		let namespaceSelect = document.getElementById('NamespaceSelect').value;
 		let newNamespaceName = document.getElementById('newNamespaceSlug').value;
-		for (var i = 0; i < instances.length; i ++ ){ 
+		let instancesLength = instances.length;
+		for (var i = 0; i < instancesLength; i ++ ){ 
 			if (instances[i].name == instanceSelect) {
-				for (var x = 0; x < instances[i].namespaces.length; x++ ){
+				let namespacesLength = instances[i].namespaces.length;
+				for (var x = 0; x < namespacesLength; x++ ){
 
 					if (newNamespaceSlug == instances[i].namespaces[x].namespace) {
 						// Is this a new instance?
@@ -393,7 +429,8 @@ function showInstance(instanceName) {
 			document.getElementById('NamespaceName').value = "";
 			document.getElementById('NamespaceSlug').value = "";
 			namespaces.appendChild(addNew);
-			for (var x = 0; x < instances[i].namespaces.length; x ++ ){
+			let namespacesLength = instances[i].namespaces.length;
+			for (var x = 0; x < namespacesLength; x ++ ){
 				
 				var opt = document.createElement('option');
 				opt.value = instances[i].namespaces[x].name;
@@ -419,7 +456,8 @@ function showNamespace(namespace) {
 	
 	let match
 	if (instance == instances[i].name) {
-		for (var x = 0; x < instances[i].namespaces.length; x ++ ){
+		let namespacesLength = instances[i].namespaces.length;
+		for (var x = 0; x < namespacesLength; x ++ ){
 			if (match) {
 				break
 			}
@@ -438,36 +476,58 @@ function showNamespace(namespace) {
 function importInstances() {
 	let text = document.getElementById('export').value
 	let object = JSON.parse(text)
-	chrome.storage.local.set({instances: object}, function() {
-		//console.log('Instances is set to:',  object);
-		successAlert("Instances Imported");
-		refreshInstances();
+	
+	if (object.settings == undefined) {
+		chrome.storage.local.set({
+			instances: object,
+		}, function() {
+			//console.log('Instances is set to:',  object);
+			successAlert("Instances Imported");
+			refreshInstances();
+			
+		});
+	} else {
+		chrome.storage.local.set({
+		instances: object.instances,
+		settings: object.settings,
+		}, function() {
+			//console.log('Instances is set to:',  object);
+			successAlert("Instances and Settings Imported");
+			refreshInstances();
+			
+		});
 		
-	});
+	}
+
+
 }
 
 
 /// Saves settings to local storage
 function saveSettings() {
 		// var Bookmarks = document.getElementById('Bookmarks').checked;
-		var AutoTab = document.getElementById('AutoTab').checked;
-		var AutoTabNameSpace = document.getElementById('AutoTabNameSpace').checked;
-		var CSS = document.getElementById('CSS').checked;
-		var SortOrder = document.getElementById('MVSortOrder').checked;
-		var TimeFormat = document.getElementById('MVTimeFormat').checked;
-		var HomepageReports = document.getElementById('HomepageReports').checked;
-		var LastUpdated = new Date().toLocaleString();
-		
+		exportWhiz.settings.AutoTab = document.getElementById('AutoTab').checked;
+		exportWhiz.settings.AutoTabNameSpace = document.getElementById('AutoTabNameSpace').checked;
+		exportWhiz.settings.CSS = document.getElementById('CSS').checked;
+		exportWhiz.settings.SortOrder = document.getElementById('MVSortOrder').checked;
+		exportWhiz.settings.TimeFormat = document.getElementById('MVTimeFormat').checked;
+		exportWhiz.settings.HomepageReports = document.getElementById('HomepageReports').checked;
+		exportWhiz.settings.LastUpdated = new Date().toLocaleString();
+		exportWhiz.settings.BookmarkFolderName = document.getElementById('BookmarkFolderName').value; 
+		exportWhiz.settings.ButtonsShow = document.getElementById('ButtonsShow').checked; 
+		exportWhiz.settings.ChatGPTKey = document.getElementById('ChatGPTKey').value; 
+		/*chrome.tabs.getCurrent().then((tab) => {
+			console.log(tab);
+			chrome.tabs.sendMessage(tab.id, {type: "bookmarks_folder", test: "test",}, function(response) {
+					console.log("response", response);
+			});
+			
+		})*/
+		//exportWhiz.settings = "";
+		console.log("saveSettings:", exportWhiz);
 		// var ContextMenu = document.getElementById('ContextMenu').checked;
 		chrome.storage.local.set({
-			AutoTab: AutoTab,
-			AutoTabNameSpace: AutoTabNameSpace,
-			CSS: CSS,
-			SortOrder: SortOrder,
-			TimeFormat: TimeFormat,
-			HomepageReports: HomepageReports,
-			LastUpdated: LastUpdated,
-			
+			settings: exportWhiz.settings,
 		}, function() {
 			// Update status to let user know options were saved.
 			successAlert("Settings Saved");
@@ -501,22 +561,24 @@ function errorAlert(displayText) {
 function restoreOptions() {
 	  // Use default value color = 'red' and likesColor = true.
 		chrome.storage.local.get({
-			AutoTab: false,
-			AutoTabNameSpace: false,
-			CSS: false,
-			MessageSearch: false,
-			SortOrder: false,
-			TimeFormat: false,
-			HomepageReports: false,
-			
+			settings: {},
 		}, function(items) {
-			// document.getElementById('Bookmarks').checked = items.Bookmarks;
-			document.getElementById('AutoTab').checked = items.AutoTab;
-			document.getElementById('AutoTabNameSpace').checked = items.AutoTabNameSpace;
-			document.getElementById('CSS').checked = items.CSS;
-			document.getElementById('MVSortOrder').checked = items.SortOrder;
-			document.getElementById('MVTimeFormat').checked = items.TimeFormat;
-			document.getElementById('HomepageReports').checked = items.HomepageReports;
+			console.log("retreiving settings:", items.settings)
+			if (items.settings.AutoTab === undefined) {
+				console.log("can't retrieve!")
+				return
+			} else {
+				// document.getElementById('Bookmarks').checked = items.Bookmarks;
+				document.getElementById('AutoTab').checked = items.settings.AutoTab;
+				document.getElementById('AutoTabNameSpace').checked = items.settings.AutoTabNameSpace;
+				document.getElementById('CSS').checked = items.settings.CSS;
+				document.getElementById('MVSortOrder').checked = items.settings.SortOrder;
+				document.getElementById('MVTimeFormat').checked = items.settings.TimeFormat;
+				document.getElementById('HomepageReports').checked = items.settings.HomepageReports;
+				document.getElementById('BookmarkFolderName').value = items.settings.BookmarkFolderName;
+				document.getElementById('ButtonsShow').checked = items.settings.ButtonsShow;
+				document.getElementById('ChatGPTKey').value = items.settings.ChatGPTKey;
+			}
 			
 			// document.getElementById('ContextMenu').checked = items.ContextMenu;
 	  });
