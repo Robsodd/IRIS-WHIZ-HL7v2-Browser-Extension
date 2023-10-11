@@ -22,7 +22,13 @@
 	color: rgb(var(--link-colour)) !important;
 }
 
+
 /* for iris */
 #header {
 	background: rgb(var(--main-colour)) !important;
+}
+
+/* iris - rule editor */
+.fr-header-sidenav-container .header .mat-toolbar {
+    background: rgb(var(--main-colour)) !important;
 }

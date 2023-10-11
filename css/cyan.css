@@ -21,3 +21,7 @@
 	background: rgb(var(--main-colour)) !important;
 }
 
+/* iris - rule editor */
+.fr-header-sidenav-container .header .mat-toolbar {
+    background: rgb(var(--main-colour)) !important;
+}

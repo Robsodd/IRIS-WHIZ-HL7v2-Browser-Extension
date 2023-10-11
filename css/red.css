@@ -12,6 +12,7 @@
 
 .stdTitle {
     background: rgb(var(--main-colour)) !important;
+	color: white !important;
 }
 
 .portalTitleInfoLabel {
@@ -22,7 +23,25 @@
 	color: rgb(var(--link-colour)) !important;
 }
 
-/* for iris */
+/* for iris 
 #header {
 	background: rgb(var(--main-colour)) !important;
+}*/
+
+#zenLayoutTableCell_2 {
+	background: rgb(var(--main-colour)) !important;
+	color: white;
+}
+
+#locatorRow a {
+	color: white;
+}
+
+#locatorRow span {
+	color: white;
+}
+
+/* iris - rule editor */
+.fr-header-sidenav-container .header .mat-toolbar {
+    background: rgb(var(--main-colour)) !important;
 }

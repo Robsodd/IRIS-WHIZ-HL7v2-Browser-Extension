@@ -1,0 +1,60 @@
+/* Custom CSS */
+
+:root {
+  --schema-highlight: #eaafff;
+  --schema-background: mediumpurple;
+}
+
+.schemaMatch {
+	background: var(--schema-highlight);
+}
+
+.schemaField {
+	border-bottom: 1px solid mediumpurple;
+	white-space: nowrap;
+	font-size: 12;
+	padding: 2px 5px;
+}
+
+.schemaFieldHeader {
+	background-color: var(--schema-background);
+	color: white;
+	padding: 2px 5px;
+}
+
+
+.schemaFieldLink {
+	border-bottom: 1px solid mediumpurple;
+	white-space: nowrap;
+	font-size: 12;
+	padding: 2px 5px;
+	cursor: pointer;
+	color: blue;
+}
+
+
+.generateDiv {
+	margin: 30px;
+    padding: 5px;
+    border: black 1px solid;
+    max-width: 760px;
+}
+
+.gptForm{
+	display: grid;
+    grid-template-columns: auto 50% auto;
+	margin-bottom: 15px;
+}
+
+.gptFormTextArea {
+	display: grid;
+    grid-template-columns: auto 50% auto;
+	margin-bottom: 15px;
+	width: 95% !important;
+    min-height: 100px !important;
+}
+
+.gptFormLabel {
+	display: grid;
+    grid-template-columns: auto 50% auto;
+}
