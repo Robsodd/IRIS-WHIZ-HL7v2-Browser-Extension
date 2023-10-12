@@ -307,21 +307,6 @@ Toggle the button and it will look up the schema using the link in the segment e
 
 ## Updates
 
-##### 12/09/2023 Updates:
-
-Version 1.7.1
-
-__BugFix__: Header/Body/ContentsTrace tabs does not reappear if they were the last thing and first thing clicked on after clicking on Selected Messages/FullTrace tabs. This is fixed. Hoozah! Thanks for the feedback Anonymous reviewer
-
-__Updated Legend__: Legend now closes on most clicks outside/on the legend. Some pages contain other iframes where it's not possible for clicks to close it. I think it's good enough as is. Hide Legend button still appears for ease of use. 
-Legend also now styled a bit better. May be tough to see on smaller screens but I think the ease of use outweighs this issue. Again, thanks for the feedback Anonymous reviewer! Don't be afraid to update your review :D
-
-To update, copy your instance object from the options screen, download the latest version and paste your instance object back into the options page.
-
-
-__Updated Name__: Thought it needed something a touch shorter. Did a picture and an Icon. It'll do.
-
-
 ##### 11/10/2023 Updates:
 
 Version 1.8.0
