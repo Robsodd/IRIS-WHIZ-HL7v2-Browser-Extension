@@ -36,6 +36,7 @@ window.addEventListener("load", function() {
 	zen1Height = zen1.style.height;
 	propertyPane = document.getElementById("propertyPane");
 	propertyPaneHeight = propertyPane.style.height;
+	propertyPane.style.resize = "both";
 	body_62 = document.getElementById("body_62");
 	body_62Height = body_62.style.height;
 	settingsForm = document.getElementById("settingsForm");
