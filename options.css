@@ -4,6 +4,8 @@
   padding: 10px;
 }
 
+
+
 .column {
   padding: 20px;
   margin: 20px;
@@ -40,6 +42,7 @@
     padding: 30px 30px 15px 30px;
     border-radius: 5px;
     box-shadow: 0 0 25px -15px rgba(0, 0, 0, 0.3);
+    min-width: fit-content;
 }
 .form-container .title{
     font-size: 25px;
@@ -49,7 +52,7 @@
 }
 
 .form-group{
-    color: #333;
+    color: #646464;
     width: 100%;
     padding: 0 8px;
     margin: 0 0 15px;
@@ -93,3 +96,240 @@
     }
 }
 
+
+
+
+
+.instanceHeaders td {
+	background: #646464;
+  color: #d3d3d3;
+  font-weight: bold;
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+}
+
+.instanceHeaders tr:hover {
+  background: #646464;
+  color: #d3d3d3;
+  font-weight: bold;
+}
+
+
+.namespaceHeaders {
+  background: #646464;
+  color: #d3d3d3;
+  font-weight: bold;
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+}
+
+.namespaceHeaders tr:hover {
+  background: #646464;
+  color: #d3d3d3;
+  font-weight: bold;
+}
+
+.colourHeaders td {
+  background: #646464;
+  color: #d3d3d3;
+  font-weight: bold;
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+}
+
+.colourHeaders tr:hover {
+  background: #646464;
+  color: #d3d3d3;
+  font-weight: bold;
+}
+
+
+.spacer {
+	border: none;	
+}
+
+tr {
+	height: 40px;
+  background: #ffffff;
+	
+}
+
+tr:hover {background-color: #ddd;}
+
+th {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+td {
+	padding-left: 10px;
+	padding-right: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 75px;
+  width: 75px;
+
+}
+
+td select {
+  width: inherit;
+}
+
+td input {
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+  display: block;
+  position: relative;
+  z-index: 3;
+  word-wrap: break-word;
+  min-width: fit-content;
+  height: 50px;
+
+}
+
+caption {
+  text-align: center;
+  border: 1px grey solid;
+  background: #646464;
+  color: #d3d3d3;
+  font-size: x-large;
+}
+
+.spacer {
+  background: #eaeaea;
+}
+
+.instanceDelete {
+	background: pink;
+	color: white;
+	cursor: pointer;
+}
+
+.instanceDelete:hover {
+	box-shadow: 3px 3px rgba(0,0,0,0.15),5px 5px rgba(0,0,0,0.1);
+	border: 1px black solid;
+	
+}
+
+.newNamespaceField::before {
+	content: "Add Namespace ";
+	color: orange;
+	cursor: pointer;
+}
+
+.newNamespaceField {
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+}
+
+.newInstanceField::before {
+	content: "Add Instance ";
+	color: orange;
+	cursor: pointer;
+}
+
+.newInstanceField {
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+}
+
+
+.newColourField::before {
+	content: "Add Colour ";
+	color: orange;
+	cursor: pointer;
+}
+
+.newColourField {
+  overflow: unset;
+  text-overflow: unset;
+  white-space: unset;
+}
+
+
+.namespaceDelete {
+	background: pink;
+	color: white;
+	cursor: pointer;
+}
+
+.namespaceDelete:hover {
+	box-shadow: 3px 3px rgba(0,0,0,0.15),5px 5px rgba(0,0,0,0.1);
+	border: 1px black solid;
+}
+
+
+.colourDelete {
+	background: pink;
+	color: white;
+	cursor: pointer;
+}
+
+.colourDelete:hover {
+	box-shadow: 3px 3px rgba(0,0,0,0.15),5px 5px rgba(0,0,0,0.1);
+	border: 1px black solid;
+}
+
+table, th, td {
+  border: 1px solid #e7e7e7;
+  border-spacing: 0px;
+}
+
+table {
+  width: 100%;
+  background: #fff;
+  margin: auto;
+  border: 2px solid gray;
+}
+
+.tableHeader {
+  position: sticky;
+  top: 0px;
+}
+
+
+
+.selected {
+  background: #A9A9A9;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+body {
+  font-size: 14px;
+  color: #646464;
+}
+
+
+
+.namespaceContainer {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: rgba(244,244,244,0.5);
+  border-radius: 25px;
+  height: 100%;
+}
+
+.namespaceContainer .tableContainer {
+  position: fixed;
+  border: 2px solid gray;
+  left: 25%;
+  top: 25%;
+  width: 50%;
+}
+
+.tableContainer {
+  height: 50%;
+  overflow: auto;
+}

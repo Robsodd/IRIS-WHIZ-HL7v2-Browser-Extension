@@ -1,5 +1,5 @@
 ***
-VERSION 1.8.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION 1.9.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -21,7 +21,7 @@ https://youtu.be/cxpMFfGYGu0
 
 Or
 
-Download from GitHub: https://github.com/Robsodd/RDUH-Intersystems-HL7v2-Browser-Extension
+Download from GitHub: https://github.com/Robsodd/IRIS-WHIZ-HL7v2-Browser-Extension
 
 Unzip the downloaded folder.
 
@@ -39,9 +39,9 @@ To add your instances and namespaces navigate to the extensions options page.
 You can do this by going into your browser's extension manager and finding the options button. 
 OR if you have pinned the extension to your taskbar, click it and then click the Options Page button that appears in the pop-up window.
 
-Scroll down to the Instances form and add your instances and namespaces as needed. Each namespace you create will be associated with the instance that is currently showing in the instance form.
+Scroll down to the Instances table and add your instances. Click the namespace cell to open the pop-up namespace table. Each namespace you create will be associated with the instance that is showing in title of the namespace form.
 
-Click save after each instance / namespace added.
+Instances and Namespaces save automatically when you click off the field being edited.
 
 Finally, enable your desired features using the checkbox form at the top of this options page.
 
@@ -53,11 +53,14 @@ Finally, enable your desired features using the checkbox form at the top of this
 02. AutoTab - Namespaces
 03. Instance Header Colours
 15. Add Bookmarks
+30. Custom Colours
 
 
 #### Right Click Context Menu
 04. Message Search
 14. Open base64 string as PDF 
+31. Custom Page Titles & Saved Pages
+
 
 
 #### Message Viewer Page
@@ -87,6 +90,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 20. Multiple Message Scroll
 26. Segment Search
 27. Hide Iris Whiz Buttons Until Needed
+29. Splitscreen Comparisons
 
 
 #### Home Page 
@@ -304,8 +308,83 @@ Default behaviour for expanding schema only shows the known schema that is avail
 Toggle the button and it will look up the schema using the link in the segment element. This is slow, especially when used in conjunction with the Searching features. Therefore I've limited it to the Contents view. WARNING! It will continue to work if you import messages to this view. Unless you like to watch the world burn, don't use the Full Schema option if you have many messages imported into your page. 
 
 
+#### 29. Splitscreen Comparisons
+
+Click the green splitscreen button to see messages side by side.  The splitscreen option is only available where the screensize can become roughly full screen.
+
+This feature makes it easier to compare longer messages on the same screen.
+
+
+#### 30. Custom Colours
+
+Create and apply custom header colours to Instances and Namespaces. 
+
+Set the background, backup background (for use when trying to do gradient background colours and sharing instances objects across a team using different browsers), text colour and link colour. 
+
+To overwrite one of the default colours create a new colour with the same name. 
+
+
+#### 31. Custom Page Titles & Saved Pages
+
+Added a right click menu item on all pages to change the current page title. Useful if you've got several message pages open so you can differentiate easily via the tab name.
+
+Changing a page title saves the page in searchable local storage so you can open it again later. Click the extension's icon to view the saved pages section. 
+
+This is useful if you have multiple message tabs open and want to easily differentiate between them.
+
+
 
 ## Updates
+
+##### 27/01/2024 Updates:
+
+Version 1.9.0
+
+
+__Option Added__: Enable Text Compare as default.
+
+New setting on options page to enable text compare without having to toggle the button.
+
+
+__Feature Added__: Splitscreen Comparisons
+
+A green button now appears on messages when the splitscreen option is available. This allows you to see messages side by side making it easier to compare longer messages.
+
+
+__Feature Added__: Custom Colours
+
+Create and apply custom header colours to Instances and Namespaces. 
+
+Set the background, backup background (for use when trying to do gradient background colours and sharing instances objects across a team using different browsers), text colour and link colour. 
+
+To overwrite one of the default colours create a new colour with the same name. 
+
+
+__Feature Added__: Custom Page Titles & Saved Pages
+
+Added a right click menu item on all pages to change the current page title. Useful if you've got several message pages open so you can differentiate easily via the tab name.
+
+Changing a page title saves the page in searchable local storage so you can open it again later. Click the extension's icon to view the saved pages section. 
+
+This is useful if you have multiple message tabs open and want to easily differentiate between them.
+
+
+
+__Feature Updated__: Instances & Namespaces:
+
+Updated from a form to a table so that you can easily see your instance & namespace setup while editing. Automatically saves as you're editing so no need to click a save button anymore.
+
+
+__Feature Updated__: Settings:
+
+Automatically saves as you're editing so no need to click a save button anymore.
+
+
+__Feature Updated__: Whiz Button Bar
+
+Restructured buttons into roughly related groups to make it easier to read. I'm not sure about it. Let me know what you think!
+
+
 
 ##### 11/10/2023 Updates:
 

@@ -24,7 +24,7 @@ let newiframe = document.createElement("iframe");
 	newiframe.src = stubUrl[0]+"EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=&btns=disable";
 	newiframe.addEventListener("load", function() { 
 		newiframe.contentDocument.childNodes[0].childNodes[0].innerHTML = messageStyleString
-		//console.log("!!!!!!!!!!!!!!!!!!!!!new Iframe loaded!!!!!!!!!!!!!!!!!!!!!");
+		//console.log("new Iframe loaded");
 	})
 
 function fullTraceDisplayOff() {
@@ -83,19 +83,7 @@ window.addEventListener("load", function() {
 		fullTraceDisplayOn();
 	})
 	
-	/*
-	headerHeaderDetails.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
-	headerBodyDetails.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
-	headerBodyContents.addEventListener('click', () => {
-		fullTraceDisplayOff();
-	});
-	*/
-	
-		// Click behaviour for tabs
+	// Click behaviour for tabs
 	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents]
 	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents] // Order must match above array
 	let fullTraceDisplayTabElementsLength = fullTraceDisplayTabElements.length
@@ -105,13 +93,10 @@ window.addEventListener("load", function() {
 			console.log("currentTarget", e.currentTarget);
 			e.currentTarget.setAttribute("class", "tabGroupButtonOn");
 			fullTraceDisplayBodyElements[i].style.display = "";
-			// THE RELATED DIV .style.display = "";
 			fullTraceDisplayOff();
 		});
 	}
-	
 	fillFullTraceTab();
-	
 });
 
 function fillFullTraceTab() {
@@ -147,8 +132,6 @@ function fillFullTraceTab() {
 				mainIframe = iframe;
 			} else {
 				// All other messages to be scraped from their iframe and then iframe closed
-				//let br = document.createElement("br");
-				//document.body.appendChild(br);
 				document.body.appendChild(iframe);
 				iframe.style.height = iframe.scrollHeight + "px";
 				iframe.scrolling = "auto";
@@ -159,6 +142,9 @@ function fillFullTraceTab() {
 			iframe.addEventListener("load", function() {
 				messageIframesLoaded ++
 				let messageDiv = document.createElement('div');
+				let messageContentDiv = document.createElement('div');
+				messageContentDiv.classList.add("MsgContents");
+
 				messageStyling(messageDiv);
 				let unknownElement
 				//console.log("IFRAME: ", iframe);
@@ -167,19 +153,18 @@ function fillFullTraceTab() {
 					//console.log("DOES THIS = HL7???? ",iframe.contentDocument.getElementsByTagName("div")[0].innerHTML.trim().substring(0,3));
 					if  (iframe.contentDocument.getElementsByTagName("div")[0].innerHTML.trim().substring(0,3) == "HL7") {
 						//console.log("MAIN IFRAME:", mainIframe.contentDocument.getElementsByTagName("body")[0]);
-						messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-						messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-						messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-						messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-						messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+						messageContentDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+						messageContentDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+						messageContentDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+						messageContentDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+						messageContentDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
 						mainIframe.style.height = "100%";
 						scrollBarStyle(mainIframe.contentDocument);
 					} else {
-						//traceMessagesCount = traceMessagesCount + 1
 						// Logic when first message is not HL7 as we need appropriate src to enable scripts to load
 						unknownElement = document.createElement("div")
 						unknownElement.innerHTML = iframe.contentDocument.childNodes[1].childNodes[1].innerHTML
-						messageDiv.appendChild(unknownElement);
+						messageContentDiv.appendChild(unknownElement);
 						
 						fullTrace.removeChild(iframe)
 						newiframe.style.display = "";
@@ -202,28 +187,30 @@ function fillFullTraceTab() {
 				//console.log("traceMessages[i].locationInfo", traceMessages[i].locationInfo)
 				
 				if (traceMessages[i].locationInfo.messageType == "responder") {
-					messageHeading = '<a style="padding: 10px">' + traceMessages[i].locationInfo.endOperation + ' <---- ' + traceMessages[i].locationInfo.startOperation + '</a>';
+					messageHeading = '<a class="IWMsgTitle" style="padding: 10px">' + traceMessages[i].locationInfo.endOperation + ' <---- ' + traceMessages[i].locationInfo.startOperation + '</a>';
 				} else {
-					messageHeading = '<a style="padding: 10px">' + traceMessages[i].locationInfo.startOperation + ' ----> ' + traceMessages[i].locationInfo.endOperation + '</a>';
+					messageHeading = '<a class="IWMsgTitle" style="padding: 10px">' + traceMessages[i].locationInfo.startOperation + ' ----> ' + traceMessages[i].locationInfo.endOperation + '</a>';
 				}
 				
 				if (iframe != mainIframe) {
 					try {
-						messageDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
+						messageContentDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
 					} catch {
-						messageDiv.innerHTML = '</br><p style="color:red">Unable to retrieve HTML content.</p>'
+						messageContentDiv.innerHTML = '</br><p style="color:red">Unable to retrieve HTML content.</p>'
 					}
 				}
 				
-				messageDiv.innerHTML = messageHeading + messageDiv.innerHTML
+				messageContentDiv.innerHTML = messageHeading + messageContentDiv.innerHTML
 				messageDiv.id = messageId;
 				
 				let messageBtnBar = messageButtonBar(mainIframe.contentDocument, messageDiv.id)
 				messageDiv.appendChild(messageBtnBar);
-				
-				closeButtonHide(mainIframe.contentDocument, messageBtnBar);
-				minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
+				messageDiv.appendChild(messageContentDiv);
+
+				sideBySideCompareButton(mainIframe.contentDocument, messageBtnBar);
 				copyRawTextButton(mainIframe.contentDocument, messageId, messageBtnBar);
+				minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
+				closeButtonHide(mainIframe.contentDocument, messageBtnBar);
 				
 				try {
 					//console.log("traceMessages", traceMessages[i]);
@@ -578,6 +565,7 @@ function messageAppend() {
 		textCompareBtn(mainIframe.contentDocument);
 		compareLegendButtons(mainIframe.contentDocument);
 		searchExpandedSchemaButton(mainIframe.contentDocument);
+		schemaModeButton(mainIframe.contentDocument);
 		searchSegmentsButton(mainIframe.contentDocument);
 		
 		let showRelatedBtn = showRelatedButton(mainIframe.contentDocument);
@@ -593,7 +581,7 @@ function messageAppend() {
 		//console.log("messageArray", String(messageArray.length), messageArray);
 		let sortedMessageArrayLength = sortedMessageArray.length;
 		for (let x = 0; x < sortedMessageArrayLength; x++) {
-			syncScrolling(mainIframe.contentDocument, sortedMessageArray[x].object);
+			syncScrolling(mainIframe.contentDocument, sortedMessageArray[x].object.children[1]);
 			mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(sortedMessageArray[x].object);
 			//console.log("!!!!!!!!!!!!!!!!!!!!!mainIframe append child!!!!!!!!!!!!!!!!!!!!!");
 		}

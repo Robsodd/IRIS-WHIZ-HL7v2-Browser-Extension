@@ -27,7 +27,7 @@ window.addEventListener("load", function() {
 
 document.addEventListener("expandSchema", function(e) {
 	schemaSearch = e.schemaSearch
-	
+	console.log("expandSchema triggered. schemaModeFull = ", schemaModeFull);
 	//if ((e.advanced == undefined) || (e.advanced == false)) {
 	if (schemaModeFull === false) {
 		expandSchema();
@@ -62,7 +62,11 @@ if (currentUrl.includes("&btns=disable")) {
 function expandSchemaAdvanced() {
 	let rows = document.getElementsByClassName("EDIDocumentTableRow")
 	//console.log("ROWS", rows);
-
+	if (rows.length > 20) {
+		if (!confirm("This page contains " + String(rows.length) + " segments which could take a long while to load. \n Are you sure you want to continue?")) {
+			return
+		}
+	}
 	for (var i = 0, row; row = rows[i]; i++) {
 		//console.log("ROW", row);
 		expandRowAdvanced(row);
@@ -390,7 +394,11 @@ function searchExpandedSchema(e) {
 
 	if (eValue == '') {
 		if ((key == "Enter") && (eValue == '')) {
-			//e.searchExpandedSchemaBtn.style.display = "";
+			if (document.getElementById('whiz').style.display == "none") {
+				e.searchExpandedSchemaBtn.style.display = "inherit";
+			} else {
+				e.searchExpandedSchemaBtn.style.display = "none";
+			}
 			e.searchInput.style.display = "none";
 			e.searchlabel.style.display = "none";
 			document.dispatchEvent(contractSchemaEvent);

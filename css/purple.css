@@ -1,33 +1,84 @@
 
 :root {
-  --main-colour: 147,52,230;
-  --highlight-colour: 255,255,255;
-  --link-colour: 0,255,255;
+  --main-colour: rgb(147,52,230);
+  --main-colour-background: rgb(147,52,230);
+  --highlight-colour: rgb(255,255,255);
+  --link-colour:rgb(0,255,255);
+  --mc: var(--main-colour, linear-gradient(top, rgb(232,231,226), rgb(242,241,236),rgb(222,221,216)));
+  --mcb: var(--main-colour-background, --mc);
+  --hc: var(--highlight-colour, initial);
+  --lc: var(--link-colour, blue);
 }
 
 .portalTitle {
-	background: rgb(var(--main-colour)) !important;
-	border-bottom: rgb(var(--main-colour)) !important;
+  background: var(--mcb) !important;
+	background: var(--mc) !important;
+}
+
+.portalName {
+	color: var(--hc) !important;
 }
 
 .stdTitle {
-    background: rgb(var(--main-colour)) !important;
+    background: var(--mc) !important;
+	color: var(--hc) !important;
 }
 
 .portalTitleInfoLabel {
-	color: rgb(var(--highlight-colour)) !important;
+	color: var(--hc) !important;
+}
+
+.portalTitleInfoVal {
+	color: var(--hc) !important;
 }
 
 .portalTitleLink {
-	color: rgb(var(--link-colour)) !important;
+	color: var(--lc) !important;
 }
+
+#portalServerFlag {
+	color: var(--lc) !important;
+}
+
 
 /* for iris */
 #header {
-	background: rgb(var(--main-colour)) !important;
+  background: var(--mc) !important;
+}
+
+#zenLayoutTableCell_2 {
+  background: var(--mcb) !important;
+	background: var(--mc);
+	color: var(--hc) !important;
+}
+
+#locatorRow {
+	background: var(--mcb);
+  background: var(--mc) !important;
+}
+
+#locatorRow a {
+	color: var(--hc) !important;
+}
+
+#locatorRow span {
+	color: var(--hc) !important;
+	
 }
 
 /* iris - rule editor */
 .fr-header-sidenav-container .header .mat-toolbar {
-    background: rgb(var(--main-colour)) !important;
+  background: var(--mcb) !important;
+  background: var(--mc);
 }
+
+.appNameContainer {
+  background: var(--mc) !important;
+	color: var(--hc) !important;
+}
+
+
+mat-toolbar-row.mat-toolbar-row {
+	background: var(--mcb) !important;
+	background: var(--mc) !important;
+  }

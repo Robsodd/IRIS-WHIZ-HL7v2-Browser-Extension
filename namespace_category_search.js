@@ -24,6 +24,20 @@ console.log("currentNamespace", currentNamespace);
 createNamespaceCategorySearchBar(document);
 namespaceCategorySearchButton(document);
 
+function minimiseiFrame(Document, iframeDiv) {
+	let minimiseBtn = Document.createElement('btn');
+	
+	minimiseBtn.classList.add("minimiseiFrameBtn");
+	
+	minimiseBtn.title = "Close";
+	minimiseBtn.innerText = "x";
+	minimiseBtn.addEventListener('click', () => {
+		minimiseBtn.parentElement.style.display = "none";
+	})
+	//console.log("buttonBar", messageBtnBar, messageDiv.id);
+	iframeDiv.appendChild(minimiseBtn);
+}	
+
 window.addEventListener("load", function() { 
 
 	// Get category list for this page
@@ -38,11 +52,19 @@ window.addEventListener("load", function() {
 	propertyPaneHeight = propertyPane.style.height;
 	propertyPane.style.resize = "both";
 	body_62 = document.getElementById("body_62");
+	if (body_62 == undefined) {
+		// Ensemble
+		body_62 = document.getElementById("body_59");
+	}
 	body_62Height = body_62.style.height;
 	settingsForm = document.getElementById("settingsForm");
 	settingsFormHeight = settingsForm.style.height;
 
 	let zenLayoutTableCell_60 = document.getElementById("zenLayoutTableCell_60");
+	if (zenLayoutTableCell_60 == undefined) {
+		// Ensemble
+		zenLayoutTableCell_60 = document.getElementById("zenLayoutTableCell_57");
+	}
 	zenLayoutTableCell_60.style.overflow = "auto";
 
 });
@@ -73,24 +95,20 @@ document.addEventListener("categoryListSelection", function(e) {
 	//console.log("categoryListSelectionEvent",e);
 	let matchingNamespaces = 0;
 	for (let i = 0; i < activeNamespaces.length; i++ ) {
+		let iframe = activeNamespaces[i].iframe;
 		if (activeNamespaces[i].hostname == currentNamespace) {
-			// skip
+			// Hide current production
+			iframe.parentElement.style.display = "none";
 		} else {
-			
-			let iframe = activeNamespaces[i].iframe;
 			let categoryList = activeNamespaces[i].categoryList;
-			//console.log("categoryList", categoryList);
-			//console.log("e.optionValue", e.optionValue);
-			
-			
 			if ((categoryList != undefined) && (categoryList.includes(eventValue))) {
 				matchingNamespaces++
 				let iframeCategoryDropDown = iframe.contentDocument.getElementById("id_Category");
 				//console.log("iframeCategoryDropDown", iframeCategoryDropDown);
-				iframe.style.display = "";
+				iframe.parentElement.style.display = "";
 				updateCategoryList(iframeCategoryDropDown, eventValue);			
 			} else {
-				iframe.style.display = "none";
+				iframe.parentElement.style.display = "none";
 			}
 		
 		}
@@ -107,6 +125,10 @@ document.addEventListener("categoryListSelection", function(e) {
 		settingsForm.style.height = "325px";
 
 		let zenLayoutTableCell_60 = document.getElementById("zenLayoutTableCell_60");
+		if (zenLayoutTableCell_60 == undefined) {
+			// Ensemble
+			zenLayoutTableCell_60 = document.getElementById("zenLayoutTableCell_57");
+		}
 		zenLayoutTableCell_60.style.overflow = "auto";
 	} else {
 		
@@ -116,6 +138,10 @@ document.addEventListener("categoryListSelection", function(e) {
 		settingsForm.style.height = settingsFormHeight;
 
 		let zenLayoutTableCell_60 = document.getElementById("zenLayoutTableCell_60");
+		if (zenLayoutTableCell_60 == undefined) {
+			// Ensemble
+			zenLayoutTableCell_60 = document.getElementById("zenLayoutTableCell_57");
+		}
 		zenLayoutTableCell_60.style.overflow = "auto";
 		
 	}
@@ -185,7 +211,7 @@ document.addEventListener("categoryList", function(e) {
 	homepageIframe.style.display = "none";
 	document.body.appendChild(homepageIframe);
 	homepageIframe.addEventListener("load", function() {
-		let ndDidYou = homepageIframe.contentDocument.getElementsByClassName("ndDidYou");
+	let ndDidYou = homepageIframe.contentDocument.getElementsByClassName("ndDidYou");
 	linksContainer = homepageIframe.contentDocument.getElementById("messagePanel");
 	let links = linksContainer.getElementsByClassName("ndLink");
 	console.log("LINKS:", links);
@@ -228,12 +254,15 @@ document.addEventListener("categoryList", function(e) {
 			activeNamespaces[i].loaded = false;
 			iframe.style.width = "100%";
 			iframe.style.height = "500px";
-			iframe.style.display = "none";
+			//iframe.style.display = "none";
 			iframe.style.resize = "both";
 			iframe.style.overflow = "auto";
 			activeNamespaces[i].categoryList = [];
 			
-			document.body.appendChild(iframe);
+			let iframeDiv = document.createElement("div");
+			minimiseiFrame(document, iframeDiv);
+			iframeDiv.appendChild(iframe);
+			document.body.appendChild(iframeDiv);
 			
 			iframe.addEventListener("load", function() {
 				// this is where we need to hide the headers, grab the categories and 

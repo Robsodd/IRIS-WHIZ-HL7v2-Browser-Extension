@@ -37,7 +37,7 @@
 		box-shadow: 3px 3px rgba(0,0,0,0.15),5px 5px rgba(0,0,0,0.1);
 		outline: none;
 	}
-	
+
 	/* Style the buttons that are used to open and close the accordion panel */
 	.accordion {
 	  background-color: #eaeaea;
@@ -65,6 +65,48 @@
 	  overflow: hidden;
 	}
 	
+	.pageContainerDiv {
+		padding: 5px;
+		padding-right: 20px;
+		border: 1px solid lightgrey;
+		text-underline-position: under;
+		text-decoration: none;
+		border-radius: 5px;
+		margin-top: 5px;
+		position: relative;
+	}
+
+	.active, .pageContainerDiv:hover {
+	  background-color: #ccc;
+	}
+
+	.pageContainerDiv p {
+		margin: 0px;
+    	color: grey;
+	}
+
+	.pageContainerDiv a {
+		text-decoration: none;
+	}
+
+	.closeBtnDelete {
+		background-color: pink;
+		padding-left: 3px;
+		padding-right: 3px;
+		border: solid 1px black;
+		cursor: pointer;
+		position: absolute;
+		display: inherit;
+		top: 5px;
+		right: 5px;
+	}
+
+	#pageTitles {
+		overflow: auto;
+		max-height: 200px;
+	}
+
+
   </style>
 </head>
 <body>
@@ -93,6 +135,18 @@
 		<input type="text" id="sessionId" name="sessionId"><br>
 		<button id="traceButton" class="btn" >Open Session</button><br>
 		<i>Current tab must be in the NameSpace you are searching.</i>
+	</div>
+</div>
+<br>
+<div id="pageTitles">
+	<button class="accordion" id="pageTitlesBtn">Saved Page Titles</button>
+	<div class="panel">
+		<p>Your saved pages:</p>
+		<label type="text" for="pageTitles">Search:<br>
+		<input type="text" id="pageTitlesSearch" name="pageTitles"><br>
+		<div id="pageContainerDiv">
+		</div>
+		<i>Defaults to showing last 5 pages saved.</i>
 	</div>
 </div>
 

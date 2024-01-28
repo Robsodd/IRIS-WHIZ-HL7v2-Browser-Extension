@@ -2,7 +2,7 @@
 console.log("Utils loaded");
 
 let settings
-
+let mouseoverEnabled = false
 
 let currentUrl = window.location.href;
 
@@ -24,6 +24,9 @@ let tabGroupBody;
 let headerDetails;
 let bodyDetails;
 let bodyContents;
+
+// Side by side compare 
+let initialImport = true;
 
 try {
 	stubUrl = currentUrl.split("EnsPortal");
@@ -88,6 +91,12 @@ let copyRawText;
 copyRawText = document.createEvent("HTMLEvents");
 copyRawText.initEvent("copyRawText", true, true);
 copyRawText.eventName = "copyRawText";
+
+
+let sideBySideCompareEvent;
+sideBySideCompareEvent = document.createEvent("HTMLEvents");
+sideBySideCompareEvent.initEvent("sideBySideCompare", true, true);
+sideBySideCompareEvent.eventName = "sideBySideCompare";
 
 let messageTabSearchEvent; // The custom event that will be created
 messageTabSearchEvent = document.createEvent("HTMLEvents");
@@ -155,7 +164,7 @@ function buttonStyling(buttonObject) {
 
 function messageStyling(object){
 	/// Style messages
-	object.className = "MsgOutline";
+	object.className = "IWMsgOutline";
 	object.style.border = "solid 2px darkBlue";
 	object.style.backgroundColor = "white";
 	object.style.borderRadius = "5px";
@@ -169,12 +178,14 @@ function messageStyling(object){
 
 // Button bar for individual messages
 function messageButtonBar(Document, messageId) {
-	let messageBtnBar = Document.createElement('div');
+	let messageBtnBar = Document.createElement('ul');
+	messageBtnBar.classList.add("messageBtnBar");
+
 	//messageBtnBar.style.backgroundColor = "black";
-	messageBtnBar.style.position = "sticky";
-	messageBtnBar.style.bottom = "100%";
-	messageBtnBar.style.left = "100%";	
-	messageBtnBar.style.width = "max-content";
+	//messageBtnBar.style.position = "sticky";
+	//messageBtnBar.style.bottom = "100%";
+	//messageBtnBar.style.left = "100%";	
+	//messageBtnBar.style.width = "max-content";
 	messageBtnBar.id = "buttonBar" + String(messageId);
 	
 	//messageBtnBar.addEventListener("click", function(e) {
@@ -190,14 +201,20 @@ function messageButtonBar(Document, messageId) {
 function closeButtonHide(Document, messageBtnBar) {
 	
 	let closeBtnHide = Document.createElement('btn');
+	closeBtnHide.classList.add("whizButton");
 	closeBtnHide.classList.add("closeBtnHide");
+	
 	
 	closeBtnHide.title = "Close";
 	closeBtnHide.innerText = "x";
 	closeBtnHide.addEventListener('click', () => {
-		closeBtnHide.parentNode.parentNode.style.display = "none";
+		closeBtnHide.parentNode.parentNode.parentNode.style.display = "none";
 	})
-	messageBtnBar.appendChild(closeBtnHide);	
+
+	let li = Document.createElement('li');
+	li.append(closeBtnHide);
+	messageBtnBar.appendChild(li);
+	//messageBtnBar.appendChild(closeBtnHide);	
 	return closeBtnHide
 }
 
@@ -205,14 +222,20 @@ function closeButtonHide(Document, messageBtnBar) {
 function closeButtonDelete(Document, messageBtnBar) {
 	
 	let closeBtnDelete = Document.createElement('btn');
+	closeBtnDelete.classList.add("whizButton");
 	closeBtnDelete.classList.add("closeBtnDelete");
+	
 
 	closeBtnDelete.title = "Close";
 	closeBtnDelete.innerText = "x";
 	closeBtnDelete.addEventListener('click', () => {
 		messageBtnBar.parentNode.parentNode.removeChild(messageBtnBar.parentNode);
 	})
-	messageBtnBar.appendChild(closeBtnDelete);
+	//messageBtnBar.appendChild(closeBtnDelete);
+	let li = Document.createElement('li');
+	li.append(closeBtnDelete);
+	messageBtnBar.appendChild(li);
+	
 	return closeBtnDelete
 }
 				
@@ -220,8 +243,9 @@ function closeButtonDelete(Document, messageBtnBar) {
 function copyRawTextButton(Document, messageId, messageBtnBar) {
 	
 	let copyRawTextBtn = document.createElement('btn');
+		copyRawTextBtn.classList.add("whizButton");
 		copyRawTextBtn.classList.add("copyRawTextBtn");
-		
+		copyRawTextBtn.id = "copyRawText" + messageId
 		copyRawTextBtn.title = "copyRawText";
 		copyRawTextBtn.innerText = "Copy Raw Text";
 					
@@ -229,15 +253,19 @@ function copyRawTextButton(Document, messageId, messageBtnBar) {
 			copyRawText.messageNumber = String(messageId);
 			Document.dispatchEvent(copyRawText);
 		})
-	messageBtnBar.appendChild(copyRawTextBtn);
-	
+	//messageBtnBar.appendChild(copyRawTextBtn);
+	let li = Document.createElement('li');
+	li.append(copyRawTextBtn);
+	messageBtnBar.appendChild(li);
+
+	return copyRawTextBtn
 }
 
 function minimiseButton(Document, messageDiv, messageBtnBar) {
 	let minimiseBtn = Document.createElement('btn');
-	
+	minimiseBtn.classList.add("whizButton");
 	minimiseBtn.classList.add("minimiseBtn");
-	
+
 	minimiseBtn.title = "Minimise";
 	minimiseBtn.innerText = "-";
 	minimiseBtn.addEventListener('click', () => {
@@ -254,7 +282,10 @@ function minimiseButton(Document, messageDiv, messageBtnBar) {
 		}
 	})
 	//console.log("buttonBar", messageBtnBar, messageDiv.id);
-	messageBtnBar.appendChild(minimiseBtn);
+	//messageBtnBar.appendChild(minimiseBtn);
+	let li = Document.createElement('li');
+	li.append(minimiseBtn);
+	messageBtnBar.appendChild(li);
 }	
 
 
@@ -278,8 +309,31 @@ function copyRawTextButtonBar(Document) {
 	})
 	let li = Document.createElement('li');
 	li.append(copyRawBtn);
-	let buttonBar = Document.getElementById("buttonBar")
+	let buttonBar = Document.getElementById("btnBarMessageSizing")
 	buttonBar.appendChild(li);
+}
+
+function sideBySideCompareButton(Document, messageBtnBar) {
+	let sideBySideCompareBtn = Document.createElement('btn');
+
+	sideBySideCompareBtn.classList.add("whizButton");
+	sideBySideCompareBtn.classList.add("sideBySideCompareBtn");
+	
+	sideBySideCompareBtn.style.display = "inherit";
+	
+	sideBySideCompareBtn.title = "Splitscreen View: Move to other side";
+	sideBySideCompareBtn.innerText = "||";
+
+	sideBySideCompareBtn.addEventListener('click', (e) => {
+		sideBySideCompareEvent.messageId = e.target.parentElement.parentElement.parentElement.id;
+		Document.dispatchEvent(sideBySideCompareEvent);
+	})
+
+	let li = Document.createElement('li');
+	li.append(sideBySideCompareBtn);
+	messageBtnBar.appendChild(li);
+	//console.log("buttonBar", messageBtnBar, messageDiv.id);
+	//messageBtnBar.appendChild(sideBySideCompareBtn);
 }
 
 
@@ -333,7 +387,7 @@ function messageImportBtn(Document) {
 			return
 		}
 		//console.log(messageTabGetMessage(compareDropDown.value))
-		messageTabGetMessage(compareDropDown.value);
+		messageTabGetMessage(compareDropDown.value, e.target.selectedOptions[0].innerText);
 		/// TODO - swap this delay for a proper promise on the messageTabGetMessage!!!
 		delay(500).then(() => {
 			Document.dispatchEvent(addMouseOverCompare);
@@ -377,38 +431,76 @@ function messageImportBtn(Document) {
 	
 	let li = Document.createElement('li');
 	li.append(div);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarTextComparison");
 	buttonBar.appendChild(li);
 }
-let mouseoverEnabled = false
+
+
 function textCompareBtn(Document) {
 	let textCompareBtn = Document.createElement('btn');
-	//buttonStyling(textCompareButton);
-	
-	textCompareBtn.classList.add("whizButton");
-	textCompareBtn.classList.add("textCompareBtn");
-	
-	textCompareBtn.title = "Hover mouse over segments and fields to perform comparison.";
-	textCompareBtn.innerText = "Enable Text Compare";
-	
-	textCompareBtn.addEventListener('click', () => {
-		if (mouseoverEnabled) {
-			Document.dispatchEvent(disableTextCompareEvent);
-			mouseoverEnabled = false;
-			textCompareBtn.style.backgroundColor = "#df663d";
-			textCompareBtn.innerText = "Enable Text Compare";
-		} else {
-			Document.dispatchEvent(enableTextCompareEvent);
-			mouseoverEnabled = true;
-			textCompareBtn.style.backgroundColor = "salmon";
-			textCompareBtn.innerText = "Disable Text Compare";
-		}
-	})
-	//Document.getElementsByTagName("body")[0].appendChild(minimiseAllButton);
 	let li = Document.createElement('li');
 	li.append(textCompareBtn);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarTextComparison");
 	buttonBar.appendChild(li);
+	console.log("TEXT COMPARE BUTTON ADDED");
+
+	chrome.storage.local.get({
+		settings: [],
+		instances: [],
+		}, function(stored) {
+			if (Object.keys(stored).length === 0) {
+				instances = [];
+				settings = {};
+			} else {
+				instances = stored.instances;
+				settings = stored.settings;
+				/*
+				if (settings.CustomColours != undefined) {
+					customColours = settings.CustomColours;
+				}*/
+				if (settings.TextCompareOn != undefined) {
+					mouseoverEnabled = settings.TextCompareOn;
+				}
+				
+			}
+			
+			//buttonStyling(textCompareButton);
+			
+			textCompareBtn.classList.add("whizButton");
+			textCompareBtn.classList.add("textCompareBtn");
+
+			if (settings.ButtonsShow) {
+				textCompareBtn.style.display = "inherit";
+			}
+			//textCompareBtn.style.display = "inherit";
+			textCompareBtn.title = "Hover mouse over segments and fields to perform comparison.";
+			if (mouseoverEnabled) {
+				textCompareBtn.innerText = "Disable Text Compare";
+				textCompareBtn.style.backgroundColor = "salmon";
+				Document.dispatchEvent(enableTextCompareEvent);
+				console.log("TEXT COMPARE AUTO ON");
+			} else {
+				textCompareBtn.innerText = "Enable Text Compare";
+			}
+			
+			textCompareBtn.addEventListener('click', () => {
+				if (mouseoverEnabled) {
+					Document.dispatchEvent(disableTextCompareEvent);
+					mouseoverEnabled = false;
+					textCompareBtn.style.backgroundColor = "#df663d";
+					textCompareBtn.innerText = "Enable Text Compare";
+				} else {
+					Document.dispatchEvent(enableTextCompareEvent);
+					mouseoverEnabled = true;
+					textCompareBtn.style.backgroundColor = "salmon";
+					textCompareBtn.innerText = "Disable Text Compare";
+				}
+			})
+			//Document.getElementsByTagName("body")[0].appendChild(minimiseAllButton);
+			
+
+	});
+	
 }
 
 function minimiseAllButton(Document) {
@@ -437,13 +529,17 @@ function minimiseAllButton(Document) {
 	})
 	let li = Document.createElement('li');
 	li.append(minimiseAllBtn);
-	let buttonBar = Document.getElementById("buttonBar")
+	let buttonBar = Document.getElementById("btnBarMessageSizing")
 	buttonBar.appendChild(li);
 }
 
-let wrapSetting = ""
-let wrapWidth = ""
-let wrapOverflowX = ""
+let wrapSetting = "";
+let wrapWidth = "";
+let wrapOverflowX = "";
+let tableLayout = "";
+let wrapWidthSegment = "";
+let textWrap = "";
+let overflowWrap = "";
 
 function wrapRowsButton(Document) {
 	/// Adds button to enable wrapping of table rows
@@ -462,28 +558,51 @@ function wrapRowsButton(Document) {
 
 		if (wrapSetting == "") {
 			wrapSetting = "inline-block" ;
-			wrapWidth = "95%";
+			wrapWidth = "auto";
+			wrapWidthSegment = "auto";
 			wrapOverflowX = "hidden";
+			tableLayout = "fixed";
+			textWrap = "balance";
+			overflowWrap = "anywhere";
 		} else {
 			wrapSetting = "" ;
 			wrapWidth = "";
+			wrapWidthSegment = "";
 			wrapOverflowX = "auto";
+			tableLayout = "unset";
+			textWrap = "";
+			overflowWrap = "";
 		}
 		let l = tableData.length;
 		for (let i = 0; i < l; i++) {
 			tableData[i].style.display = wrapSetting;
+			tableData[i].style.textWrap = textWrap;
+			tableData[i].style.overflowWrap = overflowWrap;
 		}
 		let EDIDocumentTable = Document.getElementsByClassName("EDIDocumentTable");
 		let l2 = EDIDocumentTable.length;
 		for (let i = 0; i < l2; i++) {
 			EDIDocumentTable[i].style.width = wrapWidth;
 			EDIDocumentTable[i].parentElement.style.overflowX = wrapOverflowX;
+			EDIDocumentTable[i].style.tableLayout = tableLayout;
 		}
+
+		let EDISegmentsTable = Document.getElementsByClassName("EDISegmentsTable");
+		let l3 = EDISegmentsTable.length;
+		for (let i = 0; i < l3; i++) {
+			EDISegmentsTable[i].style.width = wrapWidthSegment;
+			EDISegmentsTable[i].parentElement.style.overflowX = wrapOverflowX;
+			EDISegmentsTable[i].parentElement.style.textWrap = textWrap;
+			EDISegmentsTable[i].parentElement.style.overflowWrap = overflowWrap;
+			EDISegmentsTable[i].style.textWrap = textWrap;
+			EDISegmentsTable[i].style.overflowWrap = overflowWrap;
+		}
+
 	});
 	
 	let li = Document.createElement('li');
 	li.append(wrapRowsBtn);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarMessageSizing");
 	buttonBar.appendChild(li);
 }
 
@@ -499,7 +618,7 @@ function showRelatedButton(messageDocument) {
 	
 	let li = messageDocument.createElement('li');
 	li.append(showRelatedBtn);
-	let buttonBar = messageDocument.getElementById("buttonBar")
+	let buttonBar = messageDocument.getElementById("btnBarTraceViewer")
 	buttonBar.appendChild(li);
 	return showRelatedBtn
 }
@@ -517,7 +636,7 @@ function hideUnrelatedButton(messageDocument) {
 
 	let li = messageDocument.createElement('li');
 	li.append(hideUnrelatedBtn);
-	let buttonBar = messageDocument.getElementById("buttonBar")
+	let buttonBar = messageDocument.getElementById("btnBarTraceViewer")
 	buttonBar.appendChild(li);
 	return hideUnrelatedBtn
 }
@@ -563,7 +682,7 @@ function searchExpandedSchemaButton(Document) {
 	});
 	
 	searchExpandedSchemaBtn.addEventListener('click', () => {
-		//searchExpandedSchemaBtn.style.display = "none";
+		searchExpandedSchemaBtn.style.display = "none";
 		searchInput.style.display = "";
 		searchlabel.style.display = "";
 		expandSchemaEvent.schemaSearch = true
@@ -574,7 +693,7 @@ function searchExpandedSchemaButton(Document) {
 	
 	let li = Document.createElement('li');
 	li.append(searchDiv);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarMessageSearch");
 	buttonBar.appendChild(li);
 	
 }
@@ -598,7 +717,7 @@ function uncloseAllButton(Document) {
 		let l = buttons.length;
 		for (let i =0; i < l; i++) {
 			if (buttons[i].title == "Close") {
-				buttons[i].parentNode.parentNode.style.display = "";
+				buttons[i].parentNode.parentNode.parentNode.style.display = "";
 			}
 		}
 		
@@ -614,7 +733,7 @@ function uncloseAllButton(Document) {
 	})
 	let li = Document.createElement('li');
 	li.append(reopenButton);
-	let buttonBar = Document.getElementById("buttonBar")
+	let buttonBar = Document.getElementById("btnBarMessageSizing")
 	buttonBar.appendChild(li);
 }
 
@@ -657,7 +776,7 @@ function shareButton(Document) {
 	})
 	let li = Document.createElement('li');
 	li.append(shareBtn);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarMessageSizing");
 	buttonBar.appendChild(li);
 		
 }
@@ -675,9 +794,9 @@ function compareLegendButtons(Document) {
 
 	let legendTitle = Document.createElement("div");
 	legendTitle.innerText = "TEXT COMPARE LEGEND";
-	legendTitle.style.color = "white";
-	legendTitle.style.backgroundColor = "black";
+	//legendTitle.style.color = "white";
 	legendTitle.style.padding = "8px";
+	legendTitle.classList.add("legendTitle");
 	
 	let legendExactMatch = Document.createElement("div");
 	legendExactMatch.innerText = "Field name match, value match";
@@ -725,15 +844,15 @@ function compareLegendButtons(Document) {
 	compareLegendDiv.appendChild(legendSegmentMatch);
 	compareLegendDiv.appendChild(legendSegmentMisMatch);
 
-	compareLegendDiv.style.position = "absolute";
+	compareLegendDiv.style.position = "fixed";
 	compareLegendDiv.style.display = "none";
 	
 	compareLegendDiv.style.backgroundColor = "#ffffff";
 	compareLegendDiv.style.border = "5px black solid";
 	
 	compareLegendDiv.style.top = "10px";
-	compareLegendDiv.style.right = "0";
-	compareLegendDiv.style.zIndex = "3";
+	compareLegendDiv.style.left = "0";
+	compareLegendDiv.style.zIndex = "4";
 	compareLegendDiv.style.overflow = "visible";
 	
 		
@@ -747,7 +866,7 @@ function compareLegendButtons(Document) {
 	hideLegendBtn.innerText = "Hide Legend";
 	hideLegendBtn.addEventListener('click', () => {
 		compareLegendDiv.style.display = "none";
-		showLegendBtn.style.display = "";
+		showLegendBtn.style.display = "block";
 	})
 
 	showLegendBtn.classList.add("whizButton");
@@ -766,25 +885,58 @@ function compareLegendButtons(Document) {
 	
 	let liShowLegendBtn = Document.createElement('li');
 	liShowLegendBtn.append(showLegendBtn);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarTextComparison");
 	buttonBar.appendChild(compareLegendDiv);
 	buttonBar.appendChild(liShowLegendBtn);
-	showLegendBtn.id = "showLegendBtn"
-	Document.addEventListener("click", function(e) {
+	showLegendBtn.id = "showLegendBtn";
+
+	/*
+	Document.addEventListener("mouseup", function(e) {
+		console.log("mouseup triggered on: ", e);
 		hideLegend(e);
 	})
-	document.addEventListener("click", function(e) {
+	document.addEventListener("mouseup", function(e) {
+		console.log("mouseup triggered on: ", e);
 		hideLegend(e);
-	})
+	})*/
 	
 	function hideLegend(e) {
-		if (e.target == showLegendBtn) {
+		if ((e.target == showLegendBtn) || (e.target == legendTitle)) {
 			// Do nothing
 		} else if (compareLegendDiv.style.display === "") {
 			hideLegendBtn.click();
 		}
 	}
 	
+
+
+	// Make the divider draggable
+	legendTitle.addEventListener("mousedown", (event) => {
+		const initialX = event.clientX;
+		const initialY = event.clientY;
+		const compareLegendDivRect = compareLegendDiv.getBoundingClientRect();
+		const initialLeft = compareLegendDivRect.left;
+		const initialTop = compareLegendDivRect.top;
+
+		const mousemoveListener = (event) => {  // Store the mousemove listener
+			const newLeft = initialLeft + (event.clientX - initialX);
+			const newTop = initialTop + (event.clientY - initialY);
+			compareLegendDiv.style.left = newLeft + "px";
+			compareLegendDiv.style.top = newTop + "px";
+			//leftContainer.style.width = newLeft - 16 + "px";
+			//rightContainer.style.width = (window.innerWidth - newLeft - compareLegendDiv.offsetWidth) + 16 + "px";
+			//rightContainer.style.paddingTop = String(document.getElementById("buttonBar").offsetHeight + 6);
+
+	};
+	
+		document.addEventListener("mousemove", mousemoveListener);  // Attach listener
+	
+		compareLegendDiv.addEventListener("mouseup", () => {  // Use divider.removeEventListener
+			document.removeEventListener("mousemove", mousemoveListener);  // Remove listener
+		
+		});
+	});
+
 }
 
 
@@ -837,7 +989,7 @@ function searchSegmentsButton(Document) {
 	
 	let li = Document.createElement('li');
 	li.append(searchDiv);
-	let buttonBar = Document.getElementById("buttonBar");
+	let buttonBar = Document.getElementById("btnBarMessageSearch");
 	buttonBar.appendChild(li);
 		
 }
@@ -855,6 +1007,7 @@ function schemaModeButton(Document) {
 	
 	schemaModeBtn.addEventListener('click', () => {
 		let expandors = document.getElementsByClassName("toggleSchema");
+		console.log("schemaModeFull = ", schemaModeFull);
 		if (schemaModeFull == false) {
 			schemaModeFull = true;
 			schemaModeBtn.innerText = "Schema Mode: Full";
@@ -874,7 +1027,7 @@ function schemaModeButton(Document) {
 	})
 	let li = Document.createElement('li');
 	li.append(schemaModeBtn);
-	let buttonBar = Document.getElementById("buttonBar")
+	let buttonBar = Document.getElementById("btnBarMessageSearch")
 	buttonBar.appendChild(li);
 }
 
@@ -960,49 +1113,49 @@ function getDomain(url) {
 }
 
 var scrollBarString = `
-	.MsgOutline::-webkit-scrollbar {
+	.MsgContents::-webkit-scrollbar {
   height: 15px;
 }
 
 /* Track */
-.MsgOutline::-webkit-scrollbar-track {
+.MsgContents::-webkit-scrollbar-track {
   /*box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);*/
   background: #f0f0f0;
   border-radius: 3px;
 }
  
 /* Handle */
-.MsgOutline::-webkit-scrollbar-thumb {
+.MsgContents::-webkit-scrollbar-thumb {
   background: #b4b4b4; 
   border-radius: 3px;
 }
 
 /* Handle on hover */
-.MsgOutline::-webkit-scrollbar-thumb:hover {
+.MsgContents::-webkit-scrollbar-thumb:hover {
   background: lightGrey; 
 }
 `
 
 const scrollBarStringHighlight = `
-	.MsgOutline::-webkit-scrollbar {
+	.MsgContents::-webkit-scrollbar {
   height: 15px;
 }
 
 /* Track */
-.MsgOutline::-webkit-scrollbar-track {
+.MsgContents::-webkit-scrollbar-track {
   /*box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);*/
   background: #f0f0f0;
   border-radius: 3px;
 }
  
 /* Handle */
-.MsgOutline::-webkit-scrollbar-thumb {
+.MsgContents::-webkit-scrollbar-thumb {
   background: #252525; 
   border-radius: 3px;
 }
 
 /* Handle on hover */
-.MsgOutline::-webkit-scrollbar-thumb:hover {
+.MsgContents::-webkit-scrollbar-thumb:hover {
   background: lightGrey; 
 }
 `
@@ -1041,6 +1194,56 @@ function addButtonBar(Document) {
 		bar.id = "buttonBar";
 		bar.className = "buttonBar";
 		//bar.style.backgroundColor = "black";
+		let messageSizingLi = Document.createElement("li");
+		let messageSizingUl = Document.createElement("ul");
+		messageSizingUl.id = "btnBarMessageSizing";
+		messageSizingUl.classList.add("btnGrp");
+		messageSizingLi.appendChild(messageSizingUl);
+		bar.appendChild(messageSizingLi);
+		// Message sizing:
+		// - wrap rows
+		// - minimise all
+		// - unclose all
+
+
+
+		let messageSearchLi = Document.createElement("li");
+		let messageSearchUl = Document.createElement("ul");
+		messageSearchUl.id = "btnBarMessageSearch";
+		messageSearchUl.classList.add("btnGrp");
+		messageSearchLi.appendChild(messageSearchUl);
+		bar.appendChild(messageSearchLi);
+
+		// Message Search:
+		// - Schema Type
+		// - Schema Search
+		// - Search Segments
+
+
+		let textComparisonLi = Document.createElement("li");
+		let textComparisonUl = Document.createElement("ul");
+		textComparisonUl.id = "btnBarTextComparison";
+		textComparisonUl.classList.add("btnGrp");
+		textComparisonLi.appendChild(textComparisonUl);
+		bar.appendChild(textComparisonLi);
+
+		// Text comparison:
+		// - Import
+		// - Text Compate
+		// - Legend
+
+
+		let traceViewerLi = Document.createElement("li");
+		let traceViewerUl = Document.createElement("ul");
+		traceViewerUl.id = "btnBarTraceViewer";
+		traceViewerUl.classList.add("btnGrp");
+		traceViewerLi.appendChild(traceViewerUl);
+		bar.appendChild(traceViewerLi);
+		// Trace Viewer
+		// - Show Related
+		// - Hide Related
+
+
 		
 		let displayButton = Document.createElement('button');
 		displayButton.classList.add("whizButton");
@@ -1170,7 +1373,7 @@ function errorAlert(displayText) {
 			}, 2000);
 }
 
-// Syncs scrolling for MsgOutline class
+// Syncs scrolling for IWMsgOutline class
 function syncScrolling(Document, object) {
 	function keypress() {
 		let ctrl = window.event.ctrlKey
@@ -1199,7 +1402,7 @@ function syncScrolling(Document, object) {
 	// Hold CTRL to scroll all message boxes simultaneously 
 	object.addEventListener("mousedown", function() {
 		//console.log("Mouse down on element!");
-		let divsArray = Document.getElementsByClassName("MsgOutline");
+		let divsArray = Document.getElementsByClassName("MsgContents");
 		//console.log("divsArray -- ", divsArray);
 		let ctrl = window.event.ctrlKey;
 		if (ctrl) {
@@ -1222,7 +1425,7 @@ function syncScrolling(Document, object) {
 	// Remove scroll link on mouseup
 	object.addEventListener("mouseup", function() {
 		//console.log("Mouse up on element!");
-		let divsArray = Document.getElementsByClassName("MsgOutline");
+		let divsArray = Document.getElementsByClassName("MsgContents");
 		//console.log("divsArray -- ", divsArray);
 		let l = divsArray.length
 		for (let x = 0; x < l; x ++) {
@@ -1253,7 +1456,5 @@ function syncScrolling(Document, object) {
 		}
 	}
 }
-
-
 
 

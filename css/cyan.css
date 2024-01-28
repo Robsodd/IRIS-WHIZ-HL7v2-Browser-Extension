@@ -1,27 +1,84 @@
 
 :root {
-  --main-colour: 0,255,255;
-  --highlight-colour: 0,255,255;
+  --main-colour: rgb(0,255,255);
+  --main-colour-background: rgb(0,255,255);
+  --highlight-colour: rgb(0,0,0);
+  --link-colour: rgb(0, 4, 255);
+  --mc: var(--main-colour, linear-gradient(top, rgb(232,231,226), rgb(242,241,236),rgb(222,221,216)));
+  --mcb: var(--main-colour-background, --mc);
+  --hc: var(--highlight-colour, initial);
+  --lc: var(--link-colour, blue);
 }
+
 .portalTitle {
-	width: 100%; 
-	height: 60px;
-	position: relative;
-	border-bottom: 1px solid gray;
-	background: rgb(var(--main-colour)) !important;
+	background: var(--mcb) !important;
+	  background: var(--mc) !important;
+  }
+  
+  .portalName {
+	  color: var(--hc) !important;
+  }
+  
+  .stdTitle {
+	  background: var(--mc) !important;
+	  color: var(--hc) !important;
+  }
+  
+  .portalTitleInfoLabel {
+	  color: var(--hc) !important;
+  }
+  
+  .portalTitleInfoVal {
+	  color: var(--hc) !important;
+  }
+  
+  .portalTitleLink {
+	  color: var(--lc) !important;
+  }
+  
+  #portalServerFlag {
+	  color: var(--lc) !important;
+  }
+  
+  
+  /* for iris */
+  #header {
+	  background: var(--mc) !important;
+  }
+  
+  #zenLayoutTableCell_2 {
+	background: var(--mcb) !important;
+	  background: var(--mc);
+	  color: var(--hc) !important;
+  }
+  
+  #locatorRow {
+	  background: var(--mcb);
+	  background: var(--mc) !important;
+  }
+  
+  #locatorRow a {
+	  color: var(--hc) !important;
+  }
+  
+  #locatorRow span {
+	  color: var(--hc) !important;
+	  
+  }
+  
+  /* iris - rule editor */
+  .fr-header-sidenav-container .header .mat-toolbar {
+	background: var(--mcb) !important;
+	background: var(--mc);
+  }
+  
+  .appNameContainer {
+	background: var(--mc) !important;
+	  color: var(--hc) !important;
+  }
+  
 
-}
-
-.stdTitle {
-    background: rgb(var(--main-colour)) !important;
-}
-
-/* for iris */
-#header {
-	background: rgb(var(--main-colour)) !important;
-}
-
-/* iris - rule editor */
-.fr-header-sidenav-container .header .mat-toolbar {
-    background: rgb(var(--main-colour)) !important;
-}
+  mat-toolbar-row.mat-toolbar-row {
+    background: var(--mcb) !important;
+    background: var(--mc) !important;
+    }

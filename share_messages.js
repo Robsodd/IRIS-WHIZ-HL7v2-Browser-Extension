@@ -1,6 +1,6 @@
 /// Share Messages
 console.log("Share Messages Content Script");
-
+initialImport = false; // Enables import to work
 /// HEADERS & TRACE TAB CONTROLS
 
 document.body.innerHTML = ""
@@ -11,14 +11,24 @@ document.body.appendChild(pageDiv);
 
 addButtonBar(document);
 buttonBarStyle(document);
-		
-minimiseAllButton(document);
+
+
+
+messageImportBtn(document);
+
+
 wrapRowsButton(document);
+
+minimiseAllButton(document);
 uncloseAllButton(document);
+
+
+searchExpandedSchemaButton(document);
+schemaModeButton(document);
+searchSegmentsButton(document);
+
 textCompareBtn(document);
 compareLegendButtons(document);
-searchExpandedSchemaButton(document);
-searchSegmentsButton(document);
 
 scrollBarStyle(document);
 
@@ -42,24 +52,16 @@ for (let i = 0; i < param_messagesLength; i++) {
 		
 		
 function add_message_to_page(param_message) {
-
 	 // Message number
 	let messageId = param_message.messageNumber;
 	let messageStartOperation = param_message.messageStartOperation;
-
 	let messageEndOperation = param_message.messageEndOperation;
 	let messageHeading;
-	/// THIS
 	let traceMessageUrl = stubUrl[0] + "EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=";
 
-
 	let iframe = document.createElement("iframe");	
-
-			
-
 	iframe.src = traceMessageUrl + String(messageId) + "&schema_expansion=disable&text_compare=disable&copy_raw_text=disable";
 	iframe.style.width = "100%";
-
 
 	// All messages to be scraped from their iframe and then iframe closed
 	document.body.appendChild(iframe);
@@ -71,25 +73,31 @@ function add_message_to_page(param_message) {
 	iframe.addEventListener("load", function() {
 		// on message iframe load get data, create messageDiv and append messageDiv to page
 		let messageDiv = document.createElement('div');
-		let message = {messageNumber: parseInt(messageId), object: messageDiv};
-		messageStyling(messageDiv);
-
-		messageDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
-		
-		messageHeading = '<a style="padding: 10px">' + messageStartOperation + ' ----> ' + messageEndOperation + '</a>'
-		
-		messageDiv.innerHTML = messageHeading + messageDiv.innerHTML
-
-		messageArray.push(message);
+		let messageDivContents = document.createElement('div');
+		messageDivContents.classList.add("MsgContents");
 
 		messageDiv.id = messageId;
 		
 		let messageBtnBar = messageButtonBar(document, messageDiv.id)
 		messageDiv.appendChild(messageBtnBar);
-					
-		closeButtonHide(document, messageBtnBar);
-		minimiseButton(document, messageDiv, messageBtnBar);
+		messageDiv.appendChild(messageDivContents);
+
+		let message = {messageNumber: parseInt(messageId), object: messageDiv};
+		messageStyling(messageDiv);
+
+		messageDivContents.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
+		
+		messageHeading = '<a class="IWMsgTitle" style="padding: 10px">' + messageStartOperation + ' ----> ' + messageEndOperation + '</a>'
+		
+		messageDivContents.innerHTML = messageHeading + messageDivContents.innerHTML
+
+		messageArray.push(message);
+
+		
+		sideBySideCompareButton(document, messageBtnBar);	
 		copyRawTextButton(document, messageId, messageBtnBar);
+		minimiseButton(document, messageDiv, messageBtnBar);
+		closeButtonHide(document, messageBtnBar);
 		
 		messageAppend(message);
 
@@ -102,8 +110,7 @@ function add_message_to_page(param_message) {
 
 function messageAppend(message) {
 	
-	
-	syncScrolling(document, message.object);
+	syncScrolling(document, message.object.children[1]);
 	// sort messages so they can be added in the message order
 	if (messageArray.length > 1) {
 		sortedMessageArray = messageArray.sort((a, b) => {

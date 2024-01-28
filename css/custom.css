@@ -33,6 +33,31 @@
 }
 
 
+
+.IWMsgOutline {
+	border: 2px solid darkblue;
+	background-color: white;
+	border-radius: 5px;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: auto;
+	position: relative;
+	padding-top: 5px;
+	overflow-x: auto;	
+}
+
+.IWMsgTitle {
+	position: sticky;
+	padding: 10px;
+	left: 0;
+	font-weight: bold;
+	width: max-content;
+}
+
+.MsgContents table {
+	width: max-content;
+}
+
 .generateDiv {
 	margin: 30px;
     padding: 5px;
@@ -57,4 +82,31 @@
 .gptFormLabel {
 	display: grid;
     grid-template-columns: auto 50% auto;
+}
+
+#rightContainer {
+	height: 100%;
+	height: -webkit-fill-available;
+	position: fixed;
+	right: 0px;
+	top: 0px;
+	padding-top: 44px;
+	overflow-y: scroll;
+}
+
+#leftContainer {
+    padding-top: 8px;
+    padding-right: 8px;
+	height: 100%;
+    overflow-y: scroll;
+}
+
+#divider {
+	width: 4px;
+	height: 100%;
+	cursor: col-resize;
+	background-color: gray;
+	position: absolute;
+	top: 0px;
+	z-index: 2;
 }

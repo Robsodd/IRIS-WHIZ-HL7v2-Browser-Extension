@@ -1,8 +1,10 @@
 console.log("Text Compare Content Script");
-
+scrollBarStyle(document);
 // on page load:
 mouseover();
 segmentHeaders();
+let instance = currentUrl.split("/csp/")[0];
+
 
 document.addEventListener("messageTabSearch", function(e) {
 	messageTabSearch(e.compareDropDown);
@@ -18,6 +20,10 @@ document.addEventListener("enableTextCompare", function(e) {
 	//console.log("EnablingTextCompare ", mouseoverEnabled);
 });
 
+document.addEventListener("sideBySideCompare", function(e) {
+	splitScreenWithDraggableDivider(e);
+});
+
 if (currentUrl.includes("&btns=disable")) {
 	// Skip creating the buttons!
 } else {
@@ -25,11 +31,14 @@ if (currentUrl.includes("&btns=disable")) {
 	addButtonBar(document);
 	buttonBarStyle(document);
 	
-	textCompareBtn(document);
+	
+
 	messageImportBtn(document);
 	wrapRowsButton(document);
 	
+	textCompareBtn(document);
 	compareLegendButtons(document);
+	
 }
 
 function messageTabSearch(compareDropDown) {
@@ -52,6 +61,8 @@ function messageTabSearch(compareDropDown) {
 	
 			let optionText = document.createTextNode(value);
 			tabOption.appendChild(optionText);
+			tabOption.instance = response.results[tab].instance
+			tabOption.namespace = response.results[tab].namespace
 
 			compareDropDown.appendChild(tabOption);
 		}
@@ -59,17 +70,98 @@ function messageTabSearch(compareDropDown) {
 }
 
 
-function messageTabGetMessage(tabId) {
+function messageTabGetMessage(tabId, sourceInfo) {
 	//console.log("messageTabGetMessage", String(tabId));
+
 	chrome.runtime.sendMessage({type: "message_tab_get_message", tabId: tabId}).then((response) => {
 		//console.log(response);
+		let container = document.createElement('div');
+		container.classList.add("IWMsgOutline");
+		let title = document.createElement('a');
+		title.classList.add("IWMsgTitle");
+		title.innerText =  sourceInfo
+
+		let messageDivContents = document.createElement('div');
+			messageDivContents.appendChild(title);
+			messageDivContents.className = "MsgContents";
 		
-		var htmlObject = document.createElement('div');
-		htmlObject.innerHTML = JSON.parse(response.results);
-		let htmlBreak = document.createElement('br');
-		document.body.appendChild(htmlBreak);
-		document.body.appendChild(htmlObject);
+		let messageId = sourceInfo.match(/\d+$/);
+
+		let messageBtnBar = messageButtonBar(document, messageId); // message ID!
+		container.appendChild(messageBtnBar);
+		container.appendChild(messageDivContents);
+
+		sideBySideCompareButton(document, messageBtnBar);
+		copyRawTextButton(document, messageId, messageBtnBar);
+		minimiseButton(document, container, messageBtnBar);
+		closeButtonHide(document, messageBtnBar);
+		syncScrolling(document, messageDivContents);
+
+		container.id = messageId;
+		var htmlbreak = document.createElement('br');
+		messageDivContents.innerHTML = messageDivContents.innerHTML + JSON.parse(response.results);
+		messageDivContents.insertBefore(htmlbreak, messageDivContents.children[2]);
+		let leftContainer = document.getElementById("leftContainer");
+		let initialMessageDiv
+		if (initialImport) {
+			
+			let pagebody = document.querySelector("body");
+			initialMessageDiv = document.createElement("div");
+			const urlParams = new URLSearchParams(window.location.search);
+			const initialMessageId = urlParams.get('HeaderId');
+			let currentNamespace = currentUrl.split("/")[5];
+			
+			let title = document.createElement('a');
+			title.innerText =  instance.split("//")[1] + " - " + currentNamespace + " - " + initialMessageId
+			title.classList.add("IWMsgTitle");
+
+			let initialMessageDivContents = document.createElement('div');
+			initialMessageDivContents.appendChild(title);
+			initialMessageDivContents.className = "MsgContents";
+
+			let messageBtnBar2 = messageButtonBar(document, messageId) // message ID!
+			initialMessageDiv.appendChild(messageBtnBar2)
+			initialMessageDiv.appendChild(initialMessageDivContents);
+			pagebody.appendChild(initialMessageDiv);
+
+			initialMessageDivContents.appendChild(pagebody.children[1]);
+			initialMessageDivContents.appendChild(pagebody.children[1]);
+			initialMessageDivContents.appendChild(pagebody.children[1]);
+			initialMessageDiv.id = "mainMessage";
+			initialMessageDiv.className = "IWMsgOutline";
+
+			sideBySideCompareButton(document, messageBtnBar2);
+			copyRawTextButton(document, initialMessageDiv, messageBtnBar2);
+			minimiseButton(document, initialMessageDiv, messageBtnBar2);
+			closeButtonHide(document, messageBtnBar2);
+			
+			
+			
+			syncScrolling(document, initialMessageDivContents);
+		}
+
+		if (leftContainer) {
+			if (initialImport) {
+				leftContainer.appendChild(initialMessageDiv);
+			}
+			leftContainer.appendChild(container);
+			initialImport = false;
+		} else {
+			if (initialImport) {
+				document.body.appendChild(initialMessageDiv);
+			}
+			document.body.appendChild(container);
+			initialImport = false;
+			
+		}
+
 		document.dispatchEvent(addExpansionEvent);
+		// Disable CopyRaw on non-instance messages
+		if (!title.innerText.includes(instance)) {
+			let copyRawTextBtn = document.getElementById("copyRawText" + messageId)
+			copyRawTextBtn.style.cursor = "not-allowed";
+			copyRawTextBtn.title = "Cannot copy raw text from another instance's message";
+		}
 	});
 	return "done"
 }
@@ -262,4 +354,131 @@ function segmentSearch(event, comparedSegment) {
 		}
 	}
 }
+
+let rightContainerList = []
+
+function splitScreenWithDraggableDivider(event) {
+	
+	// Create Containers if needed
+	let rightContainer = document.getElementById("rightContainer");
+	const mainContainer = document.querySelector("body");
+	let leftContainer = document.getElementById("leftContainer");
+	let divider = document.getElementById("divider");
+	if (leftContainer) {
+		
+	} else {
+		leftContainer = document.createElement("div");
+		moveObjectsWithChildren(mainContainer, leftContainer)
+		mainContainer.style.marginTop = "0";
+		leftContainer.style.paddingTop = "8px";
+		leftContainer.style.paddingRight = "8px";
+		leftContainer.style.width = "50%";
+		leftContainer.style.height = "100%";
+		leftContainer.style.overflowY = "scroll";
+		leftContainer.id = "leftContainer";
+		mainContainer.appendChild(leftContainer);
+	}
+
+	if (rightContainer) {
+		console.log("rightContainer exists:", rightContainer);
+	} else {
+		console.log("rightContainer does not exist");
+		mainContainer.style.overflowY = "hidden";
+		leftContainer.style.width = "50%";  // Set its initial position to 50%
+		rightContainer = document.createElement("div");
+		rightContainer.style.width = "50%";  // Set its initial position to 50%
+		rightContainer.id = "rightContainer";
+		divider = document.createElement("div");
+		divider.id = "divider";
+		divider.style.left = "50%";          // Set its initial position to 50%
+		mainContainer.appendChild(divider);
+		mainContainer.appendChild(rightContainer);
+		let dividerRect = divider.getBoundingClientRect()
+		let initialLeftDivider = dividerRect.left;
+		divider.style.left = initialLeftDivider + 8 + "px"
+		// Make the divider draggable
+		divider.addEventListener("mousedown", (event) => {
+			const initialX = event.clientX;
+			const dividerRect = divider.getBoundingClientRect();
+			const initialLeft = dividerRect.left;
+		
+			const mousemoveListener = (event) => {  // Store the mousemove listener
+				const newLeft = initialLeft + (event.clientX - initialX);
+				divider.style.left = newLeft + "px";
+				leftContainer.style.width = newLeft - 16 + "px";
+				rightContainer.style.width = (window.innerWidth - newLeft - divider.offsetWidth) + 16 + "px";
+				rightContainer.style.paddingTop = String(document.getElementById("buttonBar").offsetHeight + 6);
+
+		};
+		
+			document.addEventListener("mousemove", mousemoveListener);  // Attach listener
+		
+			divider.addEventListener("mouseup", () => {  // Use divider.removeEventListener
+			document.removeEventListener("mousemove", mousemoveListener);  // Remove listener
+			
+			});
+		});
+	}
+	
+	
+	
+	let messageObject = document.getElementById(event.messageId);
+	console.log("messageObject", messageObject);
+	console.log("event.messageId", String(event.messageId));
+	console.log(typeof event.messageId)
+	console.log(event.messageId == rightContainerList[0])
+	console.log("rightContainerList", rightContainerList);
+	let messageId = event.messageId
+	messageId = String(event.messageId);
+
+	// Move message
+	if ((rightContainerList.length == 1) && (rightContainerList.includes(messageId))) {
+		// Move object to left container, delete rightContainer and restyle leftContainer
+		leftContainer.appendChild(messageObject);
+		messageObject.style.marginLeft = "";
+		rightContainer.parentElement.removeChild(rightContainer);
+		divider.parentElement.removeChild(divider);
+		leftContainer.style.width = "100%";
+		const indexToRemove = rightContainerList.indexOf(messageId);
+		
+
+		if (indexToRemove !== -1) {
+			rightContainerList.splice(indexToRemove, 1);
+			console.log(rightContainerList); // Output: ["1234", "12345"]
+		} else {
+			console.log("Item not found in the list.");
+		}
+	} else if (rightContainerList.includes(messageId)) {
+		// Move object to left container and remove from rightContainerList
+		leftContainer.appendChild(messageObject);
+		messageObject.style.marginLeft = "";
+		const indexToRemove = rightContainerList.indexOf(messageId);
+
+		if (indexToRemove !== -1) {
+			rightContainerList.splice(indexToRemove, 1);
+			console.log(rightContainerList); // Output: ["1234", "12345"]
+		} else {
+			console.log("Item not found in the list.");
+		}
+	} else {
+		// Move object to right container and add to rightContainerList
+		rightContainer.appendChild(messageObject);
+		messageObject.style.marginLeft = "20px";
+		rightContainerList.push(messageObject.id);
+	}
+	rightContainer.style.paddingTop = String(document.getElementById("buttonBar").offsetHeight + 6);
+
+  }
+
+
+  
+  function moveObjectsWithChildren(mainContainer, leftContainer) {
+	let length = mainContainer.children.length
+	//console.log("mainContainer.children", mainContainer.children);
+	for (let i = 0; i < length; i++) {
+		//console.log("moving element", mainContainer.children[0]);
+		leftContainer.appendChild(mainContainer.children[0]);
+	}
+  }
+  // Call the function to split the screen
 

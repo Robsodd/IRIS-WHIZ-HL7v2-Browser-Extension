@@ -31,7 +31,11 @@ function searchSegments(e) {
 	let textSearchLength = textSearch.length;
 	let segmentRows = document.getElementsByClassName("EDIDocumentTableRow");
 	if ((key == "Enter") && (eValue == '')) {
-		e.searchSegmentsBtn.style.display = "inherit";
+		if (document.getElementById('whiz').style.display == "none") {
+			e.searchSegmentsBtn.style.display = "inherit";
+		} else {
+			e.searchSegmentsBtn.style.display = "none";
+		}
 		e.searchInput.style.display = "none";
 		e.searchlabel.style.display = "none";
 	} else {

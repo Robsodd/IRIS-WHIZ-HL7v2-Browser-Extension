@@ -200,19 +200,20 @@ function createModal() {
 		modalContent.style.backgroundColor = "rgba(255,255,255,0.9)";
 		modalContent.style.height = "85%";
 		modalContent.style.overflow = "auto";
-		modalContent.innerHTML = "<h3>Extended Criteria Search History</h3>";
-		modal.appendChild(modalContent);
-		
-		
+		let title = document.createElement("h3");
+		title.innerText = "Extended Criteria Search History";
+				
 		let btnBar = messageButtonBar(document, "modalBtnBar");
-		
+		btnBar.style.top = "10"
+		btnBar.style.right = "10"
 		// Adds close button that hides parent modal when clicked
 		let closeButton = closeButtonHide(document, btnBar);
 		closeButton.addEventListener('click', () => {
-			closeButton.parentElement.parentElement.parentElement.style.display = "none";
+			closeButton.parentElement.parentElement.parentElement.parentElement.style.display = "none";
 		});
 		modalContent.appendChild(btnBar);
-		
+		modalContent.appendChild(title);
+		modal.appendChild(modalContent);
 		// Iterate through criterionCache and create divs
 		let criterionCacheLength = criterionCache.length;
 		for (let i = 0; i < criterionCache.length; i++) {
@@ -231,6 +232,8 @@ function createModal() {
 				criterionCache[i].div.id = criterionCache[i].div.className
 				
 				let criterionBtnBar = messageButtonBar(document, criterionCache[i].div.id);
+				criterionBtnBar.style.right = "20px";
+				criterionBtnBar.style.position = "absolute";
 				
 				// Add close buttons to crieterion elements
 				let closeButton = closeButtonDelete(document, criterionBtnBar);

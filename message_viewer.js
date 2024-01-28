@@ -136,6 +136,8 @@ window.addEventListener("load", function() {
 				iframe.addEventListener("load", function() {
 
 					let messageDiv = document.createElement('div');
+					let messageDivContents = document.createElement('div');
+					messageDivContents.classList.add("MsgContents");
 					let message = {messageNumber: parseInt(messageId), object: messageDiv, messageStartOperation: messageStartOperation, messageEndOperation: messageEndOperation,};
 					messageStyling(messageDiv);
 					if (messageStatus != "OK") {
@@ -146,11 +148,11 @@ window.addEventListener("load", function() {
 						//console.log("DOES THIS = HL7???? ",iframe.contentDocument.getElementsByTagName("div")[0].innerHTML.trim().substring(0,3));
 						if  (iframe.contentDocument.getElementsByTagName("div")[0].innerHTML.trim().substring(0,3) == "HL7") {
 							//console.log("MAIN IFRAME:", mainIframe.contentDocument.getElementsByTagName("body")[0].innerHTML);
-							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
-							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDivContents.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDivContents.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDivContents.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDivContents.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
+							messageDivContents.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
 							mainIframe.style.display = "";
 							
 							// Add buttons to main iframe
@@ -174,8 +176,8 @@ window.addEventListener("load", function() {
 						} else {
 							let unknownElement = document.createElement("div")
 							unknownElement.innerText = "*The first message is not a HL7 message. This situation is yet to be catered for.";
-							messageDiv.appendChild(unknownElement);
-							messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes);
+							messageDivContents.appendChild(unknownElement);
+							messageDivContents.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes);
 							//messageDiv.appendChild(mainIframe.contentDocument.getElementsByTagName("body")[0].childNodes[0]);
 						}
 						
@@ -183,19 +185,20 @@ window.addEventListener("load", function() {
 						
 						// mainIframe.contentDocument.getElementsByTagName("body")[0].appendChild(messageDiv);
 					} else {
-						messageDiv.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
+						messageDivContents.innerHTML = iframe.contentDocument.getElementsByTagName("body")[0].innerHTML;
 					}
 					
-					messageHeading = '<a style="color: red; padding: 10px"">#' + String(messageSearchNumber) + ' ' + messageCreated + '</a><br><a style="padding: 10px">' + messageStartOperation + ' ----> ' + messageEndOperation + '</a>';
-					messageDiv.innerHTML = messageHeading + messageDiv.innerHTML;
+					messageHeading = '<a class="IWMsgTitle" style="color: red; padding: 10px"">#' + String(messageSearchNumber) + ' ' + messageCreated + '</a><br><a style="padding: 10px">' + messageStartOperation + ' ----> ' + messageEndOperation + '</a>';
+					messageDivContents.innerHTML = messageHeading + messageDivContents.innerHTML;
 					
 					let closeButton = document.createElement('btn');
-					buttonStyling(closeButton);
-					closeButton.style.backgroundColor = "pink";
-					closeButton.title = "Close";
+					let li = document.createElement('li');
+					li.appendChild(closeButton)
+					//buttonStyling(closeButton);
 					closeButton.innerText = "x";
-					closeButton.style.marginLeft = "-35px";
-					closeButton.style.zIndex = "1"
+					closeButton.style.position = "relative";
+					closeButton.classList.add("WhizButton");
+					closeButton.classList.add("closeBtnDelete");
 					
 					closeButton.addEventListener('click', () => {
 						closeButton.parentNode.parentNode.style.display = "none";
@@ -218,15 +221,20 @@ window.addEventListener("load", function() {
 					
 					messageArray.push(message);
 					messageDiv.id = messageId;
+					
+
+					let messageBtnBar = messageButtonBar(mainIframe.contentDocument, messageDiv.id)
+					messageDiv.appendChild(messageBtnBar);
+					messageDiv.appendChild(messageDivContents);
 					messageAppend(message);
 					
 					// Add buttons to messageDiv
-					let messageBtnBar = messageButtonBar(mainIframe.contentDocument, messageDiv.id)
-					messageDiv.appendChild(messageBtnBar);
-					messageBtnBar.appendChild(closeButton);
+					
+					
 					//closeButtonHide(mainIframe.contentDocument, messageBtnBar);
-					minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
 					copyRawTextButton(mainIframe.contentDocument, messageId, messageBtnBar);
+					minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
+					messageBtnBar.appendChild(li);
 										
 					if (iframe != mainIframe) {
 						iframe.parentNode.removeChild(iframe);
@@ -257,8 +265,8 @@ window.addEventListener("load", function() {
 
 function messageAppend(message) {
 	/// Appends message to the mainIframe
-	
-	syncScrolling(mainIframe.contentDocument, message.object);
+	console.log("THIS IS MY ISSUE:", message.object);
+	syncScrolling(mainIframe.contentDocument, message.object.children[1]);
 	
 	// Sort the message array
 	if (messageArray.length > 1) {
