@@ -1,5 +1,5 @@
 ***
-VERSION 1.9.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION 1.9.1 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -100,6 +100,8 @@ Finally, enable your desired features using the checkbox form at the top of this
 #### Production Page
 24. ChatGPT Powered Test Message Generator
 25. Active Production Category Search
+32. Production Queue Search
+
 
 
 #### Extension Pop-up
@@ -333,8 +335,24 @@ Changing a page title saves the page in searchable local storage so you can open
 This is useful if you have multiple message tabs open and want to easily differentiate between them.
 
 
+#### 32. Production Queue Search
+
+Added a search bar to the Queue tab on the production page. Allows you to search queuing componenets. Clicking the table header will order the table by that column.  Defaults to sorting by Count of queue.
+
+Useful to see queues quickly compared with scrolling because ain't nobody got time for that.
+
 
 ## Updates
+
+##### 27/01/2024 Updates:
+
+Version 1.9.1
+
+__Feature Added__: Production Queue Search
+
+Added a search bar to the Queue tab on the production page. Allows you to search queuing componenets. Clicking the table header will order the table by that column.  Defaults to sorting by Count of queue.
+
+
 
 ##### 27/01/2024 Updates:
 
