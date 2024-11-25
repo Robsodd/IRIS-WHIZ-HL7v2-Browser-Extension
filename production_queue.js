@@ -1,6 +1,5 @@
 console.log("Production Queue Script Loaded");
 
-
 let queueTable;
 let grpQueue;
 
@@ -81,7 +80,7 @@ function reorderQueueTable(sortBy) {
         const valueA = a.children[sortIndex]?.innerText.trim() || '';
         const valueB = b.children[sortIndex]?.innerText.trim() || '';
 
-        // Customize sorting logic based on column data type (e.g., numbers, strings)
+        // Customize sorting logic based on column data type
         if (!isNaN(valueA) && !isNaN(valueB)) {
             return Number(valueB) - Number(valueA); // Numerical sorting
         }
@@ -94,40 +93,4 @@ function reorderQueueTable(sortBy) {
     tbody.appendChild(headerRow);
     rows.forEach(row => tbody.appendChild(row));
     
-
-    // Append the sorted rows back into the tbody
-    
-
-}
-
-
-
-
-
-
-function searchQueue(e) {
-	console.log(e);
-	let key = e.key;
-	let eValue = e.target.value;
-	if (keys.includes(key)) {
-		//console.log(e.key, "skipped")
-		return
-	}
-	
-	let textSearch = eValue.toLowerCase();
-	textSearch = textSearch.replace(/\s/gm, " ");
-
-	for (var i = titles.length - 1, page; page = titles[i]; i--) {
-		console.log("Check queue: ", page);
-		//console.log((row.childNodes[4].innerText.toUpperCase() == (textSearchArray[1].toUpperCase())));
-		let compareText = page.title.replace(/\s/gm, " ");
-		compareText = compareText.toLowerCase();
-		if (compareText.includes(textSearch)) {
-			document.getElementById(page.id).style.display = "";
-		} else {
-			document.getElementById(page.id).style.display = "none";
-		}
-
-	}		
-	
 }
