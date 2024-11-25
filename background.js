@@ -508,6 +508,13 @@ const namespaceCategorySearch = {
 						id: "namespaceCategorySearch",
 }	
 
+const productionQueue = {
+						matches: ["*://*/csp/*/EnsPortal.ProductionConfig.zen*",],
+						allFrames: true,
+						js: ["production_queue.js"],
+						id: "productionQueue",
+					}	
+
 // Custom Header Colours
 const customCss = {
 						matches: ["*://*/csp/*",],
@@ -585,7 +592,7 @@ function update_content_scripts() {
 			chrome.scripting.unregisterContentScripts().then(() => {
 				// Add Generic Content Scripts
 				chrome.scripting.registerContentScripts(
-				[ utils, customColours, pageTitles, namespaceCategorySearch, messageGenerator, messageSearch, schemaExpansion, segmentSearch, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer, saveMessageViewer, customCss, buttonCss],
+				[ utils, customColours, pageTitles, productionQueue, namespaceCategorySearch, messageGenerator, messageSearch, schemaExpansion, segmentSearch, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer, saveMessageViewer, customCss, buttonCss],
 					() => { 
 						
 						if (storage.settings.HomepageReports) {
