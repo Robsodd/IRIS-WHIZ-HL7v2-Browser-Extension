@@ -98,7 +98,7 @@
 
 .namespaceCategorySearchBtn {
 	width: fit-content;
-	display: inherit;
+	display: block !important;
 	background-color: lightblue;
 }
 
