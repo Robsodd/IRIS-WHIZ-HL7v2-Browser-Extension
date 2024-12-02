@@ -83,7 +83,6 @@ Finally, enable your desired features using the checkbox form at the top of this
 09. Import HL7 Message from another Message Content Page
 28. Schema Mode
 
-
 #### Various Pages (feature exists on more than one page)
 10. Copy Raw HL7 Text
 11. Expand & Search HL7 Schema   (was Expand HL7 Schema)
@@ -102,6 +101,11 @@ Finally, enable your desired features using the checkbox form at the top of this
 24. ChatGPT Powered Test Message Generator
 25. Active Production Category Search
 32. Production Queue Search
+36. Category Dropdown Case-Insensitive Order
+37. Production Page Message Refresh
+
+#### Message Queue Page
+34. Queue Refresh
 
 #### Extension Pop-up
 05. Extension Pop-up - Open Session         
@@ -360,8 +364,6 @@ Drag the sidebar as needed to view either the data or the charts more easily.
 This page is useful for diving into your data. I hope.
 
 
-
-
 #### 34. Queue Refresh
 
 Iris saw the demise of the auto-refresh button on the production Queue page. I have given it life again. 
@@ -378,15 +380,25 @@ On the Message Viewer page you can click the Iris Whiz Export button to download
 Useful if you want to do analysis on your data but don't want to use the fancy new Chart.JS page I spent ages creating.
 
 
-#### 36. 
+#### 36. Category Dropdown Case-Insensitive Order
+
+Alphabetises the category dropdown list on the production page, regardless of case. Without this the order is case dependent.
+
+Helpful if you have a thing for alphabetical order.
+
+
+#### 37. Production Page Message Refresh
+
+Added refresh button on the Message tab on the production page. Set an interval in the dropdown for automatic refreshing.
+
+
 
 
 ## Updates
 
-##### 18/11/2024 Updates:
+##### 02/12/2024 Updates:
 
 Version 1.10.0
-
 
 __Feature Added__: ChartJS Analysis
 
@@ -426,6 +438,16 @@ __Feature Added__: Export Search as CSV
 On the Message Viewer page you can click the Iris Whiz Export button to download a CSV copy of the data currently in your search table.
 
 Useful if you want to do quick analysis on your data but don't want to use the fancy new Chart.JS page I spent ages creating.
+
+
+__Feature Added__: Production Page Message Refresh
+
+Added refresh button on the Message tab on the production page. Set an interval in the dropdown for automatic refreshing.
+
+
+__Feature Added__: Category Dropdown Case-Insensitive Order
+
+Alphabetises the category dropdown list on the production page, regardless of case. Without this the order is case dependent.
 
 
 __Bug Fix__: Hide Related
