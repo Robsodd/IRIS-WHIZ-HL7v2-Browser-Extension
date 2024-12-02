@@ -1,9 +1,9 @@
 {
   "name": "IRIS Whiz",
   "description": "Enhances the HL7 V2 experience in Intersystems IRIS/Ensemble.",
-  "version": "1.9.1",
+  "version": "1.10.0",
   "manifest_version": 3,
-  "permissions": ["scripting", "tabs", "tabGroups", "background", "storage", "contextMenus", "bookmarks"],
+  "permissions": ["scripting", "tabs", "tabGroups", "background", "storage", "contextMenus", "bookmarks", "sidePanel"],
   "host_permissions": ["*://*/"],
   "options_page": "options.html",
   "background": {
@@ -14,5 +14,8 @@
   },
   "icons": {
     "48": "icons/icon48.png"
+  },
+  "side_panel": {
+    "default_path": "popup.html"
   }
  }

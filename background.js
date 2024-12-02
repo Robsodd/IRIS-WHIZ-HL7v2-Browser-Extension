@@ -10,6 +10,15 @@ let settings = {
 			AutoTabNameSpace: false,
 			CSS: false,
 			BookmarkFolderName: "TIE Links",
+			SortOrder: false,
+			TimeFormat: false,
+			TextCompareOn: false,
+			HomepageReports: false,
+			LastUpdated: false,
+			ButtonsShow: false,
+			SaveAnalysis: false,
+			ChatGPTKey: "",
+			CustomColours: []
 		}
 
 let defaultColours = ["grey", "blue","red","yellow","green","pink","purple","cyan","orange"]
@@ -30,6 +39,11 @@ chrome.storage.local.get({
 		}, function(stored) {
 			if (stored == undefined) {
 				if (Debug) console.log("Settings Storage Undefined", stored.settings);
+				chrome.storage.local.set({
+						settings: settings,
+					}, function() {
+						if (Debug) console.log("Default Settings Applied: ", settings);
+					});
 			} else {
 				if (Debug) console.log("Instances Storage Updated", stored.settings);
 				settings = stored.settings;
@@ -443,6 +457,14 @@ const messageViewer = {
 						js: ["message_viewer.js"],
 						id: "message_viewer",
 				}
+
+const messageviewerExport = {
+						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
+						allFrames: true,
+						js: ["message_viewer_export.js"],
+						id: "messageviewerExport",
+				}	
+				
 const criteriaCache = {
 						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
 						allFrames: true,
@@ -510,10 +532,21 @@ const namespaceCategorySearch = {
 
 const productionQueue = {
 						matches: ["*://*/csp/*/EnsPortal.ProductionConfig.zen*",],
+						excludeMatches: [
+											"*://*/csp/*/*disableNamespaceCategorySearch=true",
+										],
 						allFrames: true,
 						js: ["production_queue.js"],
 						id: "productionQueue",
-					}	
+}	
+
+const queueRefresh = {
+	matches: ["*://*/*/EnsPortal.Queues.zen*","*://*/*/EnsPortal.Queues.cls*",],
+	allFrames: true,
+	js: ["queue_refresh.js"],
+	id: "queueRefresh",
+}	
+
 
 // Custom Header Colours
 const customCss = {
@@ -563,6 +596,13 @@ let darkMode = {
 	runAt: "document_start",
 }
 
+const analysis = {
+	matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
+	allFrames: true,
+	js: ["analysis.js"],
+	id: "analysis",
+}
+
 let matches = [];
 // Add Content Scripts functionality
 function update_content_scripts() {
@@ -592,7 +632,7 @@ function update_content_scripts() {
 			chrome.scripting.unregisterContentScripts().then(() => {
 				// Add Generic Content Scripts
 				chrome.scripting.registerContentScripts(
-				[ utils, customColours, pageTitles, productionQueue, namespaceCategorySearch, messageGenerator, messageSearch, schemaExpansion, segmentSearch, textCompare, copyRawText, traceViewer, messageViewer, criteriaCache, shareMessages, pdfViewer, saveMessageViewer, customCss, buttonCss],
+				[ utils, customColours, pageTitles, productionQueue, queueRefresh, namespaceCategorySearch, messageGenerator, messageSearch, schemaExpansion, segmentSearch, textCompare, copyRawText, traceViewer, messageViewer, analysis, messageviewerExport, criteriaCache, shareMessages, pdfViewer, saveMessageViewer, customCss, buttonCss],
 					() => { 
 						
 						if (storage.settings.HomepageReports) {
@@ -696,6 +736,40 @@ chrome.runtime.onMessage.addListener(
 					if (Debug) console.log("message_tab_get_message response from content script: ", get_message_response);
 					sendResponse({response: "Message Retrieved", results: get_message_response.response});
 				});				
+			} else if (request.type == "analysis") {
+				console.log("analysis request", request);
+
+				chrome.tabs.create({ url: chrome.runtime.getURL("analysis.html") + "?analysis=" + request.analysis.id }, function(tab) {
+					// Listen for the tab to complete loading
+					chrome.tabs.onUpdated.addListener(function onUpdated(tabId, info) {
+						if (tabId === tab.id && info.status === "complete") {
+							// Tab is fully loaded, inject the content script
+							chrome.tabs.sendMessage(tab.id, { message: "analysis_data", data: request.data, messageSearchTab: sender.tab.id }).then((response) => {
+								if (chrome.runtime.lastError) {
+									console.error("Message sending failed: ", chrome.runtime.lastError);
+								} else {
+									console.log("Message sent successfully, response:", response);
+								}
+							});
+				
+							// Remove the listener after it's used
+							chrome.tabs.onUpdated.removeListener(onUpdated);
+						}
+					});
+				});
+			} else if (request.type == "analysis_save") {
+				console.log("analysis save request", request);
+
+				
+				chrome.tabs.sendMessage(request.messageSearchTab, { message: "analysis_save", name:request.name, range:request.range}).then((response) => {
+					if (chrome.runtime.lastError) {
+						console.error("Message sending failed: ", chrome.runtime.lastError);
+					} else {
+						console.log("Message sent successfully, response:", response);
+					}
+				});
+				
+			
 			}
 			else {
 				sendResponse({response: "Background Script has no handling defined for this message type."});

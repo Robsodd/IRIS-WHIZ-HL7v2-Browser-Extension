@@ -1,0 +1,546 @@
+<!-- popup.html -->
+<!DOCTYPE html>
+<!-- Add in:
+
+- PDF Viewer (from Base64 encoded)
+- Options page link
+- Trace Show/Hide based on current page
+
+
+-->
+<html>
+<head>
+    <script src="chartjs/chart.umd.js"></script>
+	<script src="chartjs/chartjs-adapter-date-fns.bundle.min.js">	</script>
+	<script src="chartjs/chartjs-plugin-datalabels.min.js"></script>
+	<script src="chartjs/hammer.min.js"></script>
+	<script src="chartjs/chartjs-plugin-zoom.min.js"></script>
+	<link rel="stylesheet" href="css/button.css">
+  <style>
+	
+	:root {
+		--Max-Height: 500px;
+	}
+	
+
+    html {
+      min-height: 5em;
+      min-width: 20em;
+      background: #ffffff;
+    }
+
+	body {
+		margin: 0px;
+	}
+
+	.padding-div {
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
+	.padding-div-charts	{
+		padding-left: 2%;
+		padding-right: 2%;
+	}
+
+	.chart-row {
+		display: flex;
+		gap: 20px;
+		flex-wrap: wrap;
+		justify-content: center;
+		margin-top: 20px;
+		min-height: 500px;
+	}
+
+	.chart-row.time {
+		max-height: 600px;
+		min-height: 400px;
+		display: block;
+	}
+	
+
+	.chart-row-control {
+		display: flex;
+		top: 0px;
+		/* margin-left: 10%; */
+		gap: 20px;
+		padding-bottom: 5px;
+		padding-top: 5px;
+		width: 100%;
+		/* flex-wrap: wrap; */
+		min-height: 20px;
+		border-bottom: #c6c6c6 1px solid;
+		align-items: flex-start;
+		justify-content: center;
+		z-index: 100;
+		background-color: #e8e8e8;
+	}
+	.chart-row-control .dynamicChartControlBox {
+		justify-content: center;
+		position: fixed;
+		height: 20px;
+		min-height: 20px;
+	}
+
+	.chart-row-control .dynamicChartControlBox ul {
+		padding-left: 10px;
+		padding-right: 20px;
+	}
+
+	.chartContainer {
+		flex: 1 1 400px;
+		min-width: 300px;
+		max-width: 100%;
+		box-sizing: border-box;
+		border-radius: 5px;
+		background-color: #f7f7f7;
+		position: relative;
+
+	}
+
+	.chartContainerMain {
+		box-sizing: border-box;
+		border-radius: 5px;
+		background-color: #f7f7f7;
+		display: flex;
+		gap: 10px;
+		align-items: flex-start;
+		justify-content: center;
+		position: relative;
+	}
+
+
+	.chartContainerMain .chart {
+		flex: 2;
+		max-height: var(--Max-Height, 400px);
+		min-height: 400px;
+		max-width: 100%;
+		min-width: 100%;
+		width: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+	
+
+	.chartContainerMain .controls {
+		flex: 1; /* 1/3 of the available space */
+		max-width: 33.33%; /* Limit to 1/3 width */
+		min-width: 200px; /* Optional: minimum width for small screens */
+		box-sizing: border-box;
+	}
+
+	/*
+	.chart-row.time .chartContainerMain .messageBtnBar {
+		display: block;
+		position: absolute;
+		right: 0px;
+		top: 0px;
+	}*/
+
+	/* Media query for smaller screens & resize */
+	@container (width < 800px) {
+		.chart-row {
+			max-height: 300px;
+			min-height: 200px;
+		}
+
+		.chart-row.time {
+			max-height: 300px;
+			min-height: 200px;
+		}
+	}
+	
+	@container (height < 1000px) {
+		.chart-row {
+			max-height: 300px;
+			min-height: 200px;
+		}
+		.chart-row.time {
+			max-height: 300px;
+			min-height: 200px;
+		}
+	}
+
+
+	canvas {
+		width: 100% !important; /* Ensures the canvas scales with the container */
+		height: 100% !important; /* Important to fill container height */
+		max-height: var(--Max-Height, 500px);
+	}
+
+	
+	/* Style the buttons that are used to open and close the accordion panel */
+	.accordion {
+	  background-color: #eaeaea;
+	  color: #444;
+	  cursor: pointer;
+	  padding: 18px;
+	  width: 100%;
+	  text-align: left;
+	  border: none;
+	  border-radius: 5px;
+	  outline: none;
+	  transition: 0.4s;
+	}
+
+	/* Add a background color to the button if it is clicked on (add the .active class with JS), and when you move the mouse over it (hover) */
+	.active, .accordion:hover {
+	  background-color: #ccc;
+	}
+
+	/* Style the accordion panel. Note: hidden by default */
+	.panel {
+	  padding: 0 18px;
+	  background-color: white;
+	  display: none;
+	  overflow: hidden;
+	}
+	
+	.pageContainerDiv {
+		padding: 5px;
+		padding-right: 20px;
+		border: 1px solid lightgrey;
+		text-underline-position: under;
+		text-decoration: none;
+		border-radius: 5px;
+		margin-top: 5px;
+		position: relative;
+	}
+
+	.active, .pageContainerDiv:hover {
+	  background-color: #ccc;
+	}
+
+	.pageContainerDiv p {
+		margin: 0px;
+    	color: grey;
+	}
+
+	.pageContainerDiv a {
+		text-decoration: none;
+	}
+
+	.closeBtnDelete {
+		background-color: pink;
+		padding-left: 3px;
+		padding-right: 3px;
+		border: solid 1px black;
+		cursor: pointer;
+		position: absolute;
+		display: inherit;
+		top: 5px;
+		right: 5px;
+	}
+
+	#pageTitles {
+		overflow: auto;
+		max-height: 200px;
+	}
+
+	.controls {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 10px; 
+		border: 1px solid #ccc; 
+		border-radius: 5px;  
+		background-color: #f9f9f9;
+		width: 200px;
+	}
+
+	label {
+		margin: 5px 10px;
+		cursor: pointer;
+	}
+
+	h3 {
+		margin-bottom: 10px;         
+	}
+
+	#container {
+		display: flex;
+		height: 100vh;
+		overflow: auto;
+	}
+
+	/* Sidebar for dataViewer */
+	#dataViewerContainer {
+		left: 0px;
+		width: 50%;
+		box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        background: yellow;
+		min-width: 150px; 
+		background-color: #f4f4f9;
+		padding: 20px;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+		overflow-y: auto;
+		z-index: 0;
+		position: relative;
+	}
+
+	/* Main content area for charts */
+	#chartsContainer {
+		/*flex-grow: 1;  Take up remaining space */
+		container: size;
+		position: fixed;
+		top: 0px;
+		right: 0px;
+		height: auto;
+		overflow-y: auto;
+		background-color: #ffffff;
+		height: 100vh;
+		width: 50%;
+		
+	}
+
+	#selectedData {
+		min-width: 150;
+		height: auto;
+		background-color: #ffffff;
+		padding: 20px;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+		overflow-y: auto;
+		z-index: 1000;
+		position: relative;
+	}
+
+	#chartData {
+		min-width: 150;
+		height: auto;
+		background-color: #ffffff;
+		padding: 20px;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+		overflow-y: auto;
+		z-index: 1000;
+		position: relative;
+	}
+
+	/* Draggable divider */
+	#divider {
+		top: 0px;
+		left: 50%;
+		position: absolute;
+		width: 5px;
+		cursor: col-resize; /* Show resize cursor */
+		background-color: #ddd;
+		height: 100vh;
+		z-index: 10;
+	}
+
+	#divider:hover {
+		background-color: rgb(192, 192, 192)
+	}
+
+	#toggleSliderBtn {
+		position: sticky;
+		top: 50%; /* Adjust to center vertically */
+		transform: translateX(-50%);
+		padding: 20px 7px;
+		background-color: #007bff;
+		color: white;
+		border: none;
+		border-radius: 5px;
+		cursor: pointer;
+		box-shadow: rgba(0, 0, 0, 0.5) 1px 1px 10px;
+	}
+
+	#toggleSliderBtn:hover {
+		background-color: #0056b3;
+	}
+
+	
+	.data-table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	.data-table th, .data-table td {
+		border: 1px solid #ddd;
+		padding: 8px;
+	}
+
+	.data-table th {
+		background-color: #f2f2f2;
+		text-align: left;
+	}
+
+	.off {
+		color: darkred;
+		background-color: pink;
+	}
+
+	.on {
+		color: darkgreen;
+		background-color: greenyellow;
+	}
+
+	.no-select {
+    	user-select: none;
+	}
+
+	#selectedMessages {
+		min-width: 150; /* Minimum width limit */
+		height: auto;
+		background-color: #ffffff;
+		padding: 20px;
+		box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+		overflow-y: auto;
+		z-index: 1000;
+		position: relative;
+	}
+
+	.dataViewerChild {
+		display: flex;                  /* Use flexbox for layout */
+		flex-direction: column;         /* Stack items vertically */
+		align-items: flex-start;        /* Align items to the start */
+		padding: 10px;                 /* Add some padding inside the box */
+		border: 1px solid #ccc;        /* Optional: Add a border */
+		border-radius: 5px;            /* Optional: Round corners */
+		background-color: #f9f9f9;  
+		margin-bottom: 10px;
+		overflow-y: auto;
+	}
+
+	.gradient-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		width: 30px; /* Width of the gradient */
+		height: 100%;
+		background: linear-gradient(to left, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)); /* Adjust gradient colors as needed */
+		pointer-events: none; /* Ensure it doesn't interfere with interactions */
+	}
+
+	.messageBtnBar {
+		position: absolute;
+		margin-top: 3px;
+	}
+
+	#dynamicChartControlBox {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		padding-left: 20px;
+		padding-right: 20px;
+		justify-content: center;
+		height: 20px;
+	}
+
+	#dynamicChartControlBox label {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		margin-bottom: 10px;
+	}
+
+	#dynamicChartControlBox h3 {
+		margin-top: 15px;
+	}
+
+	.timeUnitDropdown {
+		margin-left: 10px;
+		margin-right: 10px;
+	}
+
+	.header {
+		position: sticky;
+		z-index: 100;
+		top: 0px;
+	}
+
+	
+
+  </style>
+</head>
+<body>
+
+<div id="container">
+	<div class="dataViewer MsgContents" id="dataViewerContainer">
+		<div class="padding-div">
+			<div id="selectedMessages" class="dataViewerChild MsgContents">
+				<div><h3>Selected Bar Chart Messages</h3></div>
+				<p>Click a bar chart block to show the message data here.</p>
+				<div id="selectedMessage" class="dataViewer"></div>
+			</div>
+			<div id="selectedData" class="dataViewerChild MsgContents">
+				<div><h3>Selected Doughnut Chart Segment</h3></div>
+				<p>Click a doughnut chart segment to show the segment data here.</p>
+				<div id="dataViewer" class="dataViewer"></div>
+			</div>
+			<div id="chartData" class="dataViewerChild MsgContents">
+				<h3>Imported Data</h3>
+				<div id="chartDataViewer" class="dataViewer"></div>
+			</div>
+		</div>
+	</div>
+	<div id="divider">
+		<button id="toggleSliderBtn"></button>
+	</div>
+	<div class = "charts" id="chartsContainer">
+		<div class="header" style="text-align: center;">
+			<div class="chart-row-control">
+				<img src="/icons/IRISWHIZ.png" height="40px" width="40px";></img>
+				<div id ="dynamicChartControlBox" class="controls">
+					<h4>Time Scale:</h4>
+					<select id="timeUnitDropdown" name="timeUnit">
+						<option value="minute" selected>Minute</option>
+						<option value="hour">Hour</option>
+						<option value="day">Day</option>
+						<option value="week">Week</option>
+						<option value="month">Month</option>
+						<option value="year">Year</option>
+					</select>
+					<button id="resetZoomBtn" class="whizButton resetZoomBtn">Reset Zoom</button>
+				</div>
+				
+			</div>
+		</div>
+		<div class="padding-div-charts">
+			<div id="barChartRow" class="chart-row time">
+				<div class="chartContainerMain">
+					<div class="chart">
+						<canvas id ="barChart"></canvas>
+					</div>
+				</div>
+			</div>
+			
+			<div class="chart-row time">
+				<div class="chartContainerMain">
+					<div class="chart">
+						<canvas id ="lineChart"></canvas>
+					</div>
+				</div>
+			</div>
+			<div class="chart-row">
+				<div class="chartContainer">
+					<canvas id ="Source"></canvas>
+				</div>
+				<div class="chartContainer">
+					<canvas id ="Target"></canvas>
+				</div>
+			</div>
+			<div class="chart-row">
+				<div class="chartContainer">
+					<canvas id ="Error"></canvas>
+				</div>
+				<div class="chartContainer">
+					<canvas id ="Status"></canvas>
+				</div>
+			</div>
+			<div id="customRow">
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+</body>
+
+<script src="utils.js"></script>
+<script src="analysis.js"></script>
+
+</html>

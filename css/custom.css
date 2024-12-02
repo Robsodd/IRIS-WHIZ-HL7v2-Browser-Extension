@@ -110,3 +110,16 @@
 	top: 0px;
 	z-index: 2;
 }
+
+
+.toggleSchema {
+	cursor: pointer;
+	padding: 3px 3px;
+	top: -3px;
+    left: -2px;
+    position: relative;
+}
+
+.toggleSchema:hover {
+	box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.5);
+}

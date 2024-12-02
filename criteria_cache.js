@@ -172,15 +172,18 @@ function createModal() {
 
 	// Create the button that opens the modal
 	modalBtn = document.createElement("button");
-	buttonStyling(modalBtn);
-	modalBtn.style.backgroundColor = "#05c705";
-	modalBtn.style.position = "absolute";
-	modalBtn.style.marginLeft = "5px";
-	modalBtn.style.bottom = "5px";
+	modalBtn.classList.add("whizButton");
+	modalBtn.classList.add("criteriaCacheBtn");
 	modalBtn.innerText = "Search History";
 
+
+    let modalBtnLi = document.createElement("li");
+
+	modalBtnLi.appendChild(modalBtn)
+	messageViewerBtnBar.appendChild(modalBtnLi);
+
 	document.body.appendChild(modal);
-	document.body.appendChild(modalBtn);
+	//document.body.appendChild(modalBtn);
 	
 	// When the user clicks the button, open the modal 
 	modalBtn.onclick = function() {
@@ -449,6 +452,10 @@ function addCriteriaToSearch(clickedCriteria) {
 				opSelect: opSelect,
 				val: val,
 				joinSelect: false,
+			}
+			// Change criterion Type assumption if RawContent present
+			if ((row.cond_Val_1 == "RawContent")|| (row.cond_Val_2 == "RawContent")) {
+				messageSearchEvent.criterionType = "Body";
 			}
 		
 		} else if (clickedCriteria[x].className == "joinRow") {

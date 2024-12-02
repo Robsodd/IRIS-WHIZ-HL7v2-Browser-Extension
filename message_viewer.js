@@ -5,8 +5,15 @@ let resultsDiv;
 let resultsMessages;
 let headerMessageTrace;
 let traceContent;
+let messageViewerBtnBar;
+messageViewerBtnBar = messageViewerButtonBar(document);
+
+console.log(messageViewerBtnBar);
 
 window.addEventListener("load", function() {
+
+	
+
 	chrome.storage.local.get({
 		settings: {},	
 		},	function(stored) {

@@ -33,6 +33,32 @@
 	width: fit-content;
 }
 
+.messageViewerBtnBar {
+	list-style-type: none;
+	text-align: center;
+	margin: 0;
+	position: absolute;
+	bottom: 0;
+	left: 50%;
+	z-index: 3;
+	padding: 2px 25px;
+	max-width: 50%;
+    min-width: 200px;
+    margin: auto;
+	width: fit-content;
+	pointer-events: none;
+}
+
+
+.messageViewerBtnBar .whizButton {
+	pointer-events: auto;
+}
+
+.messageViewerBtnBar li {
+	display: inline-block;
+	margin: 3px;
+  }
+
 .buttonBar li {
   display: inline-block;
   margin: 3px;
@@ -270,6 +296,25 @@
 	position: ;
 }
 
+.saveMessageViewerBtn {
+	background-color: purple;
+	color: white;
+}
+
+.criteriaCacheBtn {
+	background-color: #05c705;
+
+}
+
+.exportCsvBtn {
+	background-color: rgb(0, 9, 135);
+	color: white;
+}
+
+.analysisBtn {
+ 	background-color: red;
+ 	color: white;
+}
 
 
 .minimiseBtn {
@@ -312,6 +357,8 @@
 	display: inherit;
 }
 
+.closeBtnHide > * { pointer-events: none; }
+
 
 .minimiseiFrameBtn {
 	position: absolute;
@@ -323,4 +370,83 @@
     display: block;
     margin-top: 10px;
     right: 5px;
+}
+
+
+.toggleFilterBtn {
+	background-color: pink;
+	display: block;
+}
+
+.maximiseBtn {
+	background-color: rgb(26, 136, 214);
+	display: block;
+}
+
+.clearSelectedMessagesBtn {
+	background-color: rgb(251, 73, 73);
+	display: block;
+}
+
+.openSelectedMessagesBtn {
+	background-color: rgb(211, 26, 214);
+	display: block;
+}
+
+.IWFullScreen {
+	position: fixed !important;
+	top: 0;
+	left: 0;
+	z-index: 1001;
+	height: 100%;
+	width: 100%;
+	background: #fff;
+	box-shadow: inset 0px 0px 3px 1px #000000;
+}
+
+.IWFullScreen .chartContainerMain .chart {
+	height: 100%;
+	width: 100%;
+	max-height: 80% !important;
+	padding: 20px;
+}
+
+.IWFullScreen .chartContainerMain {
+	height: 90%;
+}
+
+.IWFullScreenControlBox {
+	padding: 0px;
+}
+
+.IWFullScreen .chartContainerMain .chart #dynamicChart {
+	max-height: 100% !important;
+}
+
+#buttonBardynamicChart {
+	position: absolute;
+	top: 140px;
+	right: 100px;
+}
+
+.lineGraphViewBtn {
+	background-color: rgb(26, 214, 120);
+	display: block;
+}
+
+.IWFullScreen #buttonBardynamicChart {
+	position: absolute;
+	top: 0px;
+	right: 0px;
+}
+
+.resetZoomBtn {
+	background-color: dodgerblue;
+	display: block;
+	margin-left: 5px;
+}
+
+.minimiseChart {
+	background-color: dodgerblue;
+	display: block;
 }

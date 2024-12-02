@@ -45,7 +45,17 @@ try {
 	//console.log("Error", e);
 }
 
+chrome.storage.local.get({
+	settings: [],
+	}, function(stored) {
+		if (Object.keys(stored).length === 0) {
+			settings = {};
+		} else {
 
+			settings = stored.settings;
+			console.log("STORED SETTINGS: ", settings);			
+		}
+})
 
 let statusDiv;
 
@@ -178,6 +188,7 @@ function messageStyling(object){
 
 // Button bar for individual messages
 function messageButtonBar(Document, messageId) {
+
 	let messageBtnBar = Document.createElement('ul');
 	messageBtnBar.classList.add("messageBtnBar");
 
@@ -195,6 +206,160 @@ function messageButtonBar(Document, messageId) {
 	//})
 	
 	return messageBtnBar
+}
+
+// Button bar for individual messages
+function messageViewerButtonBar(Document) {
+	let messageViewerBtnBar = Document.createElement('ul');
+	//messageViewerBtnBar.classList.add("messageViewerBtnBar");
+	//messageViewerBtnBar.id = "messageViewerBtnBar"
+	Document.body.appendChild(messageViewerBtnBar);
+
+	let currentPageTitle = document.title
+	console.log("currentPageTitle", currentPageTitle);
+	if (currentPageTitle.includes("Login")) {
+		throw new Error("Prevent buttonBar loading on Login page");
+	}
+
+	let bar = Document.createElement('ul');
+	messageViewerBtnBar.id = "buttonBar";
+	messageViewerBtnBar.className = "messageViewerBtnBar";
+	//bar.style.backgroundColor = "black";
+	messageViewerBtnBar.style.position = "absolute";
+	messageViewerBtnBar.style.top = "unset";
+	messageViewerBtnBar.style.bottom = "0px";
+	messageViewerBtnBar.style.left = "50%";
+	messageViewerBtnBar.style.backgroundColor = "unset";
+	messageViewerBtnBar.style.padding = "15px 25px"
+		
+	let displayButton = Document.createElement('button');
+	displayButton.classList.add("whizButton");
+	displayButton.classList.add("displayBarBtn");
+	displayButton.style.position = "absolute";
+	displayButton.style.bottom = "5px";
+	displayButton.style.left = "50%";
+	displayButton.style.display = "inherit";
+	displayButton.title = "Display IRIS Whiz Buttons";
+	displayButton.innerText = "IRIS Whiz";
+	displayButton.id = "whiz"
+	messageViewerBtnBar.append(displayButton);
+	let minimiseButtonBarBtn = minimiseButtonBarButton(Document, messageViewerBtnBar);
+	minimiseButtonBarBtn.classList.add("whizButton")
+	// children[0].className
+	displayButton.addEventListener("click", function(e) {
+		messageViewerBtnBar.style.boxShadow = "inset 0 0 100px 100px rgba(255, 255, 255, 0.6)";
+		messageViewerBtnBar.style.border = "1px grey solid"
+		minimiseButtonBarBtn.style.display = "inherit";
+		displayButton.style.display = "none";
+		let buttons = messageViewerBtnBar.getElementsByClassName("whizButton");
+		for (let i = 0; i < buttons.length; i++) {
+			if ((buttons[i].classList.contains("whizButton")) && (buttons[i].id != "whiz")) {
+				buttons[i].style.display = "inherit";
+			}
+		}
+	})		
+
+	//Document.body.insertBefore(bar, Document.body.firstChild);
+	chrome.storage.local.get({
+		settings: {},
+		}
+		,	function(stored) {
+			if (stored.settings.ButtonsShow) {
+				delay(1000).then(() => {
+					displayButton.click();
+				})
+				
+			}
+		}
+	);
+
+	return messageViewerBtnBar
+}
+
+function genericButton(Document, messageBtnBar) {
+	let genericBtn = Document.createElement('btn');
+	genericBtn.classList.add("whizButton");
+
+	let li = Document.createElement('li');
+	li.append(genericBtn);
+	messageBtnBar.appendChild(li);
+	return genericBtn
+}
+
+function maximiseButton(Document, messageBtnBar) {
+	
+	let maximiseBtn = Document.createElement('btn');
+	maximiseBtn.classList.add("whizButton");
+	maximiseBtn.classList.add("maximiseBtn");
+	maximiseBtn.title = "Fullscreen View";
+	maximiseBtn.innerText = "Fullscreen";
+	let dynamicChartControlBox = Document.getElementById("dynamicChartControlBox")
+	let divider = Document.getElementById("divider")
+	let previousParent
+	maximiseBtn.addEventListener("click", (e) => {
+		if (messageBtnBar.parentElement.classList.contains("IWFullScreen")) {
+			//messageBtnBar.parentElement.classList.remove("IWFullScreen")
+			//messageBtnBar.parentElement.classList.add("chartContainer")
+			//maximiseBtn.classList.remove("closeBtnHide");
+			divider.style.zIndex = "10";
+			console.log("savedClassList",messageBtnBar.parentElement.savedClassList);
+			messageBtnBar.parentElement.classList = messageBtnBar.parentElement.savedClassList;
+			//messageBtnBar.parentElement.parentElement.parentElement.parentElement.classList = messageBtnBar.parentElement.parentElement.parentElement.parentElement.savedClassList;
+			dynamicChartControlBox = document.getElementById("dynamicChartControlBox")
+			dynamicChartControlBox.classList = dynamicChartControlBox.savedClassList
+			maximiseBtn.classList.add("maximiseBtn");
+			maximiseBtn.innerText = "Fullscreen";
+			previousParent.appendChild(dynamicChartControlBox);
+
+		} else {
+			divider.style.zIndex = "0";
+			//messageBtnBar.parentElement.classList.add("IWFullScreen")
+			//messageBtnBar.parentElement.classList.remove("chartContainer")
+			const classListCopy = [...messageBtnBar.parentElement.classList];
+			const classListCopyControl= [...dynamicChartControlBox.classList];
+			messageBtnBar.parentElement.savedClassList = classListCopy;
+			//messageBtnBar.parentElement.parentElement.parentElement.parentElement.savedClassList = classListCopyParent;
+			dynamicChartControlBox.savedClassList = classListCopyControl;
+			dynamicChartControlBox.parentElement = previousParent
+			console.log("savedClassList",messageBtnBar.parentElement.savedClassList);
+			messageBtnBar.parentElement.classList = "IWFullScreen";
+
+			previousParent = dynamicChartControlBox.parentElement
+			let li = document.createElement("li")
+			li.appendChild(dynamicChartControlBox)
+			maximiseBtn.parentElement.parentElement.insertBefore(li, maximiseBtn.parentElement.parentElement.firstChild)
+
+			dynamicChartControlBox.classList = "IWFullScreenControlBox";
+			
+			maximiseBtn.classList.remove("maximiseBtn");
+			maximiseBtn.classList.add("closeBtnHide");
+			maximiseBtn.innerText = "Exit Fullscreen";
+		}
+
+	})
+
+	let li = Document.createElement('li');
+	li.append(maximiseBtn);
+	messageBtnBar.appendChild(li);
+	//messageBtnBar.appendChild(closeBtnHide);	
+	return maximiseBtn
+}
+
+function toggleFilterButton(Document, messageBtnBar) {
+	
+	let toggleFilterBtn = Document.createElement('btn');
+	toggleFilterBtn.classList.add("whizButton");
+	toggleFilterBtn.classList.add("toggleFilterBtn");
+	
+	
+	toggleFilterBtn.title = "Filter Charts by Selected Segment Data";
+	toggleFilterBtn.innerText = "Toggle Filter: Off";
+
+	let li = Document.createElement('li');
+	li.append(toggleFilterBtn);
+	messageBtnBar.appendChild(li);
+	//messageBtnBar.appendChild(closeBtnHide);	
+	return toggleFilterBtn
 }
 
 // Hides parent element when clicked
@@ -268,8 +433,16 @@ function minimiseButton(Document, messageDiv, messageBtnBar) {
 
 	minimiseBtn.title = "Minimise";
 	minimiseBtn.innerText = "-";
+	let clicked = false;
 	minimiseBtn.addEventListener('click', () => {
 		let tables = messageDiv.getElementsByTagName("table")
+		if (clicked) {
+			minimiseBtn.innerText = "-";
+			clicked = false;
+		} else {
+			minimiseBtn.innerText = "+";
+			clicked = true;
+		}
 		let l = tables.length;
 		for (let i = 0; i < l; i ++) {
 			if (tables[i].style.display == "none") {
@@ -279,6 +452,49 @@ function minimiseButton(Document, messageDiv, messageBtnBar) {
 				tables[i].style.display = "none";
 				minimiseBtn.set = "minimised";
 			}
+		}
+	})
+	//console.log("buttonBar", messageBtnBar, messageDiv.id);
+	//messageBtnBar.appendChild(minimiseBtn);
+	let li = Document.createElement('li');
+	li.append(minimiseBtn);
+	messageBtnBar.appendChild(li);
+}	
+
+function minimiseChartButton(Document, chartDiv, messageBtnBar) {
+	let minimiseBtn = Document.createElement('btn');
+	minimiseBtn.classList.add("whizButton");
+	minimiseBtn.classList.add("minimiseBtn");
+
+	minimiseBtn.title = "Minimise";
+	minimiseBtn.innerText = "-";
+	let clicked = false;
+	//let chartDisplay = chartDiv.parentElement.parentElement.style.display;
+	let chartParent;
+	let minHeight;
+	let minHeightParent;
+	let minHeightParentParent;
+	minimiseBtn.addEventListener('click', () => {
+		if (clicked) {
+			minimiseBtn.innerText = "-";
+			clicked = false;
+			chartParent.parentElement.parentElement.style.minHeight = minHeightParentParent;
+			chartParent.parentElement.style.minHeight = minHeightParent;
+			chartParent.style.minHeight = minHeight;
+			chartParent.appendChild(chartDiv);
+			//chartDiv.parentElement.parentElement.style.display = chartDisplay
+		} else {
+			chartParent = chartDiv.parentElement;
+			minHeightParentParent = chartParent.parentElement.parentElement.style.minHeight;
+			minHeightParent = chartParent.parentElement.style.minHeight;
+			minHeight = chartParent.style.minHeight;
+			chartParent.parentElement.parentElement.style.minHeight = "20px";
+			chartParent.parentElement.style.minHeight = "20px";
+			chartParent.style.minHeight = "20px";
+			minimiseBtn.innerText = "+";
+			clicked = true;
+			chartParent.removeChild(chartDiv);
+			//chartDiv.parentElement.parentElement.style.display = "none"
 		}
 	})
 	//console.log("buttonBar", messageBtnBar, messageDiv.id);
@@ -454,6 +670,7 @@ function textCompareBtn(Document) {
 			} else {
 				instances = stored.instances;
 				settings = stored.settings;
+				console.log("STORED SETTINGS: ", settings);
 				/*
 				if (settings.CustomColours != undefined) {
 					customColours = settings.CustomColours;
@@ -748,17 +965,7 @@ function shareButton(Document) {
 	shareBtn.innerText = "Copy Share Link";
 	
 	shareBtn.addEventListener('click', () => {
-		let shareLink = stubUrl[0] + "EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=";
-		let l = sortedMessageArray.length;
-		for (let i = 0; i < l; i++) {
-			let messageParams = "&m=" + String(sortedMessageArray[i].messageNumber) + "&s=" + encodeURIComponent(sortedMessageArray[i].messageStartOperation) + "&e=" + encodeURIComponent(sortedMessageArray[i].messageEndOperation);
-			if (i == 0) {
-				// Page url is based on the first message.
-				shareLink = shareLink + String(sortedMessageArray[i].messageNumber) + "&btns=disable&share=1" + messageParams;
-			} else {
-				shareLink = shareLink + messageParams;
-			}				
-		}
+		let shareLink = stubUrl[0] + createMultiMessageLink();
 		const textArea = Document.createElement("textarea");
 		textArea.value = shareLink;
 		textArea.innerText = shareLink;
@@ -778,9 +985,86 @@ function shareButton(Document) {
 	li.append(shareBtn);
 	let buttonBar = Document.getElementById("btnBarMessageSizing");
 	buttonBar.appendChild(li);
-		
+	return shareBtn
 }
 
+
+function createMultiMessageLink() {
+	let shareLink = "EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=";
+	let l = sortedMessageArray.length;
+	for (let i = 0; i < l; i++) {
+		let messageParams = "&m=" + String(sortedMessageArray[i].messageNumber) + "&s=" + encodeURIComponent(sortedMessageArray[i].messageStartOperation) + "&e=" + encodeURIComponent(sortedMessageArray[i].messageEndOperation);
+		if (i == 0) {
+			// Page url is based on the first message.
+			shareLink = shareLink + String(sortedMessageArray[i].messageNumber) + "&btns=disable&share=1" + messageParams;
+		} else {
+			shareLink = shareLink + messageParams;
+		}				
+	}
+	return shareLink
+}
+
+function clearSelectedMessagesButton(Document, buttonBar) {
+	// Used on the Analysis page.
+	let clearSelectedMessagesBtn = Document.createElement('btn');	
+	clearSelectedMessagesBtn.classList.add("whizButton");
+	clearSelectedMessagesBtn.classList.add("clearSelectedMessagesBtn");
+	
+	clearSelectedMessagesBtn.title = "Clear Selected Messages";
+	clearSelectedMessagesBtn.innerText = "Clear Messages";
+	
+	let li = Document.createElement('li');
+	li.append(clearSelectedMessagesBtn);
+	//let buttonBar = Document.getElementById("btnBarMessageSizing");
+	buttonBar.appendChild(li);
+	return clearSelectedMessagesBtn
+}
+
+function lineGraphViewButton(Document, buttonBar) {
+	// Used on the Analysis page.
+	let lineGraphViewBtn = Document.createElement('btn');	
+	lineGraphViewBtn.classList.add("whizButton");
+	lineGraphViewBtn.classList.add("lineGraphViewBtn");
+	
+	lineGraphViewBtn.title = "Show On Line Graph";
+	lineGraphViewBtn.innerText = "Show On Line Graph";
+	
+	let li = Document.createElement('li');
+	li.append(lineGraphViewBtn);
+
+	buttonBar.appendChild(li);
+	return lineGraphViewBtn
+}
+
+function openSelectedMessagesButton(Document, buttonBar) {
+	// Used on the Analysis page.
+	let openSelectedMessagesBtn = Document.createElement('btn');
+	//buttonStyling(shareButton);
+	
+	openSelectedMessagesBtn.classList.add("whizButton");
+	openSelectedMessagesBtn.classList.add("openSelectedMessagesBtn");
+	
+	openSelectedMessagesBtn.title = "Open Selected Messages";
+	openSelectedMessagesBtn.innerText = "View Selected Messages";
+	
+	openSelectedMessagesBtn.addEventListener('click', () => {
+		if (sortedMessageArray.length == 0) {
+			return
+		}
+		let domainURL = sortedMessageArray[0].sessionURL.split("EnsPortal")
+		let shareLink = domainURL[0] + createMultiMessageLink();
+		
+		// Open New window
+		window.open(shareLink, '_blank');
+		
+		
+	})
+	let li = Document.createElement('li');
+	li.append(openSelectedMessagesBtn);
+	//let buttonBar = Document.getElementById("btnBarMessageSizing");
+	buttonBar.appendChild(li);
+	return openSelectedMessagesBtn
+}
 
 
 function compareLegendButtons(Document) {

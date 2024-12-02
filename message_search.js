@@ -33,7 +33,7 @@ function delay(time) {
 
 
 /// Adds a criterion to the message search page
-function add_criterion(request) {
+function add_criterion(request) {	
 	//console.log("add_criterion", request)
 
 	let schema = request.schema
@@ -83,7 +83,8 @@ function add_criterion(request) {
 
 	/// Flow for adding a criterion once the Add Criterion Frame is open
 	function criterion_flow(frame) {
-		delay(300).then(() => {
+		
+		delay(300).then(() => {			
 			let criterionType = frame.contentWindow.document.getElementById("control_7")
 			criterionType.value = "VDocSegment";
 			criterionType.dispatchEvent(event);
@@ -147,6 +148,7 @@ function add_criterion(request) {
 
 /// Adds a criterion to the message search page *v2 is for event handling instead of message handling
 function add_criterion2(messageSearchEvent) {
+	
 	//console.log("add_criterion messageSearchEvent", messageSearchEvent)
 	
 	let criterionType = messageSearchEvent.criterionType; //
@@ -201,8 +203,8 @@ function add_criterion2(messageSearchEvent) {
 
 	/// Flow for adding a criterion once the Add Criterion Frame is open
 	function criterion_flow(frame) {
-		
-		if ((criterionType == "VDocPath") || (criterionType == "VDocSegment") || (criterionType == "Header")) {
+				
+		if ((criterionType == "VDocPath") || (criterionType == "VDocSegment") || (criterionType == "Header")||(criterionType == "Body")) {
 			delay(300).then(() => {
 				let criterionType = frame.contentWindow.document.getElementById("control_7");
 				criterionType.value = messageSearchEvent.criterionType;
@@ -245,7 +247,7 @@ function add_criterion2(messageSearchEvent) {
 				
 					delay(delay_time).then(() => {
 						let segmentType;
-						if (messageSearchEvent.criterionType == "Header") { 
+						if ((messageSearchEvent.criterionType == "Header")||(messageSearchEvent.criterionType == "Body")) { 
 							// skip
 						} else {
 							segmentType = frame.contentWindow.document.getElementById("cond_" + String(i-joinCount) + "_Val_1");
@@ -258,7 +260,7 @@ function add_criterion2(messageSearchEvent) {
 					
 					delay(delay_time).then(() => {
 						let fieldName
-						if (messageSearchEvent.criterionType == "Header") {
+						if ((messageSearchEvent.criterionType == "Header")||(messageSearchEvent.criterionType == "Body")) {
 							fieldName = frame.contentWindow.document.getElementById("prop_" + String(i-joinCount));
 						} else {
 							fieldName = frame.contentWindow.document.getElementById("cond_" + String(i-joinCount) + "_Val_2");

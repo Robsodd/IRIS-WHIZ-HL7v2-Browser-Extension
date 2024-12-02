@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"name": "Default_ellisro - e_tst:MYCARE_OCS_TST",
+			"uri": "isfs://e_tst:mycare_ocs_tst/?project=Default_ellisro"
+		}
+	],
+	"settings": {
+		"objectscript.showExplorer": false
+	}
+}

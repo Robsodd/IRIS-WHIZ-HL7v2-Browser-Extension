@@ -1,5 +1,5 @@
 ***
-VERSION 1.9.1 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION 1.10.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -17,7 +17,7 @@ This code is made available as is and will not be supported. Please see License.
 
 Follow the instructions in the tutorial video below:
 
-https://youtu.be/on9NoXd1qyQ
+https://youtu.be/cxpMFfGYGu0
 
 Or
 
@@ -70,6 +70,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 17. Complete Date
 18. Extended Criteria Search History 
 19. Share Search
+33. ChartJS Analysis Page
 
 
 #### Visual Trace Page
@@ -101,8 +102,6 @@ Finally, enable your desired features using the checkbox form at the top of this
 24. ChatGPT Powered Test Message Generator
 25. Active Production Category Search
 32. Production Queue Search
-
-
 
 #### Extension Pop-up
 05. Extension Pop-up - Open Session         
@@ -342,9 +341,117 @@ Added a search bar to the Queue tab on the production page. Allows you to search
 Useful to see queues quickly compared with scrolling because ain't nobody got time for that.
 
 
+#### 33. ChartJS Analysis Page
+
+An Analyse button now appears on message viewer page. This opens the results of your search in a new tab and shows you the data in some default ChartJS pie charts and a main message timeline.
+
+Pan (click and drag), zoom in (mouse wheel) and change the date range (radio list of options) on the main timeline chart. Click a block on the chart to show the corresponding message in the Selected Messages box. Click the View Selected Messages button to open the listed messages in a new window for easy comparison.
+
+Click Pie Chart segments to show the messages in the clicked segment in the Selected Data Segment box. Toggle the filter button at the top of this box to filter all charts down to only this selected data, including the timeline chart.
+
+Click the View On Timeline button on any pie chart to see the data for that pie chart displayed on the TimeLine chart.
+
+Any criteria you have added to your message search will appear as piecharts at the bottom of the page. 
+
+Toggle fullscreen mode on any chart with its corresponding 'Fullscreen' button.
+
+Drag the sidebar as needed to view either the data or the charts more easily.
+
+This page is useful for diving into your data. I hope.
+
+
+
+
+#### 34. Queue Refresh
+
+Iris saw the demise of the auto-refresh button on the production Queue page. I have given it life again. 
+
+Select the refresh interval in the dropdown.
+
+Useful if you don't have a desire to repeatedly click a refresh button.
+
+
+#### 35. Export Search as CSV
+
+On the Message Viewer page you can click the Iris Whiz Export button to download a CSV copy of the data currently in your search table.
+
+Useful if you want to do analysis on your data but don't want to use the fancy new Chart.JS page I spent ages creating.
+
+
+#### 36. 
+
+
 ## Updates
 
-##### 27/01/2024 Updates:
+##### 18/11/2024 Updates:
+
+Version 1.10.0
+
+
+__Feature Added__: ChartJS Analysis
+
+An Analyse button now appears on message viewer page. This opens the results of your current search in a new tab and shows you the data in some default ChartJS pie charts and a main message timeline.
+
+Thanks to the creators of the following libraries I used:
+Chart.js v4.4.5
+https://www.chartjs.org
+(c) 2024 Chart.js Contributors
+Released under the MIT License
+
+chartjs-adapter-date-fns v3.0.0
+https://www.chartjs.org
+(c) 2022 chartjs-adapter-date-fns Contributors
+
+chartjs-plugin-datalabels v2.2.0
+https://chartjs-plugin-datalabels.netlify.app
+(c) 2017-2022 chartjs-plugin-datalabels contributors
+Released under the MIT license
+
+chartjs-plugin-zoom v2.0.1
+(c) 2016-2023 chartjs-plugin-zoom Contributors
+Released under the MIT License
+
+Hammer.JS - v2.0.8 - 2016-04-23
+http://hammerjs.github.io/
+Copyright (c) 2016 Jorik Tangelder;
+Licensed under the MIT license
+
+
+__Feature Added__: Queue refresh
+
+Iris now has an auto refresh dropdown for the Queues page. Will refresh the queue at the interval selected. Does not load on Ensemble as it already has this feature.
+
+__Feature Added__: Export Search as CSV
+
+On the Message Viewer page you can click the Iris Whiz Export button to download a CSV copy of the data currently in your search table.
+
+Useful if you want to do quick analysis on your data but don't want to use the fancy new Chart.JS page I spent ages creating.
+
+
+__Bug Fix__: Hide Related
+
+Hide related button going for walkies.
+
+
+__Feature Updated__: TraceViewer
+
+Clickable area to highlight the message in the FullTrace tab was tiny. Now it's all of the background area.
+
+
+__Feature Updated__: Saved Searches
+
+Saved Searches now automatically use Body Property Criterion Type if RawContent is found in the text values. 
+
+__Feature Updated__: Expand Schema
+
+Expand Schema buttons now highlight on hover. Also now square to prevent them messing the visual of the message. 
+
+
+
+
+## Updates
+
+##### 26/11/2024 Updates:
 
 Version 1.9.1
 
@@ -353,6 +460,8 @@ __Feature Added__: Production Queue Search
 Added a search bar to the Queue tab on the production page. Allows you to search queuing componenets. Clicking the table header will order the table by that column.  Defaults to sorting by Count of queue.
 
 
+
+## Updates
 
 ##### 27/01/2024 Updates:
 

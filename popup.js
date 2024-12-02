@@ -3,6 +3,7 @@
 
 let instances;
 let titles;
+let analysis;
 
 document.querySelector('#optionsPage').addEventListener('click', function() {
   if (chrome.runtime.openOptionsPage) {
@@ -55,6 +56,33 @@ function searchPageTitles(e) {
 	
 }
 
+function searchAnalysis(e) {
+	console.log(e);
+	let key = e.key;
+	let eValue = e.target.value;
+	if (keys.includes(key)) {
+		//console.log(e.key, "skipped")
+		return
+	}
+	
+	let textSearch = eValue.toLowerCase();
+	textSearch = textSearch.replace(/\s/gm, " ");
+
+	for (var i = titles.length - 1, page; page = titles[i]; i--) {
+		console.log("Check page: ", page);
+		//console.log((row.childNodes[4].innerText.toUpperCase() == (textSearchArray[1].toUpperCase())));
+		let compareText = page.title.replace(/\s/gm, " ");
+		compareText = compareText.toLowerCase();
+		if (compareText.includes(textSearch)) {
+			document.getElementById(page.id).style.display = "";
+		} else {
+			document.getElementById(page.id).style.display = "none";
+		}
+
+	}		
+	
+}
+
 let pageTitlesBtnClicked = false;
 document.getElementById('pageTitlesBtn').addEventListener('click', function() {
 	if (pageTitlesBtnClicked) {
@@ -80,6 +108,72 @@ document.getElementById('pageTitlesBtn').addEventListener('click', function() {
 		alert("Unable to load pages.");
 	}
 });
+
+/* // Option to save analysis. 
+let analysisBtnClicked = false;
+document.getElementById('savedAnalysisBtn').addEventListener('click', function() {
+	if (analysisBtnClicked) {
+		return
+	}
+	analysisBtnClicked = true;
+	try {
+		let analysisContainerDiv = document.getElementById("analysisContainerDiv");
+		let length = analysis.length
+		for (i = 0; i < length; i++) {
+			let pageDiv = createAnalysisDiv(analysis[i])
+			if (i >= 5) {
+				pageDiv.style.display = "none";
+				analysisContainerDiv.appendChild(pageDiv);
+			} else {
+				analysisContainerDiv.appendChild(pageDiv);
+			}
+		}
+		
+		
+		
+	} catch {
+		alert("Unable to load pages.");
+	}
+});*/
+
+function createAnalysisDiv(page) {
+	let analysisContainerDiv = document.createElement("div");
+	analysisContainerDiv.classList.add("pageContainerDiv");
+
+	if (page.name == "") {
+		analysisContainerDiv.innerHTML = "<a href='"+page.url+"' target='_blank' rel='noopener noreferrer'>"+page.id+"</a>"
+	} else {
+		analysisContainerDiv.innerHTML = "<a href='"+page.url+"' target='_blank' rel='noopener noreferrer'>"+page.name+"</a>"
+	}
+	analysisContainerDiv.title = page.url;
+	analysisContainerDiv.id = page.id;
+
+	let datetimeP = document.createElement("p");
+
+	datetimeP.innerText = page.date.formatted;
+	analysisContainerDiv.appendChild(datetimeP);
+	// Close button
+	let closeButton = document.createElement("div");
+	closeButton.innerText = "X";
+	closeButton.classList.add("closeBtnDelete");
+	closeButton.addEventListener("click", () => {
+		analysisContainerDiv.parentElement.removeChild(analysisContainerDiv);
+		// Delete page from titles object
+		for (let i = 0; i < analysis.length; i++) {
+			if (analysis[i].id == page.id) {
+				console.log(analysis);
+				analysis.splice(i, 1);
+				console.log(analysis);
+				chrome.storage.local.set({ analysis: analysis }).then(() => {
+					console.log("analysis is set");
+				  });
+				return
+			}
+		}		
+	})
+	analysisContainerDiv.appendChild(closeButton);
+	return analysisContainerDiv;
+}
 
 function createPageDiv(page) {
 	let pageContainerDiv = document.createElement("div");
@@ -126,6 +220,13 @@ chrome.storage.local.get({
 	titles: []
 	}, function(stored) { 
 		titles = stored.titles;
+});
+
+// Load saved analysis
+chrome.storage.local.get({
+	analysis: []
+	}, function(stored) { 
+		analysis = stored.analysis;
 });
 
 async function goToTrace() {

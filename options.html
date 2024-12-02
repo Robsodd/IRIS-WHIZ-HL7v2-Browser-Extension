@@ -44,6 +44,10 @@
 					<label for="MVTimeFormat">Time format Complete as default</label>  
 					</br><i>When checked automatically changes the Time Format dropdown to Complete on page load.</i></br></br>
 
+					<input type="checkbox" name="SaveAnalysis" id="SaveAnalysis" value="SaveAnalysis">
+					<label for="SaveAnalysis">Save Analysis Search Criteria</label>  
+					</br><i>When Analysis button clicked, saves the current Search criteria and stores a link in the Extension Pop-Up.</i></br></br>
+
 					<h3>Other Features:</h3>
 					<input type="checkbox" name="TextCompareOn" id="TextCompareOn" value="TextCompareOn">
 					<label for="TextCompareOn">Text Compare On as default</label>  </br> <i>Starts message contents view with text compare on as default, regardless of button's visibility.</i></br></br>
@@ -142,12 +146,13 @@
 				Avoid editing this text unless you're comfortable with JSON.
 			</div>
 			 <div class="form-group">
-				<label for="export">Instances Object:</label></br>
+				<label for="export">Instances Object:</label></br> 
 
 				<textarea id="export" name="export" rows="4" cols="50"></textarea>
 			</div>
 			<div class="form-group">
 				<button class="btn signup" id="import">Import</button>
+				<button class="btn signup" id="exportBtn">Export as txt File</button>
 			</div>
 
 		

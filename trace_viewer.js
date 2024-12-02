@@ -239,7 +239,9 @@ function fillFullTraceTab() {
 						}
 					})
 					
+					// When SVG clicked, click FullTrace Message
 					traceMessages[i].parentElement.addEventListener('click', (e) => {
+							console.log("clicked element!!!", traceMessages[i]);
 							let messageArrayLength = messageArray.length;
 							for (let i = 0; i < messageArrayLength; i ++) {
 								messageArray[i].object.setAttribute('selected',"");
@@ -264,7 +266,7 @@ function fillFullTraceTab() {
 					})
 					
 					// Scroll to svg element in Trace window on CTRL click messageDiv
-					messageDiv.addEventListener('click', (e) => {
+					messageDiv.childNodes[1].addEventListener('click', (e) => {
 						let ctrl = window.event.ctrlKey
 						//console.log("keydown triggered");
 						if (ctrl) {

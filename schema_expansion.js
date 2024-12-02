@@ -16,7 +16,7 @@ window.addEventListener("load", function() {
 		toggleBtn.title = "Expand Schema";
 		toggleBtn.style.marginTop = "-16px";
 		toggleBtn.style.cursor = "pointer";
-		toggleBtn.style.padding = "7px 3px";
+		toggleBtn.style.padding = "3px 3px";
 		toggleBtn.className = "toggleSchema";
 		toggleBtn.style.backgroundColor = "orange";
 		expandors[i].style.padding = "1px";
@@ -285,7 +285,7 @@ let expansionElementClassnames = ["EDIDocumentTableExpandor", "EDIDocumentTableS
 
 // Add an event listener
 document.addEventListener("addExpansion", function(e) {
-	//console.log("addExpasion Listener Triggered");
+	console.log("addExpasion Listener Triggered");
 	addExpansionListeners();
 });
 
@@ -313,6 +313,7 @@ function expandContractElement(expandorElement) {
 	if (expandorElement.className.includes("EDIDocumentTableExpandor")) {
 		if 	(expandorElement.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.childNodes.length < 2) {
 			// EXPAND!
+			
 			schemaSearch = false;
 			if (schemaModeFull === false) {
 				expandRow(expandorElement.parentNode);

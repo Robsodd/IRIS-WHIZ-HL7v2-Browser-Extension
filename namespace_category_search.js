@@ -39,7 +39,7 @@ function minimiseiFrame(Document, iframeDiv) {
 }	
 
 window.addEventListener("load", function() { 
-
+	reorderDropdownAlphabetically("id_Category");
 	// Get category list for this page
 	let categorySelect = document.getElementById("id_Category");
 	for (let i = 0; i < categorySelect.options.length; i++ ) {
@@ -327,4 +327,28 @@ function optionsLoading() {
 	
 }
 
+function reorderDropdownAlphabetically(dropdownId) {
+    // Find the dropdown element by its ID
+    const dropdown = document.getElementById(dropdownId);
+    if (!dropdown) {
+        console.error(`Dropdown with ID "${dropdownId}" not found.`);
+        return;
+    }
 
+    // Extract all option elements into an array
+    const options = Array.from(dropdown.options);
+
+    // Separate the first option if it is selected by default (e.g., "All")
+    const defaultOption = options.find(option => option.selected && option.value === "");
+    const otherOptions = options.filter(option => option !== defaultOption);
+
+    // Sort the options alphabetically, ignoring case
+    otherOptions.sort((a, b) => a.text.toLowerCase().localeCompare(b.text.toLowerCase()));
+
+    // Clear the dropdown and append the options in order
+    dropdown.innerHTML = ""; // Clear all options
+    if (defaultOption) {
+        dropdown.appendChild(defaultOption); // Re-add the default option if it exists
+    }
+    otherOptions.forEach(option => dropdown.appendChild(option)); // Append sorted options
+}

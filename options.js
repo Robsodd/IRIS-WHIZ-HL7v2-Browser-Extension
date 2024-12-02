@@ -19,6 +19,7 @@ exportWhiz.settings.HomepageReports = false;
 exportWhiz.settings.LastUpdated = false;
 exportWhiz.settings.BookmarkFolderName = false; 
 exportWhiz.settings.ButtonsShow = false;
+exportWhiz.settings.SaveAnalysis = false;
 exportWhiz.settings.ChatGPTKey = "";
 exportWhiz.settings.CustomColours = [];
 
@@ -188,6 +189,7 @@ function saveSettings() {
 		exportWhiz.settings.LastUpdated = new Date().toLocaleString();
 		exportWhiz.settings.BookmarkFolderName = document.getElementById('BookmarkFolderName').value; 
 		exportWhiz.settings.ButtonsShow = document.getElementById('ButtonsShow').checked;
+		exportWhiz.settings.SaveAnalysis = document.getElementById('SaveAnalysis').checked;;
 		if (document.getElementById('ChatGPTKey').value.includes("****")) {
 			// Don't overwrite
 			exportWhiz.settings.ChatGPTKey = settings.ChatGPTKey
@@ -264,7 +266,7 @@ function restoreOptions() {
 				document.getElementById('HomepageReports').checked = items.settings.HomepageReports;
 				document.getElementById('BookmarkFolderName').value = items.settings.BookmarkFolderName;
 				document.getElementById('ButtonsShow').checked = items.settings.ButtonsShow;
-				
+				document.getElementById('SaveAnalysis').checked = items.settings.SaveAnalysis;
 				document.getElementById('ChatGPTKey').value = replaceLetters(items.settings.ChatGPTKey);
 			}
 			
@@ -305,6 +307,7 @@ document.getElementById('TextCompareOn').addEventListener('change', saveSettings
 document.getElementById('HomepageReports').addEventListener('change', saveSettings);
 document.getElementById('BookmarkFolderName').addEventListener('change', saveSettings);
 document.getElementById('ButtonsShow').addEventListener('change', saveSettings);
+document.getElementById('SaveAnalysis').addEventListener('change', saveSettings);
 document.getElementById('ChatGPTKey').addEventListener('change', saveSettings);
 
 
@@ -1484,3 +1487,25 @@ function deleteCustomColour(deleteCell) {
 		autoSaveColours();
 	}
 }
+
+document.getElementById("exportBtn").addEventListener('click', ()=> {
+	let exportString = document.getElementById('export').value
+	// = JSON.stringify(exportString, null, 1);
+    // Create a Blob with the CSV data
+    const blob = new Blob([exportString], { type: 'text/plain;charset=utf-8;' });
+
+    // Create a download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "Iris Whizz Config";
+
+    // Trigger the download
+    document.body.appendChild(a);
+    a.click();
+
+    // Clean up
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+})
