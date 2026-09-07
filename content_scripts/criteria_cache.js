@@ -3,7 +3,7 @@ console.log("Criteria Cache Script Loaded");
 
 let numberOfCriterionToCache = 10;
 let extendedCriteria;
-let extendedCriteriaClone;
+let extendedCriteriaTableClone;
 let criterionCache = []; // Copy of storage criterion cache
 let criterion = [];
 let searchDateTime;
@@ -51,6 +51,9 @@ function saveCache(skipCurrent) {
 
 	/// Copy the criteria section
 	let extendedCriteriaTable = document.getElementById("extendedCriteriaTable");
+	if (extendedCriteriaTable === null) {
+		return
+	}
 	//console.log("extendedCriteriaTable", extendedCriteriaTable);
 	extendedCriteriaTableClone = extendedCriteriaTable.cloneNode(true);
 	searchDateTime = getDate();
