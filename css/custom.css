@@ -123,3 +123,31 @@
 .toggleSchema:hover {
 	box-shadow: inset 0px 0px 10px rgba(255, 255, 255, 0.5);
 }
+
+#basicAnalysisTable {
+	width: 100%;
+	border-collapse: collapse;
+}
+#basicAnalysisTable th, #basicAnalysisTable td {
+	border: 1px solid #ddd;
+	padding: 8px;
+}
+
+#basicAnalysisTable th {
+	background-color: #f2f2f2;
+	text-align: left;
+}
+
+#dynamicChartControlBox {
+	border-radius: 5px;
+	border: solid 1px grey;
+	background-color: rgb(242, 242, 242);
+	display: flex;
+	align-items: center;
+	justify-content: center; /* Center children horizontally */
+	gap: 10px;
+}
+
+#dynamicChartControlBox h4 {
+	margin: 0;
+}
