@@ -159,7 +159,9 @@ categoryListSelectionEvent = document.createEvent("HTMLEvents");
 categoryListSelectionEvent.initEvent("categoryListSelection", true, true);
 categoryListSelectionEvent.eventName = "categoryListSelection";
 
-
+let analysisEvent = document.createEvent("HTMLEvents")
+analysisEvent.eventName = "analysis";
+analysisEvent.initEvent("analysis", true, true);
 
 function buttonStyling(buttonObject) {
 	/// Default button styling
@@ -581,6 +583,42 @@ function expandSchemaButton(Document) {
 	buttonBar.appendChild(li);
 	
 }
+
+
+function messageResendButton(Document, buttonBar) {
+    // Create the "Resend" button
+    let messageResendBtn = Document.createElement('btn');
+    messageResendBtn.classList.add("whizButton");
+    messageResendBtn.classList.add("messageResendBtn");
+    messageResendBtn.innerText = "Resend";
+    messageResendBtn.title = "Search message in Message Viewer and click resend.";
+
+    // Wrap the button in a list item and append it to the button bar
+    let li = Document.createElement('li');
+    li.append(messageResendBtn);
+    buttonBar.appendChild(li);
+
+    // Add event listener to the button
+    messageResendBtn.addEventListener('click', () => {
+        let messageId = buttonBar.id;
+		
+        messageId = messageId.replace("buttonBar", ""); // Extract the message ID
+		//console.log("MESAGE ID FOR SEARCH", messageId)
+        let searchType = "singleMessage";
+        let criterionType = "Header";
+        let prop_0 = "CorrespondingMessageId";
+
+        // Construct the new URL
+        let new_tab_url = `${stubUrl[0]}EnsPortal.MessageViewer.zen?MESSAGE_SEARCH=true&search_type=${searchType}&criterionType=${criterionType}&prop_0=${prop_0}&value=${messageId}`;
+        
+        // Open the URL in a new tab
+        window.open(new_tab_url, '_blank');
+    });
+
+    return messageResendBtn;
+}
+
+
 function messageImportBtn(Document) {
 	
 	let div = document.createElement('div');
@@ -1742,3 +1780,69 @@ function syncScrolling(Document, object) {
 }
 
 
+
+
+function MessageViewerTabBar(Document) {
+	let detailsTabGroup = Document.getElementById("detailsTabGroup");
+
+	let displayHeaderElements = [
+		{ 
+			"tab": "btn_1_82",
+			"body": "headerDetails",
+		},
+		{ 
+			"tab": "btn_2_82",
+			"body": "bodyDetails",
+		},
+		{ 
+			"tab": "btn_3_82",
+			"body": "bodyContents",
+		},
+		{
+			"tab": "btn_4_82",
+			"body": "traceContent",
+		},
+		{
+			"tab": "selectedMessagesTabHeader",
+			"body": "selecteMessagesTab",
+		},
+		{
+			"tab": "analysisTabHeader",
+			"body": "analysisTab",
+		}
+	]
+	displayHeaderElements.forEach((currentElement, i) => {
+		currentElement["tabObject"] = Document.getElementById(currentElement.tab);
+		currentElement["bodyObject"] = Document.getElementById(currentElement.body);
+	})
+	displayHeaderElements.forEach((currentElement, i) => {
+		let button = Document.getElementById(currentElement.tab)
+		let body = Document.getElementById(currentElement.body)
+		if (button) {
+			currentElement.tabObject.addEventListener('click', () => {
+				if (currentElement.tabObject.getAttribute("class") == "tabGroupButtonDisabled") {
+					return
+				};
+
+				if (currentElement.tab == "analysisTabHeader") {
+					Document.dispatchEvent(analysisEvent);
+				}
+				console.log("MARK CURRENT TAB ACTIVE",currentElement)
+				// Set the clicked tab as active
+				currentElement.tabObject.setAttribute("class", "tabGroupButtonOn");
+				currentElement.bodyObject.style.display = "";
+				
+				// Update all other tabs
+				displayHeaderElements.forEach((otherElement, x) => {
+					console.log("HIDE OTHER ELEMENTS",otherElement)
+					if ((otherElement.tabObject !== null) && (otherElement.tabObject !== currentElement.tabObject)) {
+						if (otherElement.tabObject.getAttribute("class") != "tabGroupButtonDisabled") {
+							otherElement.tabObject.setAttribute("class", "tabGroupButtonOff");
+							otherElement.bodyObject.style.display = "none";
+						};
+					}
+				});
+			});
+		}
+	});
+}
