@@ -93,7 +93,8 @@ function add_message_to_page(param_message) {
 
 		messageArray.push(message);
 
-		
+		let messageResendBtn = messageResendButton(document, messageBtnBar);
+		messageResendBtn.style.display = "block";
 		sideBySideCompareButton(document, messageBtnBar);	
 		copyRawTextButton(document, messageId, messageBtnBar);
 		minimiseButton(document, messageDiv, messageBtnBar);
