@@ -1,6 +1,9 @@
 console.log("Background Script Running");
 const Debug = true;
 
+const owner = "Robsodd";
+const repo = "IRIS-WHIZ-HL7v2-Browser-Extension";
+
 if (Debug) console.log(Debug, "true");
 
 // CHROME STORAGE
@@ -24,12 +27,27 @@ let settings = {
 let defaultColours = ["grey", "blue","red","yellow","green","pink","purple","cyan","orange"]
 // Get the instances object on Extension load
 chrome.storage.local.get({
-			instances: {},
+			instances: [],
 		}, function(stored) {
 	if (stored == undefined) {
 		instances = []
 	} else {
 		instances = stored.instances
+	}
+	console.log("STORED INSTANCES: ", instances);
+	// Let users know the instances object needs setting up
+	if (instances.length == 0) {
+		chrome.action.setBadgeText({
+			text: "!"
+		})
+		chrome.action.setBadgeBackgroundColor({
+			color: "#FFA500"
+		})
+	} else {
+		chrome.action.setBadgeText({
+			text: ""
+		})
+		cleanUpHostPermissions();
 	}
 });
 
@@ -53,6 +71,9 @@ chrome.storage.local.get({
 // When changes are made to the Instances object on the settings page, make them here also.
 chrome.storage.onChanged.addListener(function(changes, areaName) {
 	if (Debug) console.log("Storage Updated, retrieving updated objects", changes);
+	if (changes.versionCheckDate) {
+		return
+	}
 	if (areaName == "local") {
 		chrome.storage.local.get(['instances'], function(stored) {
 			if (Debug) console.log("Instances retrieved: ", stored);
@@ -62,7 +83,21 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
 				instances = stored.instances;
 				update_content_scripts();
 			}
+				// Let users know the instances object needs setting up
+			if (instances.length == 0) {
+				chrome.action.setBadgeText({
+					text: "!"
+				})
+				chrome.action.setBadgeBackgroundColor({
+					color: "#FFA500"
+				})
+			} else {
+				chrome.action.setBadgeText({
+					text: ""
+				})
+			}
 		});
+
 		chrome.storage.local.get({
 			settings: {},
 		}, function(stored_settings) {
@@ -396,293 +431,278 @@ chrome.contextMenus.onClicked.addListener(function(clickData, tab){
 	
 // Content Scripts
 
-const messageSearch = {
-						matches: ["*://*/csp/*/EnsPortal*",],
-						excludeMatches: [
-											"*://*/csp/*/EnsPortal.ProductionConfig.zen*",
-										],
-						allFrames: true,
-						js: ["message_search.js"],
-						id: "message_search",
-				}		
-const schemaExpansion = {
-						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*",],
-						excludeMatches: [
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*",
-										],
-						allFrames: true,
-						js: ["schema_expansion.js"],
-						id: "schema_expansion",
-				}
-const segmentSearch = {
-						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*",],
-						excludeMatches: [
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*",
-										],
-						allFrames: true,
-						js: ["segment_search.js"],
-						id: "segment_search",
-				}
-const textCompare = {
-						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*",],
-						excludeMatches: [
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&text_compare=disable*",
-										],
-						allFrames: true,
-						js: ["text_compare.js"],
-						id: "text_compare",
-				}		
-const copyRawText = {
-						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*",],
-						excludeMatches: [
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-											"*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&copy_raw_text=disable*",
-										],
-						allFrames: true,
-						js: ["copy_raw_text.js"],
-						id: "copy_raw_text",
-				}
-const traceViewer = {
-						matches: ["*://*/csp/*/EnsPortal.VisualTrace.zen?SESSIONID=*",],
-						allFrames: true,
-						js: ["trace_viewer.js"],
-						id: "trace_viewer",
-				}		
-const messageViewer = {
-						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
-						allFrames: true,
-						js: ["message_viewer.js"],
-						id: "message_viewer",
-				}
-
-const messageviewerExport = {
-						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
-						allFrames: true,
-						js: ["message_viewer_export.js"],
-						id: "messageviewerExport",
-				}	
-				
-const criteriaCache = {
-						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
-						allFrames: true,
-						js: ["criteria_cache.js"],
-						id: "criteria_cache",
-				}			
-const shareMessages = {
-						matches: ["*://*/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&share=1*",],
-						allFrames: true,
-						js: ["share_messages.js"],
-						id: "share_messages",
-				}			
-const componentReport = {
-						matches: [
-									"*://*/csp/sys/%25CSP.Portal.Home.zen*",
-									"*://*/csp/sys/UtilHome.csp",
-								],
-						excludeMatches: [
-											"*://*/csp/*/*disableComponentReport=true",
-										],
-						allFrames: false,
-						js: ["component_report.js"],
-						id: "component_report",
-				}
-const pdfViewer = {
-						matches: ["*://*/csp/*",],
-						excludeMatches: [
-							"*://*/csp/*/*disableNamespaceCategorySearch=true",
-						],
-						allFrames: true,
-						js: ["pdf_viewer.js"],
-						id: "pdf_viewer",
-}
-const saveMessageViewer = {
-						matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
-						allFrames: true,
-						js: ["save_message_viewer.js"],
-						id: "save_message_viewer",
-}
-let utils = {
-						matches: ["*://*/csp/*",],
-						excludeMatches: [
-											"*://*/csp/*/*disableNamespaceCategorySearch=true",
-										],
-						allFrames: true,
-						js: ["utils.js"],
-						id: "utils",
-						runAt: "document_start",
-}
-const messageGenerator = {
-						matches: ["*://*/csp/*/EnsPortal.Dialog.TestingService.cls*",],
-						allFrames: true,
-						js: ["message_generator.js"],
-						id: "messageGenerator",
-}
-const namespaceCategorySearch = {
-						matches: ["*://*/csp/*/EnsPortal.ProductionConfig.zen*",],
-						excludeMatches: [
-											"*://*/csp/*/*disableNamespaceCategorySearch=true",
-										],
-						allFrames: true,
-						js: ["namespace_category_search.js"],
-						id: "namespaceCategorySearch",
-}	
-
-const productionQueue = {
-						matches: ["*://*/csp/*/EnsPortal.ProductionConfig.zen*",],
-						excludeMatches: [
-											"*://*/csp/*/*disableNamespaceCategorySearch=true",
-										],
-						allFrames: true,
-						js: ["production_queue.js"],
-						id: "productionQueue",
-}	
-
-const queueRefresh = {
-	matches: ["*://*/*/EnsPortal.Queues.zen*","*://*/*/EnsPortal.Queues.cls*",],
-	allFrames: true,
-	js: ["queue_refresh.js"],
-	id: "queueRefresh",
-}	
-
-
-// Custom Header Colours
-const customCss = {
-						matches: ["*://*/csp/*",],
-						excludeMatches: [
-							"*://*/csp/*/*disableNamespaceCategorySearch=true",
-						],
-						allFrames: true,
-						css: ["css/custom.css"],
-						id: "customCSS",
-}
-const buttonCss = {
-						matches: ["*://*/csp/*",],
-						allFrames: true,
-						css: ["css/button.css"],
-						id: "buttonCSS",
-}
-
-let customColours = {
-						matches: ["*://*/csp/*",],
-						excludeMatches: [
-							"*://*/csp/*/*disableNamespaceCategorySearch=true",
-						],
-						allFrames: true,
-						js: ["custom_css.js"],
-						id: "customColours",
-						runAt: "document_start",
-}
-
-let pageTitles = {
-	matches: ["*://*/csp/*",],
-	allFrames: false,
-	js: ["page_titles.js"],
-	id: "pageTitles",
-}
-let darkMode = {
-	matches: ["*://*/csp/*",],
-	allFrames: true,
-	css: [
-		"css/darkmode/d_ZEN_SVGComponent.css", 
-		"css/darkmode/d_page-defined-styles_svg.css",
-		"css/darkmode/d_ZEN_Portal_standardPage.css",
-		"css/darkmode/d_ZEN_Componenet_core_3.css",
-		"css/darkmode/d_home.css",
-	],
-	id: "darkMode",
-	runAt: "document_start",
-}
-
-const analysis = {
-	matches: ["*://*/csp/*/EnsPortal.MessageViewer.zen*",],
-	allFrames: true,
-	js: ["analysis.js"],
-	id: "analysis",
-}
+const scriptDefinitions = {
+    messageSearch: {
+        id: "message_search",
+        js: ["content_scripts/message_search.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal*"],
+        excludePaths: ["/csp/*/EnsPortal.ProductionConfig.zen*"]
+    },
+    schemaExpansion: {
+        id: "schema_expansion",
+        js: ["content_scripts/schema_expansion.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
+        excludePaths: [
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*"
+        ]
+    },
+    segmentSearch: {
+        id: "segment_search",
+        js: ["content_scripts/segment_search.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
+        excludePaths: [
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*"
+        ]
+    },
+    textCompare: {
+        id: "text_compare",
+        js: ["content_scripts/text_compare.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
+        excludePaths: [
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&text_compare=disable*"
+        ]
+    },
+    copyRawText: {
+        id: "copy_raw_text",
+        js: ["content_scripts/copy_raw_text.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
+        excludePaths: [
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
+            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&copy_raw_text=disable*"
+        ]
+    },
+    traceViewer: {
+        id: "trace_viewer",
+        js: ["content_scripts/trace_viewer.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.VisualTrace.zen?SESSIONID=*"]
+    },
+    messageViewer: {
+        id: "message_viewer",
+        js: ["content_scripts/message_viewer.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
+    },
+    messageviewerExport: {
+        id: "messageviewerExport",
+        js: ["content_scripts/message_viewer_export.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
+    },
+    criteriaCache: {
+        id: "criteria_cache",
+        js: ["content_scripts/criteria_cache.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
+    },
+    shareMessages: {
+        id: "share_messages",
+        js: ["content_scripts/share_messages.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&share=1*"]
+    },
+    componentReport: {
+        id: "component_report",
+        js: ["content_scripts/component_report.js"],
+        allFrames: false, // Originally false in your code
+        paths: [
+            "/csp/sys/%25CSP.Portal.Home.zen*",
+            "/csp/sys/UtilHome.csp"
+        ],
+        excludePaths: ["/csp/*/*disableComponentReport=true"]
+    },
+    pdfViewer: {
+        id: "pdf_viewer",
+        js: ["content_scripts/pdf_viewer.js"],
+        allFrames: true,
+        paths: ["/csp/*"],
+        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
+    },
+    saveMessageViewer: {
+        id: "save_message_viewer",
+        js: ["content_scripts/save_message_viewer.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
+    },
+    utils: {
+        id: "utils",
+        js: ["utils.js"],
+        allFrames: true,
+        runAt: "document_start",
+        paths: ["/csp/*"],
+        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
+    },
+    messageGenerator: {
+        id: "messageGenerator",
+        js: ["content_scripts/message_generator.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.Dialog.TestingService.cls*"]
+    },
+    namespaceCategorySearch: {
+        id: "namespaceCategorySearch",
+        js: ["content_scripts/namespace_category_search.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.ProductionConfig.zen*"],
+        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
+    },
+    productionQueue: {
+        id: "productionQueue",
+        js: ["content_scripts/production_queue.js"],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.ProductionConfig.zen*"],
+        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
+    },
+    queueRefresh: {
+        id: "queueRefresh",
+        js: ["content_scripts/queue_refresh.js"],
+        allFrames: true,
+        paths: [
+            "/*/EnsPortal.Queues.zen*", 
+            "/*/EnsPortal.Queues.cls*"
+        ]
+    },
+    customCss: {
+        id: "customCSS",
+        css: ["css/custom.css"],
+        allFrames: true,
+        paths: ["/csp/*"],
+        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
+    },
+    buttonCss: {
+        id: "buttonCSS",
+        css: ["css/button.css"],
+        allFrames: true,
+        paths: ["/csp/*"]
+    },
+    customColours: {
+        id: "customColours",
+        js: ["content_scripts/custom_css.js"],
+        allFrames: true,
+        runAt: "document_start",
+        paths: ["/csp/*"],
+        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
+    },
+    pageTitles: {
+        id: "pageTitles",
+        js: ["content_scripts/page_titles.js"],
+        allFrames: false, // Originally false in your code
+        paths: ["/csp/*"]
+    },
+	// This is going to take too much time and I'm shelving it.
+    // darkMode: {
+    //     id: "darkMode",
+    //     css: [
+    //         "css/darkmode/d_ZEN_SVGComponent.css", 
+    //         "css/darkmode/d_page-defined-styles_svg.css",
+    //         "css/darkmode/d_ZEN_Portal_standardPage.css",
+    //         "css/darkmode/d_ZEN_Componenet_core_3.css",
+    //         "css/darkmode/d_home.css"
+    //     ],
+    //     allFrames: true,
+    //     runAt: "document_start",
+    //     paths: ["/csp/*"]
+    // },
+    analysis: {
+        id: "analysis",
+        js: [
+            "chartjs/chart.umd.js",
+            "chartjs/chartjs-adapter-date-fns.bundle.min.js",
+            "chartjs/chartjs-plugin-datalabels.min.js",
+            "chartjs/hammer.min.js",
+            "chartjs/chartjs-plugin-zoom.min.js",
+            "content_scripts/analysis.js"
+        ],
+        allFrames: true,
+        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
+    }
+};
 
 let matches = [];
+
+
 // Add Content Scripts functionality
 function update_content_scripts() {
+    chrome.storage.local.get({ settings: {}, instances: [] }, async function(storage) {
+        
+        // 2. Clear existing scripts first
+        try {
+            await chrome.scripting.unregisterContentScripts();
+        } catch (e) {
+            console.error("Error unregistering scripts:", e);
+        }
 
-	chrome.storage.local.get({
-		settings: {},
-		instances: {},
-		},	function(storage) {
-			if (Debug) console.log("Content Script Settings: ", settings);
-			
-			// Update matching for universal scripts
-			matches = [];
-			for (let i = 0; i < instances.length; i ++) {
-				
-				let url = "*://" + String(instances[i].url) + "/*"
-				let url2 = "*://" + String(instances[i].url) + ":*/*"
-				
-				matches.push(url);
-				matches.push(url2);
-				
-			}
-			
-			customColours.matches = matches;
-			utils.matches = matches;
-			if (Debug) console.log(customColours);
+        if (storage.instances.length === 0) return;
 
-			chrome.scripting.unregisterContentScripts().then(() => {
-				// Add Generic Content Scripts
-				chrome.scripting.registerContentScripts(
-				[ utils, customColours, pageTitles, productionQueue, queueRefresh, namespaceCategorySearch, messageGenerator, messageSearch, schemaExpansion, segmentSearch, textCompare, copyRawText, traceViewer, messageViewer, analysis, messageviewerExport, criteriaCache, shareMessages, pdfViewer, saveMessageViewer, customCss, buttonCss],
-					() => { 
-						
-						if (storage.settings.HomepageReports) {
-							chrome.scripting.registerContentScripts(
-								[componentReport],
-								() => { 
-									if (Debug) console.log("Homepage Reports Loaded")
-								});
-						}
-						
-						
-						if (Debug) console.log("Generic Content Scripts Loaded");
-				});
+        // 3. Build the dynamic scripts array
+        const scriptsToRegister = [];
 
-				//Add instance specific content scripts
-				
-				if (storage.settings.CSS) {
-					chrome.storage.local.get(['instances'], function(stored) {
-						let instances = stored.instances
-						let instancesLength = instances.length;
-						for (var i = 0; i < instancesLength; i ++ ){
-							let colour
-							if (defaultColours.includes(instances[i].colour)) {
-								colour = "css/" + instances[i].colour + ".css";
-							} else {
-								colour = "css/grey.css";
-							}
-							let scriptId = instances[i].name + "CSS";
-							
-							let url = "*://" + String(instances[i].url) + "/*";
-							let url2 = "*://" + String(instances[i].url) + ":*/*";
-							chrome.scripting.registerContentScripts(
-							[{
-									matches: [url, url2,],
-									allFrames: true,
-									css: [colour],
-									id: scriptId,
-							}],
-							() => { 
-								if (Debug) console.log("CSS Content Script Added");
-							});
+        // Helper function to build full URLs from instances and paths
+        const buildMatches = (instances, paths) => {
+            let fullUrls = [];
+            instances.forEach(instance => {
+                // Ensure instance.url doesn't have trailing slashes before appending paths
+                const baseHost = String(instance.url).replace(/\/$/, ""); 
+                paths.forEach(path => {
+                    fullUrls.push(`*://${baseHost}${path}`);
+                    fullUrls.push(`*://${baseHost}:*${path}`); // Account for specific ports
+					fullUrls.push(`*://${baseHost}/*/${path}`); // Health Connect
+                    fullUrls.push(`*://${baseHost}:*/*/${path}`); // Health Connect: Account for specific ports
+                });
+            });
+            return fullUrls;
+        };
 
-								
-							}
-					});
-				}
-			});
-		}
-			
-	);
+        // Populate the scripts array with the dynamically generated URLs
+        for (const [key, scriptDef] of Object.entries(scriptDefinitions)) {
+            
+            // Example: Skip component report if setting is off
+            if (key === 'componentReport' && !storage.settings.HomepageReports) continue;
+
+            const scriptConfig = {
+                id: scriptDef.id,
+                js: scriptDef.js,
+                css: scriptDef.css,
+                allFrames: scriptDef.allFrames,
+                runAt: scriptDef.runAt,
+                matches: buildMatches(storage.instances, scriptDef.paths)
+            };
+
+            if (scriptDef.excludePaths) {
+                 scriptConfig.excludeMatches = buildMatches(storage.instances, scriptDef.excludePaths);
+            }
+
+            scriptsToRegister.push(scriptConfig);
+        }
+
+        // 4. Instance-specific CSS (Dark mode / Custom Colors)
+        if (storage.settings.CSS) {
+            storage.instances.forEach(instance => {
+                const colour = defaultColours.includes(instance.colour) ? instance.colour : "grey";
+                scriptsToRegister.push({
+                    id: `${instance.name}_CSS`,
+                    css: [`css/${colour}.css`],
+                    allFrames: true,
+                    matches: [`*://${instance.url}/*`, `*://${instance.url}:*/*`]
+                });
+            });
+        }
+
+        // 5. Register with error catching
+        try {
+            await chrome.scripting.registerContentScripts(scriptsToRegister);
+            if (Debug) console.log("Scripts successfully updated.");
+        } catch (error) {
+            console.error("Failed to register dynamic scripts:", error);
+        }
+    });
 }
 
 // Listen for Message to get all Message Tabs
@@ -739,7 +759,7 @@ chrome.runtime.onMessage.addListener(
 			} else if (request.type == "analysis") {
 				console.log("analysis request", request);
 
-				chrome.tabs.create({ url: chrome.runtime.getURL("analysis.html") + "?analysis=" + request.analysis.id }, function(tab) {
+				chrome.tabs.create({ url: chrome.runtime.getURL("/pages/analysis.html") + "?analysis=" + request.analysis.id }, function(tab) {
 					// Listen for the tab to complete loading
 					chrome.tabs.onUpdated.addListener(function onUpdated(tabId, info) {
 						if (tabId === tab.id && info.status === "complete") {
@@ -770,9 +790,192 @@ chrome.runtime.onMessage.addListener(
 				});
 				
 			
+			// } else if (request.type === "request-permission") {
+
+			// 					/*
+			// 	function requestPermissions() {
+			// 		chrome.permissions.request({
+			// 			origins: [url, url2]
+			// 		}, function (granted) {
+			// 			if (granted) {
+			// 				console.log("Permission granted for example.com!");
+			// 			} else {
+			// 				console.log("Permission denied by user.");
+			// 			}
+			// 		});
+			// 	}*/
+				
+			// 	// Check if the permission is already granted
+			// 	chrome.permissions.contains({
+			// 		origins: ["*://" + request.url + "/*"]
+			// 	}, function (result) {
+			// 		if (result) {
+			// 			console.log("Permission already granted.");
+			// 			// Permission already exists, make the request
+			// 		} else {
+			// 			console.log("Requesting permission...");
+			// 			chrome.permissions.request(
+			// 				{ origins: ["*://" + request.url + "/*"] },
+			// 				(granted) => {
+			// 					if (granted) {
+			// 						console.log("Permission granted!");
+			// 					} else {
+			// 						console.log("Permission denied.");
+			// 					}
+			// 				}
+			// 			);
+			// 		}
+			// 	});
+				
+				
 			}
 			else {
 				sendResponse({response: "Background Script has no handling defined for this message type."});
 			}
 			return true
 	});
+
+
+
+
+chrome.storage.local.get({
+	versionCheckDate: null,
+	}, function(stored) {
+	console.log("stored.versionCheckDate", stored.versionCheckDate);
+	
+	let versionCheckDate;
+	
+	// If versionCheckDate is not set, set it to 3 days ago
+	if (stored.versionCheckDate === null) {
+		versionCheckDate = new Date();
+		versionCheckDate.setDate(versionCheckDate.getDate() - 3);
+		chrome.storage.local.set({ versionCheckDate: versionCheckDate.toISOString() }); // Save as ISO string
+	} else {
+		// Convert stored string back to a Date object
+		versionCheckDate = new Date(stored.versionCheckDate);
+
+		// Validate the date
+		if (isNaN(versionCheckDate.getTime())) {
+			console.warn("Invalid stored date. Resetting to 3 days ago.");
+			versionCheckDate = new Date();
+			versionCheckDate.setDate(versionCheckDate.getDate() - 3);
+			chrome.storage.local.set({ versionCheckDate: versionCheckDate.toISOString() });
+		  }
+	}
+	
+	let currentDate = new Date();
+	let twoDaysAgo = new Date();
+	twoDaysAgo.setDate(currentDate.getDate() - 2);
+	
+	console.log("version Check Date:", versionCheckDate);
+	console.log("Two Days Ago:", twoDaysAgo);
+	
+	// Compare the dates
+	if (versionCheckDate != twoDaysAgo) {
+		console.log("version date is older than 2 days. Checking for a new version...");
+		checkForNewVersion();
+	
+		// Update the stored versionCheckDate to the current date
+		chrome.storage.local.set({ versionCheckDate: new Date().toISOString() });
+	} else {
+		console.log("version date is within the last 2 days. No check needed.");
+	}
+});
+
+async function checkForNewVersion() {
+		let today = new Date();
+		const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases/latest`;
+		console.log("api URL", apiUrl);
+		try {
+			const response = await fetch(apiUrl);
+			if (!response.ok) {
+				throw new Error(`GitHub API error: ${response.status}`);
+			}
+	
+			const data = await response.json();
+			const latestVersion = data.tag_name; // Typically contains the version, e.g., "v1.2.3"
+	
+			console.log("Latest version:", latestVersion);
+	
+			// Compare with the extension's version
+			const currentVersion = chrome.runtime.getManifest().version;
+			if (currentVersion === latestVersion) {
+				console.log("A new version is available!");
+				notifyUser(latestVersion); // Notify the user
+			} else {
+				console.log("You are using the latest version.");
+				chrome.storage.local.set({
+					version: "Latest version",
+					versionCheckDate: new Date().toISOString(),
+				});
+			}
+		} catch (error) {
+			console.error("Failed to fetch the latest version:", error);
+		}
+}
+
+function notifyUser(version) {
+
+	chrome.action.setBadgeText({
+		text: "!"
+	})
+	chrome.action.setBadgeBackgroundColor({
+		color: "#00FFFF"
+	})
+	chrome.storage.local.set({
+		version: version,
+		versionCheckDate: new Date(),
+	}, function() {
+		if (Debug) console.log("New version Available: ", version);
+	});
+}
+
+
+function cleanUpHostPermissions() {
+	// Step 1: Generate allowed origins from instances
+	const allowedOrigins = instances.map((instance) => `*://${instance.url}/*`);
+  
+	// Step 2: Get manifest permissions
+	const manifestOrigins = chrome.runtime.getManifest().host_permissions || [];
+	console.log("Manifest Origins:", manifestOrigins);
+  
+	// Step 3: Get all current permissions
+	chrome.permissions.getAll((permissions) => {
+	  if (chrome.runtime.lastError) {
+		console.error("Error getting permissions:", chrome.runtime.lastError.message);
+		return;
+	  }
+  
+	  const currentOrigins = permissions.origins || [];
+	  console.log("Current Origins:", currentOrigins);
+  
+	  // Step 4: Identify dynamically added origins to remove
+	  const originsToRemove = currentOrigins.filter(
+		(origin) =>
+		  !allowedOrigins.includes(origin) && // Not in allowed origins
+		  !manifestOrigins.includes(origin)   // Not in manifest origins
+	  );
+  
+	  if (originsToRemove.length === 0) {
+		console.log("No dynamically added permissions to remove. All is good!");
+		return;
+	  }
+  
+	  console.log("Origins to Remove (Dynamic):", originsToRemove);
+  
+	  // Step 5: Remove dynamically added permissions
+	  chrome.permissions.remove({ origins: originsToRemove }, (removed) => {
+		if (chrome.runtime.lastError) {
+		  console.error("Error removing permissions:", chrome.runtime.lastError.message);
+		  return;
+		}
+  
+		if (removed) {
+		  console.log("Successfully removed dynamically added permissions:", originsToRemove);
+		} else {
+		  console.error("Failed to remove some dynamically added permissions.");
+		}
+	  });
+	});
+  }
+  
