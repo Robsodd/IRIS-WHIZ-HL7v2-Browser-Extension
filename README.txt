@@ -1,5 +1,5 @@
 ***
-VERSION 1.10.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS Foundation Trust
+VERSION Version 1.11.0 - Developed by Rob Ellis 
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -7,7 +7,7 @@ VERSION 1.10.0 - Developed by Rob Ellis @ Royal Devon University Healthcare NHS 
 
 Originally created to make the differences between TEST and PRODUCTION instances more immediately obvious, features were added to enhance and make easier; message searching, message comparison and monitoring productions.
 
-This web browser extension is best suited to Interface analysts working with HL7 v2 messages.
+This web browser extension is best suited to Interface analysts working with HL7 v2 messages in the Intersystems healthshare environment.
 
 This code is made available as is and will not be supported. Please see License.txt for full details.
 
@@ -71,6 +71,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 18. Extended Criteria Search History 
 19. Share Search
 33. ChartJS Analysis Page
+38. Quick Analysis Tab
 
 
 #### Visual Trace Page
@@ -82,6 +83,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 #### Message Content Page
 09. Import HL7 Message from another Message Content Page
 28. Schema Mode
+
 
 #### Various Pages (feature exists on more than one page)
 10. Copy Raw HL7 Text
@@ -102,10 +104,6 @@ Finally, enable your desired features using the checkbox form at the top of this
 25. Active Production Category Search
 32. Production Queue Search
 36. Category Dropdown Case-Insensitive Order
-37. Production Page Message Refresh
-
-#### Message Queue Page
-34. Queue Refresh
 
 #### Extension Pop-up
 05. Extension Pop-up - Open Session         
@@ -364,6 +362,7 @@ Drag the sidebar as needed to view either the data or the charts more easily.
 This page is useful for diving into your data. I hope.
 
 
+
 #### 34. Queue Refresh
 
 Iris saw the demise of the auto-refresh button on the production Queue page. I have given it life again. 
@@ -392,13 +391,61 @@ Helpful if you have a thing for alphabetical order.
 Added refresh button on the Message tab on the production page. Set an interval in the dropdown for automatic refreshing.
 
 
+#### 38. Quick Analysis Tab
+
+On the Message Viewer page you can click the Quick Analisys tab to view a condensed version of the ChartJS Analysis page. 
+
+This tab displays a timeline chart for the messages currently displaying in the central results table. 
+
+It also contains a summarised table of the values displaying in your central results table so you can easily check how many messages have a particular value in them.
+
 
 
 ## Updates
 
+##### 07/09/2026 Updates:
+
+Version 1.11.0
+
+__Compatibility Update__: HealthConnect
+
+The extension *should* now work with HealthConnect instances. 
+
+
+__Feature Added__: Quick Analysis
+
+On the message Viewer page there is now a Quick Analysis Tab. This shows a cut down version of the ChartJS integration for, you guessed it, quick analysis.
+
+
+__Feature Updated__: Options Page
+
+It looks marginally prettier (not my specialty) and is easier to navigate.
+
+
+__Feature Updated__: Instances - Script Permissions 
+
+I'm planning on publishing this to the chrome/microsoft stores so we now ask the users for permission to run this extension on the urls added for your instances. 
+
+As it's only me editing this I've never bothered to do this - for some reason I trust myself not to add malware that scrapes other websites. 
+
+So now you control where these scripts run! 
+
+This is mainly for the Chrome store approval but I hope it gives you a warm fuzzy fealing too.
+
+**IMPORTANT** If the features aren't working after this update, try clicking the IMPORT button on the Export/Import tab on the options page. This will prompt you to give permissions for this extension to run on your instances.
+
+
+
+__Organisational stuff__: directories
+
+These have been tidied.
+
+
+
 ##### 02/12/2024 Updates:
 
 Version 1.10.0
+
 
 __Feature Added__: ChartJS Analysis
 
@@ -432,6 +479,7 @@ Licensed under the MIT license
 __Feature Added__: Queue refresh
 
 Iris now has an auto refresh dropdown for the Queues page. Will refresh the queue at the interval selected. Does not load on Ensemble as it already has this feature.
+
 
 __Feature Added__: Export Search as CSV
 
