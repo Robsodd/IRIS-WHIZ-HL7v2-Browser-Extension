@@ -78,24 +78,47 @@ window.addEventListener("load", function() {
 	
 	fullTrace.appendChild(newiframe)
 	
-	
-	fullTraceHeader.addEventListener('click', () => {
-		fullTraceDisplayOn();
-	})
-	
-	// Click behaviour for tabs
-	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents]
-	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents] // Order must match above array
-	let fullTraceDisplayTabElementsLength = fullTraceDisplayTabElements.length
-	for (let i = 0; i < fullTraceDisplayTabElementsLength; i++) {
-		fullTraceDisplayTabElements[i].addEventListener('click', (e) => {
-			console.log("ELEM CLICKED: ", fullTraceDisplayTabElements[i], fullTraceDisplayBodyElements[i]);
-			console.log("currentTarget", e.currentTarget);
-			e.currentTarget.setAttribute("class", "tabGroupButtonOn");
-			fullTraceDisplayBodyElements[i].style.display = "";
-			fullTraceDisplayOff();
+	let displayHeaderElements = [
+			{ 
+				"tab": headerHeaderDetails,
+				"body": headerDetails,
+			},
+			{ 
+				"tab": headerBodyDetails,
+				"body": bodyDetails,
+			},
+			{ 
+				"tab": headerBodyContents,
+				"body": bodyContents,
+			},
+			{
+				"tab": fullTraceHeader,
+				"body": fullTrace,
+			}
+		]
+		
+	displayHeaderElements.forEach((currentElement, i) => {
+		currentElement.tab.addEventListener('click', () => {
+			if (currentElement.tab.getAttribute("class") == "tabGroupButtonDisabled") {
+				return
+			};
+			
+			// Set the clicked tab as active
+			currentElement.tab.setAttribute("class", "tabGroupButtonOn");
+			currentElement.body.style.display = "";
+			
+			// Update all other tabs
+			displayHeaderElements.forEach((otherElement, x) => {
+				if (otherElement.tab !== currentElement.tab) {
+					if (otherElement.tab.getAttribute("class") != "tabGroupButtonDisabled") {
+						otherElement.tab.setAttribute("class", "tabGroupButtonOff");
+						otherElement.body.style.display = "none";
+					};
+				}
+			});
 		});
-	}
+	});
+	
 	fillFullTraceTab();
 });
 
@@ -207,6 +230,9 @@ function fillFullTraceTab() {
 				messageDiv.appendChild(messageBtnBar);
 				messageDiv.appendChild(messageContentDiv);
 
+
+				let messageResendBtn = messageResendButton(mainIframe.contentDocument, messageBtnBar);
+				messageResendBtn.style.display = "block";
 				sideBySideCompareButton(mainIframe.contentDocument, messageBtnBar);
 				copyRawTextButton(mainIframe.contentDocument, messageId, messageBtnBar);
 				minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
