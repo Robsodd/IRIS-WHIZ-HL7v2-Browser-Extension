@@ -1316,41 +1316,74 @@ function searchSegmentsButton(Document) {
 		
 }
 
+
 let schemaModeFull = false;
-function schemaModeButton(Document) {
-	let schemaModeBtn = Document.createElement('btn');
-	
-	schemaModeBtn.classList.add("whizButton");
-	schemaModeBtn.classList.add("schemaModeButton");
-	
-	schemaModeBtn.title = "Toggle Schema between messages known values and full schema";
-	
-	schemaModeBtn.innerText = "Schema Mode: Known";
-	
-	schemaModeBtn.addEventListener('click', () => {
-		let expandors = document.getElementsByClassName("toggleSchema");
-		console.log("schemaModeFull = ", schemaModeFull);
-		if (schemaModeFull == false) {
-			schemaModeFull = true;
-			schemaModeBtn.innerText = "Schema Mode: Full";
-			schemaModeBtn.style.backgroundColor = "darkred";
-			for (let i = 0; i < expandors.length; i++){ 
-				expandors[i].style.backgroundColor = "darkred";
-			}
-			
-		} else {
-			schemaModeFull = false
-			schemaModeBtn.innerText = "Schema Mode: Known";
-			schemaModeBtn.style.backgroundColor = "orange";
-			for (let i = 0; i < expandors.length; i++){ 
-				expandors[i].style.backgroundColor = "orange";
-			}
-		}
-	})
-	let li = Document.createElement('li');
-	li.append(schemaModeBtn);
-	let buttonBar = Document.getElementById("btnBarMessageSearch")
-	buttonBar.appendChild(li);
+
+
+chrome.storage.local.get(['schemaModeFull'], function(result) {
+    if (result.schemaModeFull !== undefined) {
+        schemaModeFull = result.schemaModeFull;
+    }
+});
+
+
+chrome.storage.onChanged.addListener(function(changes, areaName) {
+    if (changes.schemaModeFull) {
+        schemaModeFull = changes.schemaModeFull.newValue;
+        
+        // If this specific frame has the button, update its colors
+        let schemaModeBtn = document.querySelector(".schemaModeButton");
+        if (schemaModeBtn) {
+            updateButtonVisuals(schemaModeBtn, schemaModeFull);
+        }
+    }
+});
+
+
+function updateButtonVisuals(btn, isFull) {
+    let targetDoc = btn.ownerDocument;
+    let expandors = targetDoc.getElementsByClassName("toggleSchema");
+    
+    if (isFull) {
+        btn.innerText = "Schema Mode: Full";
+        btn.style.setProperty("background-color", "darkred", "important");
+        for (let i = 0; i < expandors.length; i++){ 
+            expandors[i].style.setProperty("background-color", "darkred", "important");
+        }
+    } else {
+        btn.innerText = "Schema Mode: Known";
+        btn.style.setProperty("background-color", "orange", "important");
+        for (let i = 0; i < expandors.length; i++){ 
+            expandors[i].style.setProperty("background-color", "orange", "important");
+        }
+    }
+}
+
+
+function schemaModeButton(targetDocument) {
+
+    let schemaModeBtn = targetDocument.createElement('btn'); 
+    
+    schemaModeBtn.classList.add("whizButton");
+    schemaModeBtn.classList.add("schemaModeButton");
+    schemaModeBtn.title = "Toggle Schema between messages known values and full schema";
+    
+    // Set initial colors based on storage
+    updateButtonVisuals(schemaModeBtn, schemaModeFull);
+    
+    schemaModeBtn.addEventListener('click', () => {
+        // Toggle the boolean and save it to storage. 
+        // The onChanged listener above handles the visual updates 
+        let newState = !schemaModeFull;
+        chrome.storage.local.set({ schemaModeFull: newState });
+    });
+    
+    let li = targetDocument.createElement('li');
+    li.append(schemaModeBtn);
+    let buttonBar = targetDocument.getElementById("btnBarMessageSearch");
+    if (buttonBar) {
+        buttonBar.appendChild(li);
+    }
 }
 
 function namespaceCategorySearchButton(Document) {
