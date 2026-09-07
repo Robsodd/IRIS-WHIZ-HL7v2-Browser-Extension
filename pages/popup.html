@@ -106,19 +106,24 @@
 		max-height: 200px;
 	}
 
+	#versionBtn {
+		background-color: aqua;
+	}
+
+	.active, #versionBtn:hover {
+		background-color: rgb(0, 202, 202);
+	}
 
   </style>
 </head>
 <body>
 <div style="text-align: center; padding: 10px;">
-	<img src="/icons/IRISWHIZ.png" height="80px" width="80px";></img>
+	<img src="/icons/Icon128.png" height="80px" width="80px";></img>
 </div>
 <div id="optionsPage">
-	<button class="accordion">Options Page</button>
+	<button id="optionsPageButton" class="accordion">Options Page</button>
 </div>
 <br>
-
-
 <div id="pdfViewer">
 	<button class="accordion">PDF Viewer</button>
 	<div class="panel">
@@ -149,7 +154,9 @@
 		<i>Defaults to showing last 5 pages saved.</i>
 	</div>
 </div>
-<br><!--
+<br>
+<button id="versionBtn">Download</button>
+<!--
 <div id="savedAnalysis">
 	<button class="accordion" id="savedAnalysisBtn">Saved Analysis</button>
 	<div class="panel">
@@ -165,9 +172,9 @@
 
 </body>
 
-<script src="utils.js"></script>
-<script src="pdf_viewer.js"></script>
-<script src="popup.js"></script>
+<script src="/utils.js"></script>
+<script src="/content_scripts/pdf_viewer.js"></script>
+<script src="/pages/popup.js"></script>
 
 
 
