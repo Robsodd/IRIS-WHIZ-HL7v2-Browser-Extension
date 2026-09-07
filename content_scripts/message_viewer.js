@@ -8,11 +8,10 @@ let traceContent;
 let messageViewerBtnBar;
 messageViewerBtnBar = messageViewerButtonBar(document);
 
+
 console.log(messageViewerBtnBar);
 
 window.addEventListener("load", function() {
-
-	
 
 	chrome.storage.local.get({
 		settings: {},	
@@ -51,7 +50,7 @@ window.addEventListener("load", function() {
 	fullTraceHeader = tabBar.rows[0].insertCell(9);
 	fullTraceHeader.innerHTML = "&nbsp;Selected Messages&nbsp;";
 	fullTraceHeader.className = "tabGroupButtonOff";
-	fullTraceHeader.id = "selectedMessagesTab";
+	fullTraceHeader.id = "selectedMessagesTabHeader";
 	fullTraceHeader.title = "Selected Messages";
 
 	headerHeaderDetails = document.getElementById("btn_1_82");
@@ -72,8 +71,9 @@ window.addEventListener("load", function() {
 	selecteMessagesTab.style.display = "none";
 	selecteMessagesTab.id = "selecteMessagesTab";
 	selecteMessagesTab.style.height = "100%";
-	
-	// Click behaviour for tabs
+	tabGroupBody.appendChild(selecteMessagesTab);
+	MessageViewerTabBar(document);
+	/* Click behaviour for tabs
 	let fullTraceDisplayTabElements = [headerHeaderDetails, headerBodyDetails, headerBodyContents, headerMessageTrace]
 	let fullTraceDisplayBodyElements = [headerDetails, bodyDetails, bodyContents, traceContent] // Order must match above array
 	let fullTraceDisplayTabElementsLength = fullTraceDisplayTabElements.length;
@@ -87,8 +87,8 @@ window.addEventListener("load", function() {
 			fullTraceDisplayOff();
 		});
 	}
+	*/
 	
-	tabGroupBody.appendChild(selecteMessagesTab);
 
 	fullTraceHeader.addEventListener('click', () => {
 		fullTraceDisplayOn();
@@ -236,8 +236,6 @@ window.addEventListener("load", function() {
 					messageAppend(message);
 					
 					// Add buttons to messageDiv
-					
-					
 					//closeButtonHide(mainIframe.contentDocument, messageBtnBar);
 					copyRawTextButton(mainIframe.contentDocument, messageId, messageBtnBar);
 					minimiseButton(mainIframe.contentDocument, messageDiv, messageBtnBar);
@@ -272,7 +270,7 @@ window.addEventListener("load", function() {
 
 function messageAppend(message) {
 	/// Appends message to the mainIframe
-	console.log("THIS IS MY ISSUE:", message.object);
+	//console.log("THIS IS MY ISSUE:", message.object);
 	syncScrolling(mainIframe.contentDocument, message.object.children[1]);
 	
 	// Sort the message array
