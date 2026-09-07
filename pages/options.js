@@ -1,6 +1,8 @@
 let instances = []
 let settings = []
 console.log(instances.length)
+let instanceAlert = document.getElementById("instanceAlert");
+instanceAlert.title = "Instances item not set!"
 //console.log(instances);
 let currentInstanceSelected;
 loadReadMe();
@@ -52,6 +54,12 @@ chrome.storage.local.get({
 		instances = [];
 	} else {
 		instances = stored.instances;
+
+		if (instances.length == 0) {
+			instanceAlert.style.display = "block";
+		} else {
+			instanceAlert.style.display = "none";
+		}
 		settings = stored.settings;
 		//document.getElementById('export').value = JSON.stringify(instances, null, 1);
 		exportString = JSON.stringify(stored, null, 1);
@@ -127,38 +135,90 @@ function getNamespaceNumber(instanceNumber, namespaceName) {
 	}
 }
 
-/// Saves the on-page text instance object 
+/// Saves the on-page text instance object and requests missing host permissions
 function importInstances() {
-	let text = document.getElementById('export').value
-	let object = JSON.parse(text)
-	
-	if (object.settings == undefined) {
-		chrome.storage.local.set({
-			instances: object,
-			settings: [],
-		}, function() {
-			//console.log('Instances is set to:',  object);
-			successAlert("Instances Imported");
-			refreshInstances();
-			
-		});
-	} else {
-		chrome.storage.local.set({
-		instances: object.instances,
-		settings: object.settings,
-		}, function() {
-			//console.log('Instances is set to:',  object);
-			successAlert("Instances and Settings Imported");
-			refreshInstances();
-			
-		});
-		
-	}
-	delay(2000).then(() => {
-		location.reload();
-	});
-	
+    let text = document.getElementById('export').value;
+    let object;
+    
+    if (text == "") {
+        object = {};
+    } else {
+        try {
+            object = JSON.parse(text);
+        } catch (e) {
+            alert("Invalid JSON format: " + e);
+            return; // Stop execution if JSON is invalid
+        }
+    }
 
+    console.log("INSTANCES OBJECT: ", object);
+
+    // 1. Extract the instances array based on the imported format
+    let importedInstances = [];
+    if (object.instances) {
+        importedInstances = object.instances;
+    } else if (Array.isArray(object)) {
+        importedInstances = object;
+    }
+
+    // 2. Gather all required origins for the imported instances
+    let originsToRequest = [];
+    importedInstances.forEach(inst => {
+        if (inst.url) {
+            const baseHost = String(inst.url).replace(/\/$/, "");
+            originsToRequest.push(`*://${baseHost}/*`);
+            originsToRequest.push(`*://${baseHost}:*/*`);
+        }
+    });
+
+    // Remove duplicates from the array
+    originsToRequest = [...new Set(originsToRequest)];
+
+    // 3. Helper function to execute your original save logic
+    const performSave = () => {
+        if ((object.settings == undefined) && (object.instances == undefined)) {
+            chrome.storage.local.set({ instances: [], settings: [] }, function() {
+                successAlert("Instances Imported");
+                refreshInstances();
+            });
+        } else if ((object.settings == undefined)) {
+            chrome.storage.local.set({ instances: object, settings: [] }, function() {
+                successAlert("Instances Imported");
+                refreshInstances();
+            });
+        } else {
+            chrome.storage.local.set({ instances: object.instances, settings: object.settings }, function() {
+                successAlert("Instances and Settings Imported");
+                refreshInstances();
+            });
+        }
+        
+        delay(2000).then(() => {
+            location.reload();
+        });
+    };
+
+    // 4. Check and request permissions before saving
+    if (originsToRequest.length > 0) {
+        chrome.permissions.contains({ origins: originsToRequest }, (hasAllPermissions) => {
+            if (hasAllPermissions) {
+                console.log("Permissions already granted for all imported instances.");
+                performSave();
+            } else {
+                console.log("Requesting missing permissions for imported instances...");
+                chrome.permissions.request({ origins: originsToRequest }, (granted) => {
+                    if (granted) {
+                        console.log("Permissions granted!");
+                        performSave();
+                    } else {
+                        alert("Import cancelled. You must grant permissions to the imported URLs to use them.");
+                    }
+                });
+            }
+        });
+    } else {
+        performSave();
+    }
 }
 
 
@@ -189,7 +249,7 @@ function saveSettings() {
 		exportWhiz.settings.LastUpdated = new Date().toLocaleString();
 		exportWhiz.settings.BookmarkFolderName = document.getElementById('BookmarkFolderName').value; 
 		exportWhiz.settings.ButtonsShow = document.getElementById('ButtonsShow').checked;
-		exportWhiz.settings.SaveAnalysis = document.getElementById('SaveAnalysis').checked;;
+		//exportWhiz.settings.SaveAnalysis = document.getElementById('SaveAnalysis').checked;;
 		if (document.getElementById('ChatGPTKey').value.includes("****")) {
 			// Don't overwrite
 			exportWhiz.settings.ChatGPTKey = settings.ChatGPTKey
@@ -266,7 +326,7 @@ function restoreOptions() {
 				document.getElementById('HomepageReports').checked = items.settings.HomepageReports;
 				document.getElementById('BookmarkFolderName').value = items.settings.BookmarkFolderName;
 				document.getElementById('ButtonsShow').checked = items.settings.ButtonsShow;
-				document.getElementById('SaveAnalysis').checked = items.settings.SaveAnalysis;
+				//document.getElementById('SaveAnalysis').checked = items.settings.SaveAnalysis;
 				document.getElementById('ChatGPTKey').value = replaceLetters(items.settings.ChatGPTKey);
 			}
 			
@@ -277,7 +337,7 @@ function restoreOptions() {
 
 function loadReadMe() {
 	let readMeText = chrome.runtime.getURL("README.txt");
-	let readMeDiv = document.getElementById("readme");
+	let readMeDiv = document.getElementById("readmeDiv");
 	
 	fetch(readMeText).then(readMe => readMe.text())
 	.then(body => {readMeDiv.innerText = body})
@@ -307,7 +367,7 @@ document.getElementById('TextCompareOn').addEventListener('change', saveSettings
 document.getElementById('HomepageReports').addEventListener('change', saveSettings);
 document.getElementById('BookmarkFolderName').addEventListener('change', saveSettings);
 document.getElementById('ButtonsShow').addEventListener('change', saveSettings);
-document.getElementById('SaveAnalysis').addEventListener('change', saveSettings);
+//document.getElementById('SaveAnalysis').addEventListener('change', saveSettings);
 document.getElementById('ChatGPTKey').addEventListener('change', saveSettings);
 
 
@@ -478,11 +538,14 @@ function createInstanceRow(instance = undefined) {
 function deleteInstance(deleteCell) {
 	if (confirm("Delete instance?")) {
 		let instance = deleteCell.parentElement.instanceReference
+		let deletedUrl = instance.url;
 		//console.log("DELETE instance", instance);
 		for (let i = 0; i < instances.length; i++) {
 			if (instances[i].name == instance.name) {
 				instances.splice(i, 1);
 				autoSaveInstances();
+				permissionDelete(deletedUrl, instances);
+                break;
 			}
 		}
 		
@@ -490,6 +553,37 @@ function deleteInstance(deleteCell) {
 	} 
 	
 };
+
+function permissionDelete(deletedUrl, remainingInstances) {
+    if (!deletedUrl) return;
+
+    const baseHostToDelete = String(deletedUrl).replace(/\/$/, "");
+
+    // Check if any REMAINING instances share the same base host
+    const isHostStillUsed = remainingInstances.some(inst => 
+        String(inst.url).replace(/\/$/, "") === baseHostToDelete
+    );
+
+    if (!isHostStillUsed) {
+        // Safely revoke the permission since no other instances need it
+        const originsToRemove = [
+            `*://${baseHostToDelete}/*`,
+            `*://${baseHostToDelete}:*/*`
+        ];
+        
+        chrome.permissions.remove({ origins: originsToRemove }, (removed) => {
+            if (removed) {
+                console.log(`Permissions revoked for ${baseHostToDelete}`);
+            }
+            // Tell background.js to update the injected content scripts
+            chrome.runtime.sendMessage({ type: "update-scripts" });
+        });
+    } else {
+        console.log(`Host ${baseHostToDelete} still in use. Keeping permissions.`);
+        // Tell background.js to update scripts anyway (to remove the specific script registration)
+        chrome.runtime.sendMessage({ type: "update-scripts" });
+    }
+}
 
 
 function createInstanceTableHeaders(instanceTableHeaders) {
@@ -937,9 +1031,6 @@ function endEdit(input) {
 		} else {
 			return
 		}
-
-		//td.style.paddingTop = padTop;
-		//td.style.paddingBottom = padBottom;
 		td.style.backgroundColor = oldColor;
 	}
 	
@@ -1032,6 +1123,9 @@ function endEdit(input) {
 						td.parentElement.instanceReference = instances[i];
 						td.parentElement.classList.add(instances[i].url);
 						updateReferenceInstances(instances[i], oldText);
+						// Permissions update for URL
+						//chrome.runtime.sendMessage({ type: "request-permission", url: instances[i].url });
+						permissionsUpdate(instances, i)
 						autoSaveInstances();
 						return
 					} else if (td.key == "colour") { 
@@ -1066,6 +1160,38 @@ function endEdit(input) {
 		createInstanceRow();
 	}
 	//console.log("AFTER td.instanceReference", td.parentElement.instanceReference);
+}
+
+function permissionsUpdate(instances, i) {
+	let baseHost = String(instances[i].url).replace(/\/$/, ""); 
+
+	// Request both the standard URL and the port wildcard
+	const originsToRequest = [
+		`*://${baseHost}/*`,
+		`*://${baseHost}:*/*`
+	];
+
+	chrome.permissions.contains({ origins: originsToRequest }, (result) => {
+		if (result) {
+			console.log("Permission already granted.");
+			// Permission exists. Save your instance data to chrome.storage here, then:
+			chrome.runtime.sendMessage({ type: "update-scripts" });
+		} else {
+			console.log("Requesting permission...");
+			chrome.permissions.request({ origins: originsToRequest }, (granted) => {
+				if (granted) {
+					console.log("Permission granted!");
+					// Success! Save your instance data to chrome.storage here, then:
+					chrome.runtime.sendMessage({ type: "update-scripts" });
+				} else {
+					console.log("Permission denied by user.");
+					// Alert the user that the extension cannot function on this URL without permission
+					alert("Permission is required to enable IRIS Whiz on this URL.");
+				}
+			});
+		}
+
+	});
 }
 
 function namespaceURLValidation(td, newNamespaceSlug) {
@@ -1181,6 +1307,11 @@ function autoSaveInstances() {
 	chrome.storage.local.set({instances: instances}, function() {
 		console.log('Instances is set to:',  instances);
 		successAlert("Instances Saved");
+		if (instances.length == 0) {
+			instanceAlert.style.display = "block";
+		} else {
+			instanceAlert.style.display = "none";
+		}
 		//updateImportText();
 	});
 }
@@ -1392,7 +1523,6 @@ function endEditCustomColour(input) {
 			}
 		}
 	} else {
-							/////////
 					
 		// new Colour
 		console.log("new colour");
@@ -1448,28 +1578,7 @@ function autoSaveColours() {
 		customColours = settings.CustomColours;
 	}
 	document.dispatchEvent(colourChangeEvent);
-	// chrome.storage.local.set({settings: settings}, function() {
-	// 	if (settings.CustomColours != undefined) {
-	// 		customColours = settings.CustomColours;
-	// 	}
-	// 	//console.log('Instances is set to:',  instances);
-	// 	successAlert("Colours Saved");
-	// 	document.dispatchEvent(colourChangeEvent);
-	// 	//updateImportText();
-	// });
-
 }
-
-/*
-function updateColourDropDowns() {
-	let dropdowns = document.getElementsByClassName("colourSelector");
-	dropdowns.forEach(function(dropdown) {
-
-
-		if dropdown.options
-
-	})
-}*/
 
 function deleteCustomColour(deleteCell) {
 	if (confirm("Delete colour?")) {
@@ -1509,3 +1618,35 @@ document.getElementById("exportBtn").addEventListener('click', ()=> {
     URL.revokeObjectURL(url);
 
 })
+
+let btnBar = document.getElementById('btnBar');
+for (const button1 of btnBar.children) {
+	button1.addEventListener('click', function() { 
+		for (const button2 of btnBar.children) { 
+			let rowId = button2.id.replaceAll("Btn" , "");
+			let row = document.getElementById(rowId);
+			if (button1 == button2) {
+				buttonSelectColor(button1.id);
+				row.style.display = "grid";
+			} else {
+				row.style.display = "none";
+			}
+		}	
+	});
+}
+
+// Highlight the selected tab
+function buttonSelectColor(buttonId) {
+	let buttons = document.getElementsByTagName('button');
+	
+	for (let i = 0; i < buttons.length; i++) {
+		if (buttons[i].id == buttonId) {
+			buttons[i].style.background = 'white';
+			buttons[i].style.borderBottom =  '5px solid white';
+		} else {
+			buttons[i].style.background = '';
+			buttons[i].style.borderBottom =  '';
+		}	
+	}
+	
+}
