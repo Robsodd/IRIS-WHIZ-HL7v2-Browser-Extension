@@ -348,7 +348,7 @@ window.addEventListener("load", function() {
                 if (lineChart.config.data.datasets.length > 8) {
                     lineChart.config.options.plugins.legend.position = "left"
                 } else {
-                     lineChart.config.options.plugins.legend.position = "top"
+                    lineChart.config.options.plugins.legend.position = "top"
                 }
                 lineChart.update();
                 filterOn = false;
@@ -386,6 +386,86 @@ window.addEventListener("load", function() {
         analysisBtn.innerText = "Analyse";
         analysisBtnLi.appendChild(analysisBtn)
         messageViewerBtnBar.appendChild(analysisBtnLi);
+
+        // Analysis Tab
+
+        let tabBar = document.getElementById("bar_82")
+        analysisTabHeader = tabBar.rows[0].insertCell(9);
+        analysisTabHeader.innerHTML = "&nbsp;Quick Analysis&nbsp;";
+        analysisTabHeader.className = "tabGroupButtonOff";
+        analysisTabHeader.id = "analysisTabHeader";
+        analysisTabHeader.title = "Quick Analysis";
+
+        tabGroupBody = document.getElementById("body_82");
+        let analysisTab = document.createElement('div');
+
+        let notice = "<i>Quick analysis.</i>";
+        analysisTab.innerHTML = notice + analysisTab.innerHTML;
+        analysisTab.style.display = "none";
+        analysisTab.style.backgroundColor = "#ffffff";
+        analysisTab.style.padding = "10px";
+        analysisTab.id = "analysisTab";
+        analysisTab.style.minHeight = "100%";
+        let chartContainer = this.document.createElement("div");
+        let qLineChart = this.document.createElement("canvas");
+        qLineChart.id = "lineChart";
+        chartContainer.appendChild(qLineChart);
+        chartContainer.style.height = "300px";
+        let dynamicControlBox = createDynamicControlBox(analysisTab);
+        refreshIcon.onclick = function () {
+            document.dispatchEvent(analysisEvent);
+        };
+        analysisTab.appendChild(chartContainer);
+        tabGroupBody.appendChild(analysisTab);
+        /*
+        let scripts = [
+                "chartjs/chart.umd.js",
+                "chartjs/chartjs-adapter-date-fns.bundle.min.js",
+                "chartjs/chartjs-plugin-datalabels.min.js",
+                "chartjs/hammer.min.js",
+                "chartjs/chartjs-plugin-zoom.min.js",
+        ];
+        console.log("SCripts count", scripts)
+        for (let i = 0; i < scripts.length; i++) {
+            const script = document.createElement('script');
+            script.setAttribute("src", scripts[i])
+            document.head.appendChild(script);
+        }*/
+        
+        
+        
+        this.document.addEventListener('analysis', () => { 
+                let checkData = [];
+                if (chartData.length != 0) {
+                    checkData = JSON.parse(JSON.stringify(chartData.data[0].data));
+                }
+                
+                chartData = extractDynamicTableData();
+                if (chartData.data[0].data == checkData) {
+                    return
+                } 
+                let table = basicAnalysisTable(chartData.data[0].data);
+                table.id = "basicAnalysisTable";
+                let tableDiv = this.document.getElementById("basicAnalysisTable")
+                if (tableDiv) {
+                    tableDiv.parentElement.removeChild(tableDiv);
+                } 
+                
+                analysisTab.appendChild(table);
+                time = setDynamicChartControlOption(chartData.data[0].data);
+                let collatedData = collateDataByTimeFrame(chartData.data[0].data);
+                if (lineChart == undefined) {
+                    createTimeChartLine(collatedData);
+                    lineChart.config.options.plugins.zoom = {};
+                } else {
+                    lineChart.config.data.datasets = collatedData.datasets;
+                    lineChart.config.data.labels = collatedData.labels;
+                }                 
+                lineChart.update();
+            })
+
+
+        MessageViewerTabBar(document);
 
         //document.body.appendChild(analysisBtn);
 
@@ -974,7 +1054,7 @@ function createTimeChartLine(chartData) {
                 x: {
                     type: 'time', // Use time scale for x-axis
                     time: {
-                        unit: chartData['time'], // Dynamically use the 'time' argument (e.g., "day", "hour")
+                        unit: time, // Dynamically use the 'time' argument (e.g., "day", "hour")
                         tooltipFormat: 'yyyy-MM-dd HH:mm', // Format for tooltip
                         displayFormats: {
                             hour: 'yyyy-MM-dd HH:mm', // Format for axis labels
@@ -2445,3 +2525,271 @@ function showAlertWithOptions(message, callback) {
     });
 }
 
+let refreshIcon;
+function createDynamicControlBox(parentDiv) {
+    // Create the container div
+    const controlBox = document.createElement('div');
+    controlBox.id = 'dynamicChartControlBox';
+    controlBox.className = 'controls';
+
+    // Create the <h4> element
+    const heading = document.createElement('h4');
+    heading.innerText = 'Time Scale:';
+    controlBox.appendChild(heading);
+
+    // Create the <select> element
+    const select = document.createElement('select');
+    select.id = 'timeUnitDropdown';
+    select.name = 'timeUnit';
+
+        // Placeholder for onclick behavior (to be set later)
+    refreshIcon = createRefreshIcon();
+    
+ 
+    
+    // Define the options
+    const options = [
+        { value: 'minute', text: 'Minute', selected: true },
+        { value: 'hour', text: 'Hour' },
+        { value: 'day', text: 'Day' },
+        { value: 'week', text: 'Week' },
+        { value: 'month', text: 'Month' },
+        { value: 'year', text: 'Year' }
+    ];
+
+    // Add the options to the select element
+    options.forEach(optionData => {
+        const option = document.createElement('option');
+        option.value = optionData.value;
+        option.innerText = optionData.text;
+        if (optionData.selected) {
+            option.selected = true;
+        }
+        select.appendChild(option);
+    });
+
+    // Append the select element to the container
+    controlBox.appendChild(select);
+    controlBox.appendChild(refreshIcon);
+    select.addEventListener('change', function () {
+        // Get the value of the selected option
+        const selectedValue = this.value;
+        time = this.value;
+        //console.log("Selected time unit:", selectedValue);
+        // Call function to update your chart or perform other actions
+        updateChartTimeUnit(selectedValue);
+    });
+
+    // Now, controlBox contains the entire structure
+    // Append controlBox to a desired parent element
+    parentDiv.appendChild(controlBox); // Change 'document.body' to your desired container
+    return controlBox
+
+}
+
+function basicAnalysisTable(array) {
+    const ignoreHeaders = ['ID', 'TimeCreated', 'sessionURL', 'Session'];
+
+    const simpleAnalysis = [];
+    
+    // Get all unique keys from the objects in the array, excluding ignoreHeaders
+    const keys = array.length > 0 ? Object.keys(array[0]).filter(key => !ignoreHeaders.includes(key)) : [];
+    
+    keys.forEach(key => {
+        const keyAnalysis = {
+            column: key,
+            items: {}
+        };
+        
+        // Count occurrences of each unique value for this key
+        array.forEach(item => {
+            const value = item[key];
+            keyAnalysis.items[value] = (keyAnalysis.items[value] || 0) + 1;
+        });
+
+        // Convert `items` object to array of { unique-value: count } objects
+        keyAnalysis.items = Object.entries(keyAnalysis.items).map(([value, count]) => ({
+            [value]: count
+        }));
+
+        simpleAnalysis.push(keyAnalysis);
+    });
+
+    // Generate the table
+    const tableData = generateTable(simpleAnalysis);
+    const table = renderTableHTML2(tableData);
+
+    return table;
+}
+
+
+function generateTable(simpleAnalysis) {
+    const table = {
+        headers: ["Column", "Unique Value", "Count"],
+        rows: []
+    };
+
+    simpleAnalysis.forEach(analysis => {
+        const column = analysis.column;
+        analysis.items.forEach(item => {
+            const uniqueValue = Object.keys(item)[0];
+            const count = item[uniqueValue];
+            table.rows.push([column, uniqueValue, count]);
+        });
+    });
+
+    return table;
+}
+
+function renderTableHTML(table) {
+    const tableElement = document.createElement("table");
+    tableElement.border = 1;
+
+    // Create the header row
+    const headerRow = document.createElement("tr");
+    table.headers.forEach(header => {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+    });
+    tableElement.appendChild(headerRow);
+
+    // Create the data rows
+    table.rows.forEach(row => {
+        const tr = document.createElement("tr");
+        row.forEach(cell => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+        });
+        tableElement.appendChild(tr);
+    });
+
+    return tableElement;
+}
+let tableFilterSearchInput;
+let tableFilterDropdown;
+function renderTableHTML2(table) {
+    const tableElement = document.createElement("table");
+    tableElement.border = 1;
+
+    // Create the header row
+    const headerRow = document.createElement("tr");
+    table.headers.forEach((header, index) => {
+        const th = document.createElement("th");
+        th.textContent = header;
+
+        // Add dropdown for "Column" header
+        if (header === "Column") {
+            tableFilterDropdown = document.createElement("select");
+            const allOption = document.createElement("option");
+            allOption.value = "";
+            allOption.textContent = "All";
+            tableFilterDropdown.appendChild(allOption);
+
+            // Populate dropdown with unique column values
+            const uniqueColumns = [...new Set(table.rows.map(row => row[0]))];
+            uniqueColumns.forEach(column => {
+                const option = document.createElement("option");
+                option.value = column;
+                option.textContent = column;
+                tableFilterDropdown.appendChild(option);
+            });
+
+            tableFilterDropdown.addEventListener("change", () => filterTable(table, tableElement, tableFilterDropdown.value, tableFilterSearchInput.value));
+            th.appendChild(document.createElement("br"));
+            th.appendChild(tableFilterDropdown);
+        }
+
+        // Add search bar for "Unique Value" header
+        if (header === "Unique Value") {
+            tableFilterSearchInput = document.createElement("input");
+            tableFilterSearchInput.type = "text";
+            tableFilterSearchInput.placeholder = "Search...";
+
+            tableFilterSearchInput.addEventListener("input", () => filterTable(table, tableElement, tableFilterDropdown.value, tableFilterSearchInput.value));
+            th.appendChild(document.createElement("br"));
+            th.appendChild(tableFilterSearchInput);
+        }
+
+        headerRow.appendChild(th);
+    });
+    tableElement.appendChild(headerRow);
+
+    // Create the footer row for totals
+    const footerRow = document.createElement("tr");
+    footerRow.style.position = "sticky";
+    footerRow.style.bottom = "0";
+    footerRow.style.backgroundColor = "#f1f1f1";
+
+    const footerCells = table.headers.map(() => {
+        const td = document.createElement("td");
+        td.style.fontWeight = "bold";
+        return td;
+    });
+
+    footerCells[0].textContent = "Totals";
+    footerRow.append(...footerCells);
+    tableElement.appendChild(footerRow);
+
+    const updateFooter = (rows) => {
+        const uniqueValuesCount = new Set(rows.map(row => row[1])).size;
+        const totalCount = rows.reduce((sum, row) => sum + parseInt(row[2], 10), 0);
+
+        footerCells[1].textContent = uniqueValuesCount;
+        footerCells[2].textContent = totalCount;
+
+        // Move the footer row to the end
+        tableElement.appendChild(footerRow);
+    };
+
+    const renderRows = (rows) => {
+        rows.forEach(row => {
+            const tr = document.createElement("tr");
+            row.forEach(cell => {
+                const td = document.createElement("td");
+                td.textContent = cell;
+                tr.appendChild(td);
+            });
+            tableElement.insertBefore(tr, footerRow);
+        });
+    };
+
+    renderRows(table.rows);
+    updateFooter(table.rows);
+
+    // Attach filtering logic
+    function filterTable(table, tableElement, columnFilter, uniqueValueFilter) {
+        // Clear all rows except the header and footer
+        tableElement.querySelectorAll("tr:not(:first-child):not(:last-child)").forEach(row => row.remove());
+
+        // Filter rows based on the selected column and search input
+        const filteredRows = table.rows.filter(row => {
+            const matchesColumn = columnFilter === "" || row[0] === columnFilter;
+            const matchesUniqueValue = uniqueValueFilter === "" || row[1].toLowerCase().includes(uniqueValueFilter.toLowerCase());
+            return matchesColumn && matchesUniqueValue;
+        });
+
+        renderRows(filteredRows);
+        updateFooter(filteredRows);
+    }
+
+    return tableElement;
+}
+
+
+function createRefreshIcon() {
+    const img = document.createElement("img");
+    img.src = "deepsee/loop_24.gif";
+    img.className = "icon";
+    img.title = "Refresh the Analysis Tab";
+    // Set hover effects
+    img.onmouseover = function () {
+        this.className = "iconHover";
+    };
+    img.onmouseout = function () {
+        this.className = "icon";
+    };
+
+    return img;
+}
