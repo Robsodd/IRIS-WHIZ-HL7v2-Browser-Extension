@@ -35,10 +35,6 @@ function delay(time) {
 /// Adds a criterion to the message search page
 function add_criterion(request) {	
 	//console.log("add_criterion", request)
-
-	let schema = request.schema
-	let segment = request.segment
-	let field = request.field
 	let value = request.value
 	
 	if (typeof value !== "undefined" && value != "undefined") {
@@ -83,47 +79,74 @@ function add_criterion(request) {
 
 	/// Flow for adding a criterion once the Add Criterion Frame is open
 	function criterion_flow(frame) {
-		
-		delay(300).then(() => {			
-			let criterionType = frame.contentWindow.document.getElementById("control_7")
-			criterionType.value = "VDocSegment";
-			criterionType.dispatchEvent(event);
-			});
 
-		delay(600).then(() => {
-			let classSelector = frame.contentWindow.document.getElementById("classSelector");
-			classSelector.value = "EnsLib.HL7.Message";
-			classSelector.dispatchEvent(event);
-			});	
-			
-			
-		delay(800).then(() => {
-			let segmentType = frame.contentWindow.document.getElementById("cond_0_Val_1");
-			segmentType.value = String(schema) + ":" + String(segment);
-			segmentType.dispatchEvent(event);
-			});	
-			
-		delay(1000).then(() => {
-			let fieldName = frame.contentWindow.document.getElementById("cond_0_Val_2");
-			fieldName.value = field;
-			fieldName.dispatchEvent(event);
-			});	
+		if (request.search_type == "singleMessage") {
 
-		delay(1200).then(() => {
-			let operation = frame.contentWindow.document.getElementById("opSelect_0");
-			operation.value = "Contains";
-			operation.dispatchEvent(event);
-			});	
-			
-		//console.log("value22222", value);
-		delay(1400).then(() => {
-			if (typeof value !== "undefined" && value != "undefined") {
+			delay(300).then(() => {			
+				let criterionType = frame.contentWindow.document.getElementById("control_7")
+				criterionType.value = "Header";
+				criterionType.dispatchEvent(event);
+				});
+
+			delay(700).then(() => {
 				//console.log("value33333", value);
-				let inputBox = frame.contentWindow.document.getElementById("val_0");
-				inputBox.value = value;
-				inputBox.dispatchEvent(event);
-			}
-			});	
+				let prop = frame.contentWindow.document.getElementById("prop_0");
+				prop.value = "ID";
+				prop.dispatchEvent(event);
+				});	
+
+			delay(1200).then(() => {
+				//console.log("value33333", value);
+				let val_0 = frame.contentWindow.document.getElementById("val_0");
+				val_0.value = value;
+				val_0.dispatchEvent(event);
+				});	
+		} else {
+			let schema = request.schema
+			let segment = request.segment
+			let field = request.field
+			
+			delay(300).then(() => {			
+				let criterionType = frame.contentWindow.document.getElementById("control_7")
+				criterionType.value = "VDocSegment";
+				criterionType.dispatchEvent(event);
+			});
+			delay(600).then(() => {
+				let classSelector = frame.contentWindow.document.getElementById("classSelector");
+				classSelector.value = "EnsLib.HL7.Message";
+				classSelector.dispatchEvent(event);
+				});	
+
+			delay(800).then(() => {
+				let segmentType = frame.contentWindow.document.getElementById("cond_0_Val_1");
+				segmentType.value = String(schema) + ":" + String(segment);
+				segmentType.dispatchEvent(event);
+				});	
+				
+			delay(1000).then(() => {
+				let fieldName = frame.contentWindow.document.getElementById("cond_0_Val_2");
+				fieldName.value = field;
+				fieldName.dispatchEvent(event);
+				});	
+	
+			delay(1200).then(() => {
+				let operation = frame.contentWindow.document.getElementById("opSelect_0");
+				operation.value = "Contains";
+				operation.dispatchEvent(event);
+				});	
+			
+			//console.log("value22222", value);
+			delay(1400).then(() => {
+				if (typeof value !== "undefined" && value != "undefined") {
+					//console.log("value33333", value);
+					let inputBox = frame.contentWindow.document.getElementById("val_0");
+					inputBox.value = value;
+					inputBox.dispatchEvent(event);
+				}
+				});	
+		}
+		
+
 		
 		delay(1600).then(() => {
 			if (typeof value !== "undefined" && value != "undefined") {
@@ -134,7 +157,7 @@ function add_criterion(request) {
 			}
 			});		
 			
-		delay(1800).then(() => {
+		delay(2000).then(() => {
 			if (typeof value !== "undefined" && value != "undefined") {
 				let run_report_button = document.getElementById("command_searchButton");
 				run_report_button.click();
@@ -317,18 +340,40 @@ window.addEventListener("load", function(event){
 	if (queryString.includes("MESSAGE_SEARCH=true")){
 		
 		var urlParams = new URLSearchParams(queryString);
-		
-		update_dateTime(urlParams.get('search_type'));
-		var request = {
-			schema: urlParams.get('schema'),
-			segment: urlParams.get('segment'),
-			field: urlParams.get('field'),
-			value: urlParams.get('value'),
-			search_type: urlParams.get('search_type')
+		console.log("urlParams", urlParams, "search_type", urlParams.get("search_type"));
+		if (urlParams.get('search_type') == "singleMessage") {
+			// update_dateTime(urlParams.get('search_type')); // Set datetime to exact message time?
+			remove_criterion().then(() => {
+				delay(300).then(() => {
+					//=true&searchType=${searchType}&criterionType=${criterionType}&prop_0=${prop_0}&value=${messageId}`;
+					this.document.getElementById("control_33").value = "";
+					this.document.getElementById("control_34").value = "3";
+					this.document.getElementById("control_36").value = "";
+					this.document.getElementById("control_39").value = "";
+					this.document.getElementById("control_37").value = urlParams.get('value');
+					this.document.getElementById("control_40").value = urlParams.get('value');
+					delay(100).then(() => {
+						let run_report_button = document.getElementById("command_searchButton");
+						run_report_button.click();
+					});
+				});	
+			});			
+		} else if (urlParams.get('search_type') == "session") {
+			// update_dateTime(urlParams.get('search_type')); // Set dateTime to exact session start time/end time
+		} else {
+			update_dateTime(urlParams.get('search_type'));
+			var request = {
+				schema: urlParams.get('schema'),
+				segment: urlParams.get('segment'),
+				field: urlParams.get('field'),
+				value: urlParams.get('value'),
+				search_type: urlParams.get('search_type')
+			}
+			remove_criterion().then(() => {
+				add_criterion(request);
+			});			
 		}
-		remove_criterion().then(() => {
-			add_criterion(request);
-		});
+
 		//
 		
 	}
@@ -340,26 +385,22 @@ window.addEventListener("load", function(event){
 /// Removes any criterion left on the page from previous searches stored in the cache
 function remove_criterion() {
 	return new Promise((resolve, reject) => {
-	
-		let buttons = document.getElementsByClassName("critLink")
+		console.log("Removing Criterion");
+		//let buttons = document.getElementsByClassName("critLink")
+		let buttons = document.getElementsByTagName("input")
+		console.log("checking Criterion", buttons);
 		//console.log("buttons", buttons);
 		let buttonsLength = buttons.length;
+		var click = new Event('click');
 		for (i = 0; i < buttonsLength; i++) {
-			
+			console.log("checking Criterion", i);
 			//console.log("button title:", i, buttons[i].title);
-			if (buttons[i].title == "Remove this criterion") {
-				
-				// TODO - Attempt to fix this
-				/* Disabled as can only remove one criterion currently. Alert window appears and breaks code.
-				delay(300).then(() => {
-					buttons[i].click();
-				});
-
-				var click = new Event('click');
+			if ((buttons[i].title == "Disable criterion") && (buttons[i].getAttribute("checked")=="checked")) {
+				console.log("click criterion", buttons[i]);
 				buttons[i].dispatchEvent(click);
-				buttons[i].click(); */
-			}
-		}
+				buttons[i].click();
+			} 
+		} 
 		resolve("Old criterion removed");
 	});
 }
