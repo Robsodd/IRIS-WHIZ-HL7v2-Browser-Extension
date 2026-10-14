@@ -189,9 +189,9 @@ function messageStyling(object){
 }
 
 // Button bar for individual messages
-function messageButtonBar(Document, messageId) {
+function messageButtonBar(contextDocument, messageId) {
 
-	let messageBtnBar = Document.createElement('ul');
+	let messageBtnBar = contextDocument.createElement('ul');
 	messageBtnBar.classList.add("messageBtnBar");
 
 	//messageBtnBar.style.backgroundColor = "black";
@@ -211,11 +211,11 @@ function messageButtonBar(Document, messageId) {
 }
 
 // Button bar for individual messages
-function messageViewerButtonBar(Document) {
-	let messageViewerBtnBar = Document.createElement('ul');
+function messageViewerButtonBar(contextDocument) {
+	let messageViewerBtnBar = contextDocument.createElement('ul');
 	//messageViewerBtnBar.classList.add("messageViewerBtnBar");
 	//messageViewerBtnBar.id = "messageViewerBtnBar"
-	Document.body.appendChild(messageViewerBtnBar);
+	contextDocument.body.appendChild(messageViewerBtnBar);
 
 	let currentPageTitle = document.title
 	console.log("currentPageTitle", currentPageTitle);
@@ -223,7 +223,7 @@ function messageViewerButtonBar(Document) {
 		throw new Error("Prevent buttonBar loading on Login page");
 	}
 
-	let bar = Document.createElement('ul');
+	let bar = contextDocument.createElement('ul');
 	messageViewerBtnBar.id = "buttonBar";
 	messageViewerBtnBar.className = "messageViewerBtnBar";
 	//bar.style.backgroundColor = "black";
@@ -234,7 +234,7 @@ function messageViewerButtonBar(Document) {
 	messageViewerBtnBar.style.backgroundColor = "unset";
 	messageViewerBtnBar.style.padding = "15px 25px"
 		
-	let displayButton = Document.createElement('button');
+	let displayButton = contextDocument.createElement('button');
 	displayButton.classList.add("whizButton");
 	displayButton.classList.add("displayBarBtn");
 	displayButton.style.position = "absolute";
@@ -245,7 +245,7 @@ function messageViewerButtonBar(Document) {
 	displayButton.innerText = "IRIS Whiz";
 	displayButton.id = "whiz"
 	messageViewerBtnBar.append(displayButton);
-	let minimiseButtonBarBtn = minimiseButtonBarButton(Document, messageViewerBtnBar);
+	let minimiseButtonBarBtn = minimiseButtonBarButton(contextDocument, messageViewerBtnBar);
 	minimiseButtonBarBtn.classList.add("whizButton")
 	// children[0].className
 	displayButton.addEventListener("click", function(e) {
@@ -261,7 +261,7 @@ function messageViewerButtonBar(Document) {
 		}
 	})		
 
-	//Document.body.insertBefore(bar, Document.body.firstChild);
+	//contextDocument.body.insertBefore(bar, contextDocument.body.firstChild);
 	chrome.storage.local.get({
 		settings: {},
 		}
@@ -278,25 +278,25 @@ function messageViewerButtonBar(Document) {
 	return messageViewerBtnBar
 }
 
-function genericButton(Document, messageBtnBar) {
-	let genericBtn = Document.createElement('btn');
+function genericButton(contextDocument, messageBtnBar) {
+	let genericBtn = contextDocument.createElement('btn');
 	genericBtn.classList.add("whizButton");
 
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(genericBtn);
 	messageBtnBar.appendChild(li);
 	return genericBtn
 }
 
-function maximiseButton(Document, messageBtnBar) {
+function maximiseButton(contextDocument, messageBtnBar) {
 	
-	let maximiseBtn = Document.createElement('btn');
+	let maximiseBtn = contextDocument.createElement('btn');
 	maximiseBtn.classList.add("whizButton");
 	maximiseBtn.classList.add("maximiseBtn");
 	maximiseBtn.title = "Fullscreen View";
 	maximiseBtn.innerText = "Fullscreen";
-	let dynamicChartControlBox = Document.getElementById("dynamicChartControlBox")
-	let divider = Document.getElementById("divider")
+	let dynamicChartControlBox = contextDocument.getElementById("dynamicChartControlBox")
+	let divider = contextDocument.getElementById("divider")
 	let previousParent
 	maximiseBtn.addEventListener("click", (e) => {
 		if (messageBtnBar.parentElement.classList.contains("IWFullScreen")) {
@@ -340,16 +340,16 @@ function maximiseButton(Document, messageBtnBar) {
 
 	})
 
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(maximiseBtn);
 	messageBtnBar.appendChild(li);
 	//messageBtnBar.appendChild(closeBtnHide);	
 	return maximiseBtn
 }
 
-function toggleFilterButton(Document, messageBtnBar) {
+function toggleFilterButton(contextDocument, messageBtnBar) {
 	
-	let toggleFilterBtn = Document.createElement('btn');
+	let toggleFilterBtn = contextDocument.createElement('btn');
 	toggleFilterBtn.classList.add("whizButton");
 	toggleFilterBtn.classList.add("toggleFilterBtn");
 	
@@ -357,7 +357,7 @@ function toggleFilterButton(Document, messageBtnBar) {
 	toggleFilterBtn.title = "Filter Charts by Selected Segment Data";
 	toggleFilterBtn.innerText = "Toggle Filter: Off";
 
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(toggleFilterBtn);
 	messageBtnBar.appendChild(li);
 	//messageBtnBar.appendChild(closeBtnHide);	
@@ -365,9 +365,9 @@ function toggleFilterButton(Document, messageBtnBar) {
 }
 
 // Hides parent element when clicked
-function closeButtonHide(Document, messageBtnBar) {
+function closeButtonHide(contextDocument, messageBtnBar) {
 	
-	let closeBtnHide = Document.createElement('btn');
+	let closeBtnHide = contextDocument.createElement('btn');
 	closeBtnHide.classList.add("whizButton");
 	closeBtnHide.classList.add("closeBtnHide");
 	
@@ -378,7 +378,7 @@ function closeButtonHide(Document, messageBtnBar) {
 		closeBtnHide.parentNode.parentNode.parentNode.style.display = "none";
 	})
 
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(closeBtnHide);
 	messageBtnBar.appendChild(li);
 	//messageBtnBar.appendChild(closeBtnHide);	
@@ -386,9 +386,9 @@ function closeButtonHide(Document, messageBtnBar) {
 }
 
 // Deletes parent element when clicked
-function closeButtonDelete(Document, messageBtnBar) {
+function closeButtonDelete(contextDocument, messageBtnBar) {
 	
-	let closeBtnDelete = Document.createElement('btn');
+	let closeBtnDelete = contextDocument.createElement('btn');
 	closeBtnDelete.classList.add("whizButton");
 	closeBtnDelete.classList.add("closeBtnDelete");
 	
@@ -399,7 +399,7 @@ function closeButtonDelete(Document, messageBtnBar) {
 		messageBtnBar.parentNode.parentNode.removeChild(messageBtnBar.parentNode);
 	})
 	//messageBtnBar.appendChild(closeBtnDelete);
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(closeBtnDelete);
 	messageBtnBar.appendChild(li);
 	
@@ -407,7 +407,7 @@ function closeButtonDelete(Document, messageBtnBar) {
 }
 				
 
-function copyRawTextButton(Document, messageId, messageBtnBar) {
+function copyRawTextButton(contextDocument, messageId, messageBtnBar) {
 	
 	let copyRawTextBtn = document.createElement('btn');
 		copyRawTextBtn.classList.add("whizButton");
@@ -418,18 +418,18 @@ function copyRawTextButton(Document, messageId, messageBtnBar) {
 					
 		copyRawTextBtn.addEventListener('click', () => {
 			copyRawText.messageNumber = String(messageId);
-			Document.dispatchEvent(copyRawText);
+			contextDocument.dispatchEvent(copyRawText);
 		})
 	//messageBtnBar.appendChild(copyRawTextBtn);
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(copyRawTextBtn);
 	messageBtnBar.appendChild(li);
 
 	return copyRawTextBtn
 }
 
-function minimiseButton(Document, messageDiv, messageBtnBar) {
-	let minimiseBtn = Document.createElement('btn');
+function minimiseButton(contextDocument, messageDiv, messageBtnBar) {
+	let minimiseBtn = contextDocument.createElement('btn');
 	minimiseBtn.classList.add("whizButton");
 	minimiseBtn.classList.add("minimiseBtn");
 
@@ -458,13 +458,13 @@ function minimiseButton(Document, messageDiv, messageBtnBar) {
 	})
 	//console.log("buttonBar", messageBtnBar, messageDiv.id);
 	//messageBtnBar.appendChild(minimiseBtn);
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(minimiseBtn);
 	messageBtnBar.appendChild(li);
 }	
 
-function minimiseChartButton(Document, chartDiv, messageBtnBar) {
-	let minimiseBtn = Document.createElement('btn');
+function minimiseChartButton(contextDocument, chartDiv, messageBtnBar) {
+	let minimiseBtn = contextDocument.createElement('btn');
 	minimiseBtn.classList.add("whizButton");
 	minimiseBtn.classList.add("minimiseBtn");
 
@@ -501,15 +501,15 @@ function minimiseChartButton(Document, chartDiv, messageBtnBar) {
 	})
 	//console.log("buttonBar", messageBtnBar, messageDiv.id);
 	//messageBtnBar.appendChild(minimiseBtn);
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(minimiseBtn);
 	messageBtnBar.appendChild(li);
 }	
 
 
 
-function copyRawTextButtonBar(Document) {
-	let copyRawBtn = Document.createElement('btn');
+function copyRawTextButtonBar(contextDocument) {
+	let copyRawBtn = contextDocument.createElement('btn');
 
 	copyRawBtn.classList.add("whizButton");
 	copyRawBtn.classList.add("copyRawBtn");
@@ -523,16 +523,16 @@ function copyRawTextButtonBar(Document) {
 			messageNumber = messageNumber.split("&")[0]
 		}
 		copyRawText.messageNumber = messageNumber
-		Document.dispatchEvent(copyRawText);
+		contextDocument.dispatchEvent(copyRawText);
 	})
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(copyRawBtn);
-	let buttonBar = Document.getElementById("btnBarMessageSizing")
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing")
 	buttonBar.appendChild(li);
 }
 
-function sideBySideCompareButton(Document, messageBtnBar) {
-	let sideBySideCompareBtn = Document.createElement('btn');
+function sideBySideCompareButton(contextDocument, messageBtnBar) {
+	let sideBySideCompareBtn = contextDocument.createElement('btn');
 
 	sideBySideCompareBtn.classList.add("whizButton");
 	sideBySideCompareBtn.classList.add("sideBySideCompareBtn");
@@ -544,10 +544,10 @@ function sideBySideCompareButton(Document, messageBtnBar) {
 
 	sideBySideCompareBtn.addEventListener('click', (e) => {
 		sideBySideCompareEvent.messageId = e.target.parentElement.parentElement.parentElement.id;
-		Document.dispatchEvent(sideBySideCompareEvent);
+		contextDocument.dispatchEvent(sideBySideCompareEvent);
 	})
 
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(sideBySideCompareBtn);
 	messageBtnBar.appendChild(li);
 	//console.log("buttonBar", messageBtnBar, messageDiv.id);
@@ -555,8 +555,8 @@ function sideBySideCompareButton(Document, messageBtnBar) {
 }
 
 
-function expandSchemaButton(Document) {
-	let expandSchemaBtn = Document.createElement('btn');
+function expandSchemaButton(contextDocument) {
+	let expandSchemaBtn = contextDocument.createElement('btn');
 	
 	expandSchemaBtn.classList.add("whizButton");
 	expandSchemaBtn.classList.add("expandSchemaBtn");
@@ -568,33 +568,33 @@ function expandSchemaButton(Document) {
 		//console.log("schema button clicked");
 		if (clicked) {
 			clicked = false;
-			Document.dispatchEvent(contractSchemaEvent);
+			contextDocument.dispatchEvent(contractSchemaEvent);
 			//contractSchema(); // Event
 		} else {
 			clicked = true;
 			expandSchemaEvent.schemaSearch = true;
-			Document.dispatchEvent(expandSchemaEvent);
+			contextDocument.dispatchEvent(expandSchemaEvent);
 			//expandSchema(); // Event
 		}
 	})
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(expandSchemaBtn);
-	let buttonBar = Document.getElementById("buttonBar")
+	let buttonBar = contextDocument.getElementById("buttonBar")
 	buttonBar.appendChild(li);
 	
 }
 
 
-function messageResendButton(Document, buttonBar) {
+function messageResendButton(contextDocument, buttonBar) {
     // Create the "Resend" button
-    let messageResendBtn = Document.createElement('btn');
+    let messageResendBtn = contextDocument.createElement('btn');
     messageResendBtn.classList.add("whizButton");
     messageResendBtn.classList.add("messageResendBtn");
     messageResendBtn.innerText = "Resend";
     messageResendBtn.title = "Search message in Message Viewer and click resend.";
 
     // Wrap the button in a list item and append it to the button bar
-    let li = Document.createElement('li');
+    let li = contextDocument.createElement('li');
     li.append(messageResendBtn);
     buttonBar.appendChild(li);
 
@@ -619,7 +619,7 @@ function messageResendButton(Document, buttonBar) {
 }
 
 
-function messageImportBtn(Document) {
+function messageImportBtn(contextDocument) {
 	
 	let div = document.createElement('div');
 	
@@ -632,7 +632,7 @@ function messageImportBtn(Document) {
 			compareDropDown.remove(0);
 		}
 		messageTabSearchEvent.compareDropDown = compareDropDown;
-		Document.dispatchEvent(messageTabSearchEvent);
+		contextDocument.dispatchEvent(messageTabSearchEvent);
 	} );
 	
 	compareDropDown.addEventListener('change', (e) => { 
@@ -644,12 +644,12 @@ function messageImportBtn(Document) {
 		messageTabGetMessage(compareDropDown.value, e.target.selectedOptions[0].innerText);
 		/// TODO - swap this delay for a proper promise on the messageTabGetMessage!!!
 		delay(500).then(() => {
-			Document.dispatchEvent(addMouseOverCompare);
+			contextDocument.dispatchEvent(addMouseOverCompare);
 		});
 		compareDropDown.style.display = "none";		
 	});
 	
-	let messageImportBtn = Document.createElement('btn');
+	let messageImportBtn = contextDocument.createElement('btn');
 	
 	//compareDropDown.classList.add("whizButton");
 	messageImportBtn.classList.add("whizButton");
@@ -673,7 +673,7 @@ function messageImportBtn(Document) {
 		compareDropDown.style.display = "";
 		
 		// When there is a "click"
-		//compareDropDownSelect = Document.getElementById("compareDropDown");
+		//compareDropDownSelect = contextDocument.getElementById("compareDropDown");
 		//messageTabGetMessage(compareDropDown.value);
 		
 		
@@ -683,19 +683,23 @@ function messageImportBtn(Document) {
 	div.append(messageImportBtn);
 	div.append(compareDropDown);
 	
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(div);
-	let buttonBar = Document.getElementById("btnBarTextComparison");
+	let buttonBar = contextDocument.getElementById("btnBarTextComparison");
 	buttonBar.appendChild(li);
 }
 
 
-function textCompareBtn(Document) {
-	let textCompareBtn = Document.createElement('btn');
-	let li = Document.createElement('li');
+function textCompareBtn(contextDocument) {
+	let textCompareBtn = contextDocument.createElement('btn');
+	let li = contextDocument.createElement('li');
 	li.append(textCompareBtn);
-	let buttonBar = Document.getElementById("btnBarTextComparison");
-	buttonBar.appendChild(li);
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing")
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
 	console.log("TEXT COMPARE BUTTON ADDED");
 
 	chrome.storage.local.get({
@@ -732,7 +736,7 @@ function textCompareBtn(Document) {
 			if (mouseoverEnabled) {
 				textCompareBtn.innerText = "Disable Text Compare";
 				textCompareBtn.style.backgroundColor = "salmon";
-				Document.dispatchEvent(enableTextCompareEvent);
+				contextDocument.dispatchEvent(enableTextCompareEvent);
 				console.log("TEXT COMPARE AUTO ON");
 			} else {
 				textCompareBtn.innerText = "Enable Text Compare";
@@ -740,26 +744,26 @@ function textCompareBtn(Document) {
 			
 			textCompareBtn.addEventListener('click', () => {
 				if (mouseoverEnabled) {
-					Document.dispatchEvent(disableTextCompareEvent);
+					contextDocument.dispatchEvent(disableTextCompareEvent);
 					mouseoverEnabled = false;
 					textCompareBtn.style.backgroundColor = "#df663d";
 					textCompareBtn.innerText = "Enable Text Compare";
 				} else {
-					Document.dispatchEvent(enableTextCompareEvent);
+					contextDocument.dispatchEvent(enableTextCompareEvent);
 					mouseoverEnabled = true;
 					textCompareBtn.style.backgroundColor = "salmon";
 					textCompareBtn.innerText = "Disable Text Compare";
 				}
 			})
-			//Document.getElementsByTagName("body")[0].appendChild(minimiseAllButton);
+			//contextDocument.getElementsByTagName("body")[0].appendChild(minimiseAllButton);
 			
 
 	});
 	
 }
 
-function minimiseAllButton(Document) {
-	let minimiseAllBtn = Document.createElement('btn');
+function minimiseAllButton(contextDocument) {
+	let minimiseAllBtn = contextDocument.createElement('btn');
 
 	minimiseAllBtn.classList.add("whizButton");
 	minimiseAllBtn.classList.add("minimiseAllBtn");
@@ -769,7 +773,7 @@ function minimiseAllButton(Document) {
 	
 	
 	minimiseAllBtn.addEventListener('click', () => {
-		let buttons = Document.getElementsByTagName('btn');
+		let buttons = contextDocument.getElementsByTagName('btn');
 		let l = buttons.length;
 		for (let i =0; i < l; i++) {
 			if (buttons[i].title == "Minimise") {
@@ -782,10 +786,15 @@ function minimiseAllButton(Document) {
 			}
 		}
 	})
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(minimiseAllBtn);
-	let buttonBar = Document.getElementById("btnBarMessageSizing")
-	buttonBar.appendChild(li);
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing")
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
+	
 }
 
 let wrapSetting = "";
@@ -796,9 +805,9 @@ let wrapWidthSegment = "";
 let textWrap = "";
 let overflowWrap = "";
 
-function wrapRowsButton(Document) {
+function wrapRowsButton(contextDocument) {
 	/// Adds button to enable wrapping of table rows
-	let wrapRowsBtn = Document.createElement('btn');
+	let wrapRowsBtn = contextDocument.createElement('btn');
 	
 	wrapRowsBtn.classList.add("whizButton");
 	wrapRowsBtn.classList.add("wrapRowsBtn");
@@ -809,7 +818,7 @@ function wrapRowsButton(Document) {
 	
 	wrapRowsBtn.addEventListener('click', () => {
 
-		let tableData = Document.getElementsByTagName("td");
+		let tableData = contextDocument.getElementsByTagName("td");
 
 		if (wrapSetting == "") {
 			wrapSetting = "inline-block" ;
@@ -834,7 +843,7 @@ function wrapRowsButton(Document) {
 			tableData[i].style.textWrap = textWrap;
 			tableData[i].style.overflowWrap = overflowWrap;
 		}
-		let EDIDocumentTable = Document.getElementsByClassName("EDIDocumentTable");
+		let EDIDocumentTable = contextDocument.getElementsByClassName("EDIDocumentTable");
 		let l2 = EDIDocumentTable.length;
 		for (let i = 0; i < l2; i++) {
 			EDIDocumentTable[i].style.width = wrapWidth;
@@ -842,7 +851,7 @@ function wrapRowsButton(Document) {
 			EDIDocumentTable[i].style.tableLayout = tableLayout;
 		}
 
-		let EDISegmentsTable = Document.getElementsByClassName("EDISegmentsTable");
+		let EDISegmentsTable = contextDocument.getElementsByClassName("EDISegmentsTable");
 		let l3 = EDISegmentsTable.length;
 		for (let i = 0; i < l3; i++) {
 			EDISegmentsTable[i].style.width = wrapWidthSegment;
@@ -855,26 +864,36 @@ function wrapRowsButton(Document) {
 
 	});
 	
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(wrapRowsBtn);
-	let buttonBar = Document.getElementById("btnBarMessageSizing");
-	buttonBar.appendChild(li);
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing")
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
 }
 
 
 function showRelatedButton(messageDocument) {
 	let showRelatedBtn = messageDocument.createElement('btn');
 
+	let li = messageDocument.createElement('li');
+	let buttonBar = messageDocument.getElementById("btnBarTraceViewer")
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
 	showRelatedBtn.classList.add("whizButton");
 	showRelatedBtn.classList.add("showRelatedBtn");
 	
 	showRelatedBtn.title = "Show messages related to the highlighted message";
 	showRelatedBtn.innerText = "Show Related";
 	
-	let li = messageDocument.createElement('li');
+
 	li.append(showRelatedBtn);
-	let buttonBar = messageDocument.getElementById("btnBarTraceViewer")
-	buttonBar.appendChild(li);
+
 	return showRelatedBtn
 }
 
@@ -882,6 +901,13 @@ let hideUnrelatedBtn
 function hideUnrelatedButton(messageDocument) {
 	hideUnrelatedBtn = messageDocument.createElement('btn');
 	
+	let li = messageDocument.createElement('li');
+	let buttonBar = messageDocument.getElementById("btnBarTraceViewer")
+	if (buttonBar) {	
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
 	hideUnrelatedBtn.classList.add("whizButton");
 	hideUnrelatedBtn.classList.add("hideUnrelatedBtn");
 	
@@ -889,17 +915,23 @@ function hideUnrelatedButton(messageDocument) {
 	hideUnrelatedBtn.innerText = "Hide Unrelated";
 	hideUnrelatedBtn.style.display = "none";
 
-	let li = messageDocument.createElement('li');
 	li.append(hideUnrelatedBtn);
-	let buttonBar = messageDocument.getElementById("btnBarTraceViewer")
-	buttonBar.appendChild(li);
+	
 	return hideUnrelatedBtn
 }
 
 
-function searchExpandedSchemaButton(Document) {
-	let searchDiv = Document.createElement('div');
-	let searchExpandedSchemaBtn = Document.createElement('btn');
+function searchExpandedSchemaButton(contextDocument) {
+	let searchDiv = contextDocument.createElement('div');
+	let searchExpandedSchemaBtn = contextDocument.createElement('btn');
+
+	let li = contextDocument.createElement('li');
+	let buttonBar = contextDocument.getElementById("btnBarMessageSearch");
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
 	
 	searchExpandedSchemaBtn.classList.add("whizButton");
 	searchExpandedSchemaBtn.classList.add("searchExpandedSchemaBtn");
@@ -909,8 +941,8 @@ function searchExpandedSchemaButton(Document) {
 	searchExpandedSchemaBtn.title = "Expand schema and enable search mode";
 	searchExpandedSchemaBtn.innerText = "Search Schema";
 
-	let searchlabel = Document.createElement('label');
-	let searchInput = Document.createElement('input');
+	let searchlabel = contextDocument.createElement('label');
+	let searchInput = contextDocument.createElement('input');
 	
 	searchInput.setAttribute('id', 'searchExpandedSchemaButton');
 	searchInput.setAttribute('name', 'search');
@@ -933,7 +965,7 @@ function searchExpandedSchemaButton(Document) {
 		searchExpandedSchemaEvent.searchInput = searchInput;
 		searchExpandedSchemaEvent.searchlabel = searchlabel;
 		searchExpandedSchemaEvent.searchExpandedSchemaBtn = searchExpandedSchemaBtn;
-		Document.dispatchEvent(searchExpandedSchemaEvent);
+		contextDocument.dispatchEvent(searchExpandedSchemaEvent);
 	});
 	
 	searchExpandedSchemaBtn.addEventListener('click', () => {
@@ -941,16 +973,13 @@ function searchExpandedSchemaButton(Document) {
 		searchInput.style.display = "";
 		searchlabel.style.display = "";
 		expandSchemaEvent.schemaSearch = true
-		Document.dispatchEvent(expandSchemaEvent);
+		contextDocument.dispatchEvent(expandSchemaEvent);
 		searchInput.focus();
 		
 	})
 	
-	let li = Document.createElement('li');
-	li.append(searchDiv);
-	let buttonBar = Document.getElementById("btnBarMessageSearch");
-	buttonBar.appendChild(li);
 	
+	li.append(searchDiv);	
 }
 
 
@@ -958,8 +987,8 @@ function escapeRegExp(text) {
   return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, '\\$&');
 }
 
-function uncloseAllButton(Document) {
-	let reopenButton = Document.createElement('btn');
+function uncloseAllButton(contextDocument) {
+	let reopenButton = contextDocument.createElement('btn');
 	
 	reopenButton.classList.add("whizButton");
 	reopenButton.classList.add("reopenButton");
@@ -968,7 +997,7 @@ function uncloseAllButton(Document) {
 	reopenButton.innerText = "Reopen Closed";
 	
 	reopenButton.addEventListener('click', () => {
-		let buttons = Document.getElementsByTagName('btn');
+		let buttons = contextDocument.getElementsByTagName('btn');
 		let l = buttons.length;
 		for (let i =0; i < l; i++) {
 			if (buttons[i].title == "Close") {
@@ -986,14 +1015,18 @@ function uncloseAllButton(Document) {
 			}
 		}
 	})
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(reopenButton);
-	let buttonBar = Document.getElementById("btnBarMessageSizing")
-	buttonBar.appendChild(li);
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing")
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
 }
 
-function shareButton(Document) {
-	let shareBtn = Document.createElement('btn');
+function shareButton(contextDocument) {
+	let shareBtn = contextDocument.createElement('btn');
 	//buttonStyling(shareButton);
 	
 	shareBtn.classList.add("whizButton");
@@ -1004,24 +1037,24 @@ function shareButton(Document) {
 	
 	shareBtn.addEventListener('click', () => {
 		let shareLink = stubUrl[0] + createMultiMessageLink();
-		const textArea = Document.createElement("textarea");
+		const textArea = contextDocument.createElement("textarea");
 		textArea.value = shareLink;
 		textArea.innerText = shareLink;
-		Document.body.appendChild(textArea);
+		contextDocument.body.appendChild(textArea);
 		textArea.select();
 		
 		try {
-			Document.execCommand('copy');
+			contextDocument.execCommand('copy');
 		} catch (err) {
 			console.error('Unable to copy to clipboard', err);
 		}
-		Document.body.removeChild(textArea);
+		contextDocument.body.removeChild(textArea);
 		
 		
 	})
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(shareBtn);
-	let buttonBar = Document.getElementById("btnBarMessageSizing");
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing");
 	buttonBar.appendChild(li);
 	return shareBtn
 }
@@ -1042,41 +1075,41 @@ function createMultiMessageLink() {
 	return shareLink
 }
 
-function clearSelectedMessagesButton(Document, buttonBar) {
+function clearSelectedMessagesButton(contextDocument, buttonBar) {
 	// Used on the Analysis page.
-	let clearSelectedMessagesBtn = Document.createElement('btn');	
+	let clearSelectedMessagesBtn = contextDocument.createElement('btn');	
 	clearSelectedMessagesBtn.classList.add("whizButton");
 	clearSelectedMessagesBtn.classList.add("clearSelectedMessagesBtn");
 	
 	clearSelectedMessagesBtn.title = "Clear Selected Messages";
 	clearSelectedMessagesBtn.innerText = "Clear Messages";
 	
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(clearSelectedMessagesBtn);
-	//let buttonBar = Document.getElementById("btnBarMessageSizing");
+	//let buttonBar = contextDocument.getElementById("btnBarMessageSizing");
 	buttonBar.appendChild(li);
 	return clearSelectedMessagesBtn
 }
 
-function lineGraphViewButton(Document, buttonBar) {
+function lineGraphViewButton(contextDocument, buttonBar) {
 	// Used on the Analysis page.
-	let lineGraphViewBtn = Document.createElement('btn');	
+	let lineGraphViewBtn = contextDocument.createElement('btn');	
 	lineGraphViewBtn.classList.add("whizButton");
 	lineGraphViewBtn.classList.add("lineGraphViewBtn");
 	
 	lineGraphViewBtn.title = "Show On Line Graph";
 	lineGraphViewBtn.innerText = "Show On Line Graph";
 	
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(lineGraphViewBtn);
 
 	buttonBar.appendChild(li);
 	return lineGraphViewBtn
 }
 
-function openSelectedMessagesButton(Document, buttonBar) {
+function openSelectedMessagesButton(contextDocument, buttonBar) {
 	// Used on the Analysis page.
-	let openSelectedMessagesBtn = Document.createElement('btn');
+	let openSelectedMessagesBtn = contextDocument.createElement('btn');
 	//buttonStyling(shareButton);
 	
 	openSelectedMessagesBtn.classList.add("whizButton");
@@ -1097,61 +1130,71 @@ function openSelectedMessagesButton(Document, buttonBar) {
 		
 		
 	})
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(openSelectedMessagesBtn);
-	//let buttonBar = Document.getElementById("btnBarMessageSizing");
+	//let buttonBar = contextDocument.getElementById("btnBarMessageSizing");
 	buttonBar.appendChild(li);
 	return openSelectedMessagesBtn
 }
 
 
-function compareLegendButtons(Document) {
+function compareLegendButtons(contextDocument) {
 	
 	let compareLegendDiv
 	let showLegendBtn
 	let hideLegendBtn
 	
-	compareLegendDiv = Document.createElement("div");
+	compareLegendDiv = contextDocument.createElement("div");
+	
+	let liShowLegendBtn = contextDocument.createElement('li');
+	let buttonBar = contextDocument.getElementById("btnBarMessageSizing")
+	if (buttonBar) {
+		buttonBar.appendChild(compareLegendDiv);
+		buttonBar.appendChild(liShowLegendBtn);
 		
 
-	let legendTitle = Document.createElement("div");
+	} else {
+		return
+	}
+
+	let legendTitle = contextDocument.createElement("div");
 	legendTitle.innerText = "TEXT COMPARE LEGEND";
 	//legendTitle.style.color = "white";
 	legendTitle.style.padding = "8px";
 	legendTitle.classList.add("legendTitle");
 	
-	let legendExactMatch = Document.createElement("div");
+	let legendExactMatch = contextDocument.createElement("div");
 	legendExactMatch.innerText = "Field name match, value match";
 	legendExactMatch.style.color = "white";
 	legendExactMatch.style.backgroundColor = "green";
 	legendExactMatch.style.padding = "8px";
 
-	let legendCopyMatch = Document.createElement("div");
+	let legendCopyMatch = contextDocument.createElement("div");
 	legendCopyMatch.innerText = "Field name mismatch, value match";
 	legendCopyMatch.style.color = "blue";
 	legendCopyMatch.style.backgroundColor = "lightgreen";
 	legendCopyMatch.style.padding = "8px";
 
-	let legendNoMatch = Document.createElement("div");
+	let legendNoMatch = contextDocument.createElement("div");
 	legendNoMatch.innerText = "Field name match - value mismatch";
 	legendNoMatch.style.color = "white";
 	legendNoMatch.style.backgroundColor = "red";
 	legendNoMatch.style.padding = "8px";
 
-	let legendPartialMatch = Document.createElement("div");
+	let legendPartialMatch = contextDocument.createElement("div");
 	legendPartialMatch.innerText = "Field name mismatch - value partial match";
 	legendPartialMatch.style.color = "blue";
 	legendPartialMatch.style.backgroundColor = "yellow";
 	legendPartialMatch.style.padding = "8px";
 	
-	let legendSegmentMatch = Document.createElement("div");
+	let legendSegmentMatch = contextDocument.createElement("div");
 	legendSegmentMatch.innerText = "Segment name match - field raw text match";
 	legendSegmentMatch.style.color = "blue";
 	legendSegmentMatch.style.backgroundColor = "white";
 	legendSegmentMatch.style.border = "6px solid green";
 	legendSegmentMatch.style.padding = "4px";
 
-	let legendSegmentMisMatch = Document.createElement("div");
+	let legendSegmentMisMatch = contextDocument.createElement("div");
 	legendSegmentMisMatch.innerText = "Segment name match - field raw text mismatch";
 	legendSegmentMisMatch.style.color = "blue";
 	legendSegmentMisMatch.style.backgroundColor = "white";
@@ -1178,8 +1221,9 @@ function compareLegendButtons(Document) {
 	compareLegendDiv.style.overflow = "visible";
 	
 		
-	hideLegendBtn = Document.createElement('btn');
-	showLegendBtn = Document.createElement('btn');
+	hideLegendBtn = contextDocument.createElement('btn');
+	showLegendBtn = contextDocument.createElement('btn');
+	showLegendBtn.id = "showLegendBtn";
 		
 		
 	hideLegendBtn.classList.add("whizButton");
@@ -1205,15 +1249,14 @@ function compareLegendButtons(Document) {
 	})
 	compareLegendDiv.appendChild(hideLegendBtn);
 	
-	let liShowLegendBtn = Document.createElement('li');
+	
 	liShowLegendBtn.append(showLegendBtn);
-	let buttonBar = Document.getElementById("btnBarTextComparison");
-	buttonBar.appendChild(compareLegendDiv);
-	buttonBar.appendChild(liShowLegendBtn);
-	showLegendBtn.id = "showLegendBtn";
+
+
+
 
 	/*
-	Document.addEventListener("mouseup", function(e) {
+	contextDocument.addEventListener("mouseup", function(e) {
 		console.log("mouseup triggered on: ", e);
 		hideLegend(e);
 	})
@@ -1263,9 +1306,18 @@ function compareLegendButtons(Document) {
 
 
 
-function searchSegmentsButton(Document) {
-	let searchDiv = Document.createElement('div');
-	let searchSegmentsBtn = Document.createElement('btn');
+function searchSegmentsButton(contextDocument) {
+	let searchDiv = contextDocument.createElement('div');
+	let searchSegmentsBtn = contextDocument.createElement('btn');
+
+	let li = contextDocument.createElement('li');
+	let buttonBar = contextDocument.getElementById("btnBarMessageSearch");
+	if (buttonBar) {
+		buttonBar.appendChild(li);
+	} else {
+		return
+	}
+	
 	
 	searchSegmentsBtn.classList.add("whizButton");
 	searchSegmentsBtn.classList.add("searchSegmentsBtn");
@@ -1274,8 +1326,8 @@ function searchSegmentsButton(Document) {
 	searchSegmentsBtn.title = "Search Segments";
 	searchSegmentsBtn.innerText = "Search Segments";
 	
-	let searchlabel = Document.createElement('label');
-	let searchInput = Document.createElement('input');
+	let searchlabel = contextDocument.createElement('label');
+	let searchInput = contextDocument.createElement('input');
 	
 	searchInput.setAttribute('id', 'searchSegmentsInput');
 	searchInput.setAttribute('name', 'search');
@@ -1305,14 +1357,12 @@ function searchSegmentsButton(Document) {
 		searchSegmentsEvent.searchInput = searchInput;
 		searchSegmentsEvent.searchlabel = searchlabel;
 		searchSegmentsEvent.searchSegmentsBtn = searchSegmentsBtn;
-		Document.dispatchEvent(searchSegmentsEvent);
+		contextDocument.dispatchEvent(searchSegmentsEvent);
 		
 	});
 	
-	let li = Document.createElement('li');
 	li.append(searchDiv);
-	let buttonBar = Document.getElementById("btnBarMessageSearch");
-	buttonBar.appendChild(li);
+
 		
 }
 
@@ -1343,6 +1393,10 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
 function updateButtonVisuals(btn, isFull) {
     let targetDoc = btn.ownerDocument;
     let expandors = targetDoc.getElementsByClassName("toggleSchema");
+
+	if (!btn.style) {
+		return
+	}
     
     if (isFull) {
         btn.innerText = "Schema Mode: Full";
@@ -1386,8 +1440,8 @@ function schemaModeButton(targetDocument) {
     }
 }
 
-function namespaceCategorySearchButton(Document) {
-	let namespaceCategorySearchBtn = Document.createElement('btn');
+function namespaceCategorySearchButton(contextDocument) {
+	let namespaceCategorySearchBtn = contextDocument.createElement('btn');
 
 	namespaceCategorySearchBtn.classList.add("whizButton");
 	namespaceCategorySearchBtn.classList.add("namespaceCategorySearchBtn");
@@ -1419,7 +1473,7 @@ function namespaceCategorySearchButton(Document) {
 	namespaceCategoryDropDown.addEventListener('change', (e) => { 
 		console.log("e", e);
 		categoryListSelectionEvent.optionValue = e.target.value
-		Document.dispatchEvent(categoryListSelectionEvent);
+		contextDocument.dispatchEvent(categoryListSelectionEvent);
 	});
 	
 	namespaceCategorySearchBtn.addEventListener('click', (e) => {
@@ -1427,25 +1481,25 @@ function namespaceCategorySearchButton(Document) {
 		namespaceCategoryDropDown.style.display = "inherit";
 		namespaceCategoryDropDownLabel.style.display = "inherit";
 		//categoryListEvent.optionValue = e.target.value
-		Document.dispatchEvent(categoryListEvent);
+		contextDocument.dispatchEvent(categoryListEvent);
 	});
 	
-	let li = Document.createElement('li');
+	let li = contextDocument.createElement('li');
 	li.append(namespaceCategorySearchBtn);
 	li.append(namespaceCategoryDropDownLabel);
 	li.append(namespaceCategoryDropDown);
-	let bar = Document.getElementById("namespaceCategorySearchBar")
+	let bar = contextDocument.getElementById("namespaceCategorySearchBar")
 	bar.appendChild(li);
 	return
 }
 
-function createNamespaceCategorySearchBar(Document) {
-	let diagramHeader = Document.getElementById("diagramHeader");
+function createNamespaceCategorySearchBar(contextDocument) {
+	let diagramHeader = contextDocument.getElementById("diagramHeader");
 	let currentPageHeaderTables = diagramHeader.querySelectorAll("table");
 	currentPageHeaderTables = currentPageHeaderTables[0]
 	let categorySearchCell = currentPageHeaderTables.rows[0].insertCell(4);
 	
-	let bar = Document.createElement("ul");
+	let bar = contextDocument.createElement("ul");
 	bar.className = "namespaceCategorySearchBar";
 	bar.id = "namespaceCategorySearchBar";
 	
@@ -1517,40 +1571,45 @@ const scrollBarStringHighlight = `
 
 let scrollBarStyleObject
 
-function scrollBarStyle(Document) {
-	scrollBarStyleObject = Document.createElement('style');
+function scrollBarStyle(contextDocument) {
+	scrollBarStyleObject = contextDocument.createElement('style');
 	scrollBarStyleObject.textContent = scrollBarString;
-	Document.head.append(scrollBarStyleObject);
+	contextDocument.head.append(scrollBarStyleObject);
 }
 
 
-function buttonBarStyle(Document) {
+function buttonBarStyle(contextDocument) {
 	return
-	const style = Document.createElement('style');
-	if (Document.getElementById("buttonBarStyle")) {
+	const style = contextDocument.createElement('style');
+	if (contextDocument.getElementById("buttonBarStyle")) {
 		// Skip
 	} else {
 		style.id = "buttonBarStyle";
 		style.textContent = buttonBarString;
-		Document.head.append(style);
+		contextDocument.head.append(style);
 	}
 }
 
-function addButtonBar(Document) {
+function addButtonBar(contextDocument) {
+
+	if (contextDocument instanceof XMLDocument || (contextDocument.contentType && contextDocument.contentType.includes("xml"))) {
+		console.log("XML document detected, skipping IRIS Whiz Button Bar.");
+		return;
+	}
 	let currentPageTitle = document.title
 	console.log("currentPageTitle", currentPageTitle);
 	if (currentPageTitle.includes("Login")) {
 		throw new Error("Prevent buttonBar loading on Login page");
 	}
-	if (Document.getElementById("buttonBar")) {
+	if (contextDocument.getElementById("buttonBar")) {
 		// Skip
 	} else {
-		let bar = Document.createElement('ul');
+		let bar = contextDocument.createElement('ul');
 		bar.id = "buttonBar";
 		bar.className = "buttonBar";
 		//bar.style.backgroundColor = "black";
-		let messageSizingLi = Document.createElement("li");
-		let messageSizingUl = Document.createElement("ul");
+		let messageSizingLi = contextDocument.createElement("li");
+		let messageSizingUl = contextDocument.createElement("ul");
 		messageSizingUl.id = "btnBarMessageSizing";
 		messageSizingUl.classList.add("btnGrp");
 		messageSizingLi.appendChild(messageSizingUl);
@@ -1562,8 +1621,8 @@ function addButtonBar(Document) {
 
 
 
-		let messageSearchLi = Document.createElement("li");
-		let messageSearchUl = Document.createElement("ul");
+		let messageSearchLi = contextDocument.createElement("li");
+		let messageSearchUl = contextDocument.createElement("ul");
 		messageSearchUl.id = "btnBarMessageSearch";
 		messageSearchUl.classList.add("btnGrp");
 		messageSearchLi.appendChild(messageSearchUl);
@@ -1575,8 +1634,8 @@ function addButtonBar(Document) {
 		// - Search Segments
 
 
-		let textComparisonLi = Document.createElement("li");
-		let textComparisonUl = Document.createElement("ul");
+		let textComparisonLi = contextDocument.createElement("li");
+		let textComparisonUl = contextDocument.createElement("ul");
 		textComparisonUl.id = "btnBarTextComparison";
 		textComparisonUl.classList.add("btnGrp");
 		textComparisonLi.appendChild(textComparisonUl);
@@ -1588,8 +1647,8 @@ function addButtonBar(Document) {
 		// - Legend
 
 
-		let traceViewerLi = Document.createElement("li");
-		let traceViewerUl = Document.createElement("ul");
+		let traceViewerLi = contextDocument.createElement("li");
+		let traceViewerUl = contextDocument.createElement("ul");
 		traceViewerUl.id = "btnBarTraceViewer";
 		traceViewerUl.classList.add("btnGrp");
 		traceViewerLi.appendChild(traceViewerUl);
@@ -1600,7 +1659,7 @@ function addButtonBar(Document) {
 
 
 		
-		let displayButton = Document.createElement('button');
+		let displayButton = contextDocument.createElement('button');
 		displayButton.classList.add("whizButton");
 		displayButton.classList.add("displayBarBtn");
 		displayButton.style.display = "inherit";
@@ -1608,7 +1667,7 @@ function addButtonBar(Document) {
 		displayButton.innerText = "IRIS Whiz";
 		displayButton.id = "whiz"
 		bar.append(displayButton);
-		let minimiseButtonBarBtn = minimiseButtonBarButton(Document, bar);
+		let minimiseButtonBarBtn = minimiseButtonBarButton(contextDocument, bar);
 		// children[0].className
 		displayButton.addEventListener("click", function(e) {
 			bar.style.boxShadow = "inset 0 0 100px 100px rgba(255, 255, 255, 0.6)";
@@ -1623,7 +1682,7 @@ function addButtonBar(Document) {
 			}
 		})		
 	
-		Document.body.insertBefore(bar, Document.body.firstChild);
+		contextDocument.body.insertBefore(bar, contextDocument.body.firstChild);
 		chrome.storage.local.get({
 			settings: {},
 			}
@@ -1637,8 +1696,8 @@ function addButtonBar(Document) {
 }
 
 
-function minimiseButtonBarButton(Document, bar) {
-	let minimiseButtonBarBtn = Document.createElement('btn');
+function minimiseButtonBarButton(contextDocument, bar) {
+	let minimiseButtonBarBtn = contextDocument.createElement('btn');
 	
 	minimiseButtonBarBtn.classList.add("minimiseButtonBarBtn");
 
@@ -1729,7 +1788,7 @@ function errorAlert(displayText) {
 }
 
 // Syncs scrolling for IWMsgOutline class
-function syncScrolling(Document, object) {
+function syncScrolling(contextDocument, object) {
 	function keypress() {
 		let ctrl = window.event.ctrlKey
 		//console.log("keydown triggered");
@@ -1747,17 +1806,17 @@ function syncScrolling(Document, object) {
 		keypress();
 	});
 	
-	Document.addEventListener("keydown", function() {
+	contextDocument.addEventListener("keydown", function() {
 		keypress();
 	});
 	
-	Document.addEventListener("keyup", function() {
+	contextDocument.addEventListener("keyup", function() {
 		keypress();
 	});
 	// Hold CTRL to scroll all message boxes simultaneously 
 	object.addEventListener("mousedown", function() {
 		//console.log("Mouse down on element!");
-		let divsArray = Document.getElementsByClassName("MsgContents");
+		let divsArray = contextDocument.getElementsByClassName("MsgContents");
 		//console.log("divsArray -- ", divsArray);
 		let ctrl = window.event.ctrlKey;
 		if (ctrl) {
@@ -1780,7 +1839,7 @@ function syncScrolling(Document, object) {
 	// Remove scroll link on mouseup
 	object.addEventListener("mouseup", function() {
 		//console.log("Mouse up on element!");
-		let divsArray = Document.getElementsByClassName("MsgContents");
+		let divsArray = contextDocument.getElementsByClassName("MsgContents");
 		//console.log("divsArray -- ", divsArray);
 		let l = divsArray.length
 		for (let x = 0; x < l; x ++) {
@@ -1815,8 +1874,8 @@ function syncScrolling(Document, object) {
 
 
 
-function MessageViewerTabBar(Document) {
-	let detailsTabGroup = Document.getElementById("detailsTabGroup");
+function MessageViewerTabBar(contextDocument) {
+	let detailsTabGroup = contextDocument.getElementById("detailsTabGroup");
 
 	let displayHeaderElements = [
 		{ 
@@ -1845,12 +1904,12 @@ function MessageViewerTabBar(Document) {
 		}
 	]
 	displayHeaderElements.forEach((currentElement, i) => {
-		currentElement["tabObject"] = Document.getElementById(currentElement.tab);
-		currentElement["bodyObject"] = Document.getElementById(currentElement.body);
+		currentElement["tabObject"] = contextDocument.getElementById(currentElement.tab);
+		currentElement["bodyObject"] = contextDocument.getElementById(currentElement.body);
 	})
 	displayHeaderElements.forEach((currentElement, i) => {
-		let button = Document.getElementById(currentElement.tab)
-		let body = Document.getElementById(currentElement.body)
+		let button = contextDocument.getElementById(currentElement.tab)
+		let body = contextDocument.getElementById(currentElement.body)
 		if (button) {
 			currentElement.tabObject.addEventListener('click', () => {
 				if (currentElement.tabObject.getAttribute("class") == "tabGroupButtonDisabled") {
@@ -1858,7 +1917,7 @@ function MessageViewerTabBar(Document) {
 				};
 
 				if (currentElement.tab == "analysisTabHeader") {
-					Document.dispatchEvent(analysisEvent);
+					contextDocument.dispatchEvent(analysisEvent);
 				}
 				console.log("MARK CURRENT TAB ACTIVE",currentElement)
 				// Set the clicked tab as active
@@ -1879,3 +1938,109 @@ function MessageViewerTabBar(Document) {
 		}
 	});
 }
+
+    function extractPayloadToTarget(sourceDoc, targetDoc, targetContainer) {
+        let body = sourceDoc.getElementsByTagName("body")[0];
+        let isRawXML = !body && sourceDoc.documentElement;
+        
+        // RAW XML STREAMCONTAINER
+        if (isRawXML) {
+            console.warn("Identified as RAW XML");
+            let rawText = new XMLSerializer().serializeToString(sourceDoc);
+            let shell = createSafeElement(targetDoc, "div");
+            shell.className = "IWcdata";
+            shell.appendChild(targetDoc.createTextNode(rawText.trim()));
+            targetContainer.appendChild(shell);
+            return; 
+        }
+
+        let firstDiv = body.getElementsByTagName("div")[0];
+        let isHL7 = firstDiv && firstDiv.innerHTML.trim().substring(0,3) === "HL7";
+        
+        if (isHL7) targetContainer.classList.add("whiz-hl7-payload");
+
+        // CSS SPONGE
+        let sourceHead = sourceDoc.head || sourceDoc.getElementsByTagName("head")[0];
+        let targetHead = targetDoc.head || targetDoc.getElementsByTagName("head")[0];
+        
+        if (!targetHead && targetDoc.documentElement) {
+            targetHead = targetDoc.createElement("head");
+            targetDoc.documentElement.insertBefore(targetHead, targetDoc.documentElement.firstChild);
+        }
+
+        if (sourceHead && targetHead) {
+            sourceHead.querySelectorAll('style, link[rel="stylesheet"]').forEach(styleNode => {
+                let isLink = styleNode.tagName.toLowerCase() === 'link';
+                if (isLink) {
+                    let href = styleNode.getAttribute('href');
+                    if (href) {
+                        let absoluteHref = new URL(href, sourceDoc.baseURI).href;
+                        if (!targetHead.querySelector(`link[href="${absoluteHref}"]`)) {
+                            let newLink = createSafeElement(targetDoc, 'link');
+                            newLink.rel = 'stylesheet';
+                            newLink.href = absoluteHref;
+                            targetHead.appendChild(newLink);
+                        }
+                    }
+                } else {
+                    let cssText = styleNode.textContent;
+                    cssText = cssText.replace(/TABLE\./g, 'table.').replace(/TD\./g, 'td.').replace(/TR\./g, 'tr.').replace(/TH\./g, 'th.');
+
+                    if (!Array.from(targetHead.querySelectorAll('style')).some(s => s.textContent === cssText)) {
+                        let newStyle = createSafeElement(targetDoc, 'style');
+                        newStyle.textContent = cssText;
+                        targetHead.appendChild(newStyle);
+                    }
+                }
+            });
+        }
+
+        // DATA EXTRACTION
+        if (isHL7) {
+            let resetCss = `.whiz-hl7-payload { font-size: 16px !important; font-family: Arial, sans-serif !important; color: black !important; } .whiz-hl7-payload table { font-size: 0.8em; }`;
+            if (targetHead && !Array.from(targetHead.querySelectorAll('style')).some(s => s.textContent.includes('.whiz-hl7-payload'))) {
+                let resetStyle = createSafeElement(targetDoc, 'style');
+                resetStyle.textContent = resetCss;
+                targetHead.appendChild(resetStyle);
+            }
+            
+            Array.from(body.childNodes).forEach(node => {
+                targetContainer.appendChild(targetDoc.importNode(node, true));
+            });
+        } else {
+            // PRETTIFIER COPY LOGIC
+            if (body.getAttribute('data-prettified') == 'true') {
+
+                // copy the children over to keep the HTML valid
+                Array.from(body.childNodes).forEach(node => {
+                    targetContainer.appendChild(targetDoc.importNode(node, true));
+                });
+                return; 
+                
+            } else {
+                let cdataElements = sourceDoc.querySelectorAll('.cdata, .cdataContents');
+                let rawText = "";
+                
+                if (cdataElements.length > 0) {
+                    rawText = Array.from(cdataElements).map(el => el.textContent || el.innerText).join('\n');
+                } else {
+                    rawText = body.textContent || body.innerText;
+                }
+                
+                rawText = rawText.trim();
+                if (rawText.startsWith("<![CDATA[")) rawText = rawText.substring(9);
+                if (rawText.endsWith("]]>")) rawText = rawText.substring(0, rawText.length - 3);
+                
+                let shell = createSafeElement(targetDoc, "div");
+                shell.className = "IWcdata";
+                shell.appendChild(targetDoc.createTextNode(rawText.trim()));
+                targetContainer.appendChild(shell);
+                return; 
+            }
+        }
+    }
+
+	const createSafeElement = (doc, tag) => {
+        let isXML = doc.documentElement && doc.documentElement.tagName.toLowerCase() !== 'html';
+        return isXML ? doc.createElementNS("http://www.w3.org/1999/xhtml", tag) : doc.createElement(tag);
+    };
