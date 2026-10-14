@@ -1,62 +1,76 @@
 /// Schema Expansion Content Script
 console.log("Schema Expansion Content Script");
-
 let clicked = false
 let schemaSearch = false;
 let schemaRowClicked = undefined;
 let schemaRowHighlighColour = "#eaafff";
 let schemaRowClickColour = "#D471F7";
+let isFullMode = false
+let startingColor = "orange"
 
-
-window.addEventListener("load", function() {
-	let expandors = document.getElementsByClassName("EDIDocumentTableExpandor");
-	for (let i = 0; i < expandors.length; i++){
-		let toggleBtn = document.createElement("button");
-		//toggleBtn.style.border = "1px black solid";
-		toggleBtn.title = "Expand Schema";
-		toggleBtn.style.marginTop = "-16px";
-		toggleBtn.style.cursor = "pointer";
-		toggleBtn.style.padding = "3px 3px";
-		toggleBtn.className = "toggleSchema";
-		toggleBtn.style.backgroundColor = "orange";
-		expandors[i].style.padding = "1px";
-		expandors[i].appendChild(toggleBtn);
-	}
-	//<button style="margin:0; padding:5px;"></button>
-});
-
-document.addEventListener("expandSchema", function(e) {
-	schemaSearch = e.schemaSearch
-	console.log("expandSchema triggered. schemaModeFull = ", schemaModeFull);
-	//if ((e.advanced == undefined) || (e.advanced == false)) {
-	if (schemaModeFull === false) {
-		expandSchema();
-	} else {
-		expandSchemaAdvanced();
-	}
-	
-});
-
-
-document.addEventListener("contractSchema", function(e) {
-	schemaSearch = false;
-	contractSchema();
-});
-
-
-document.addEventListener("searchExpandedSchema", function(e) {
-	searchExpandedSchema(e);
-});
-
-
-
-if (currentUrl.includes("&btns=disable")) {
-	// Skip creating the buttons!
+if (document instanceof XMLDocument || (document.contentType && document.contentType.includes("xml"))) {
+	console.log("XML document detected, skipping Schema Expansion.");
 } else {
-	addButtonBar(document);
-	buttonBarStyle(document);
-	searchExpandedSchemaButton(document);
-	schemaModeButton(document);
+
+	window.addEventListener("load", function() {
+		// 1. Fetch the absolute latest state from storage when the frame finishes loading
+		chrome.storage.local.get(['schemaModeFull'], function(result) {
+			// Default to false (orange) if it hasn't been set yet
+			isFullMode = result.schemaModeFull === true; 
+			startingColor = isFullMode ? "darkred" : "orange";
+
+			let expandors = document.getElementsByClassName("EDIDocumentTableExpandor");
+			for (let i = 0; i < expandors.length; i++){
+				let toggleBtn = document.createElement("button");
+				
+				toggleBtn.title = "Expand Schema";
+				toggleBtn.style.marginTop = "-16px";
+				toggleBtn.style.cursor = "pointer";
+				toggleBtn.style.padding = "3px 3px";
+				toggleBtn.className = "toggleSchema";
+				
+				// 2. Apply the correct synced color with 'important' to bypass ZEN styles
+				toggleBtn.style.setProperty("background-color", startingColor, "important");
+				
+				expandors[i].style.padding = "1px";
+				expandors[i].appendChild(toggleBtn);
+			}
+		});
+	});
+
+	document.addEventListener("expandSchema", function(e) {
+		schemaSearch = e.schemaSearch
+		console.log("expandSchema triggered. schemaModeFull = ", schemaModeFull);
+		//if ((e.advanced == undefined) || (e.advanced == false)) {
+		if (schemaModeFull === false) {
+			expandSchema();
+		} else {
+			expandSchemaAdvanced();
+		}
+		
+	});
+
+
+	document.addEventListener("contractSchema", function(e) {
+		schemaSearch = false;
+		contractSchema();
+	});
+
+
+	document.addEventListener("searchExpandedSchema", function(e) {
+		searchExpandedSchema(e);
+	});
+
+
+
+	if (currentUrl.includes("&btns=disable")) {
+		// Skip creating the buttons!
+	} else {
+		addButtonBar(document);
+		buttonBarStyle(document);
+		searchExpandedSchemaButton(document);
+		schemaModeButton(document);
+	}
 }
 
 function expandSchemaAdvanced() {
