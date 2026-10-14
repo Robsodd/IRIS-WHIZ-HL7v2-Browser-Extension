@@ -1,5 +1,5 @@
 ***
-VERSION Version 1.11.0 - Developed by Rob Ellis 
+VERSION Version 1.12.0 - Developed by Rob Ellis 
 
 [![OEX](https://img.shields.io/badge/Available%20on-Intersystems%20Open%20Exchange-00b2a9.svg)](https://openexchange.intersystems.com/package/RDUH-Interface-Analyst-HL7v2-Browser-Extension) 
 
@@ -13,35 +13,17 @@ This code is made available as is and will not be supported. Please see License.
 
 
 
-## Installation & Set Up:
+## Set Up:
 
-Follow the instructions in the tutorial video below:
-
-https://youtu.be/cxpMFfGYGu0
-
-Or
-
-Download from GitHub: https://github.com/Robsodd/IRIS-WHIZ-HL7v2-Browser-Extension
-
-Unzip the downloaded folder.
-
-In your browser navigate to the extension settings. 
-
-Enable developer mode.
-
-This should enable an option to Load Unpacked extensions. 
-
-Click this button and select the folder containing this extension, this should install and enable the extension.
-
-Some features require that you build out your instances of Intersystems Ensemble/Iris and namespaces on the Options page, though not all.
+All features require that you build out your instances of Intersystems Ensemble/Iris/Healthconnect on the Options page. Some features also require namespaces to be created.
 
 To add your instances and namespaces navigate to the extensions options page. 
-You can do this by going into your browser's extension manager and finding the options button. 
+You can do this by going into your browser's extension manager and finding the options button on this extension. 
 OR if you have pinned the extension to your taskbar, click it and then click the Options Page button that appears in the pop-up window.
 
 Scroll down to the Instances table and add your instances. Click the namespace cell to open the pop-up namespace table. Each namespace you create will be associated with the instance that is showing in title of the namespace form.
 
-Instances and Namespaces save automatically when you click off the field being edited.
+Instances and Namespaces save automatically when you click off the field being edited. You will be prompted with a permission request for the extension to work on your instances, read it and click accept if you're happy.
 
 Finally, enable your desired features using the checkbox form at the top of this options page.
 
@@ -93,6 +75,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 26. Segment Search
 27. Hide Iris Whiz Buttons Until Needed
 29. Splitscreen Comparisons
+39. Prettify XML/JSON/FHIR
 
 
 #### Home Page 
@@ -100,7 +83,7 @@ Finally, enable your desired features using the checkbox form at the top of this
 
 
 #### Production Page
-24. ChatGPT Powered Test Message Generator
+~~24. ChatGPT Powered Test Message Generator~~
 25. Active Production Category Search
 32. Production Queue Search
 36. Category Dropdown Case-Insensitive Order
@@ -265,11 +248,11 @@ Messages in the FullTrace tab are now linked to their SVG equivalent in the Visu
 This is to allow you to more easily see which message is which when there are dozens of messages. For example, an ADT feed sending to multiple systems.
 
 
-#### 24. ChatGPT Powered Test Message Generator
+~~#### 24. ChatGPT Powered Test Message Generator~~
 
-Use ChatGPT to generate you a test HL7 message. The prompt will appear on the Test window on the production page as long as you have input an API Key to the ChatGPT API key setting of the Options page.
+~~Use ChatGPT to generate you a test HL7 message. The prompt will appear on the Test window on the production page as long as you have input an API Key to the ChatGPT API key setting of the Options page.~~
 
-You need to select a schema and a doc type and it will automatically generate you a prompt. Edit the prompt as you please and then click the Generate to call ChatGPT. 
+~~You need to select a schema and a doc type and it will automatically generate you a prompt. Edit the prompt as you please and then click the Generate to call ChatGPT. ~~
 
 
 #### 25. Active Production Category Search
@@ -400,8 +383,58 @@ This tab displays a timeline chart for the messages currently displaying in the 
 It also contains a summarised table of the values displaying in your central results table so you can easily check how many messages have a particular value in them.
 
 
+#### 39. Prettify XML/JSON/FHIR
+
+On XML/JSON/FHIR messages you can now prettify the content.
+
 
 ## Updates
+
+##### 07/09/2026 Updates:
+
+Version 1.12.0
+
+
+__Feature Removed__: ChatGPT Test message generator
+
+I removed this to get this approved for use at work as the paperwork required wasn't worth the feature.
+
+
+__Feature Added__: Prettify XML/JSON/FHIR
+
+Option added to prettify XML/JSON on page load. Toggle button added to ensure you can still view the RAW content.
+
+Useful when you have XML/JSON with CDATA embdedded data that does not natively prettify.
+
+Search fucntion also added which can either hide or collapse non-matching data using the checkbox.
+
+
+__Feature Updated__: Search History
+
+Retention settings added to delete the cached searched after X days, set on the options page.
+
+
+__Feature Updated__: Full Trace Tab
+
+Changed how the FullTrace tab works as it now handles non-HL7 messages with the prettifier script. It's still a wee bit buggy but I'm working on it.
+
+
+__Feature Updated__: Options Page Settings
+
+More granular control enabled for settings.
+
+
+__Feature Updated__: ReadMe file
+
+Now sort of respects markdown on the options page. Ish. Makes it a bit easier to read
+
+
+__Background Tomfoolery__:
+
+Updated to load content scripts via a config file.
+
+
+
 
 ##### 07/09/2026 Updates:
 
