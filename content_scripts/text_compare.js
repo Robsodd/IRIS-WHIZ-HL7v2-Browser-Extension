@@ -1,44 +1,49 @@
 console.log("Text Compare Content Script");
-scrollBarStyle(document);
-// on page load:
-mouseover();
-segmentHeaders();
-let instance = currentUrl.split("/csp/")[0];
 
-
-document.addEventListener("messageTabSearch", function(e) {
-	messageTabSearch(e.compareDropDown);
-});
-
-document.addEventListener("disableTextCompare", function(e) {
-	mouseoverEnabled = false;
-	//console.log("DisablingTextCompare ", mouseoverEnabled);
-});
-
-document.addEventListener("enableTextCompare", function(e) {
-	mouseoverEnabled = true;
-	//console.log("EnablingTextCompare ", mouseoverEnabled);
-});
-
-document.addEventListener("sideBySideCompare", function(e) {
-	splitScreenWithDraggableDivider(e);
-});
-
-if (currentUrl.includes("&btns=disable")) {
-	// Skip creating the buttons!
+if (document instanceof XMLDocument || (document.contentType && document.contentType.includes("xml"))) {
+	console.log("XML document detected, skipping Text Compare.");
 } else {
-	
-	addButtonBar(document);
-	buttonBarStyle(document);
-	
-	
+	scrollBarStyle(document);
+	// on page load:
+	mouseover();
+	segmentHeaders();
+	let instance = currentUrl.split("/csp/")[0];
 
-	messageImportBtn(document);
-	wrapRowsButton(document);
-	
-	textCompareBtn(document);
-	compareLegendButtons(document);
-	
+
+	document.addEventListener("messageTabSearch", function(e) {
+		messageTabSearch(e.compareDropDown);
+	});
+
+	document.addEventListener("disableTextCompare", function(e) {
+		mouseoverEnabled = false;
+		//console.log("DisablingTextCompare ", mouseoverEnabled);
+	});
+
+	document.addEventListener("enableTextCompare", function(e) {
+		mouseoverEnabled = true;
+		//console.log("EnablingTextCompare ", mouseoverEnabled);
+	});
+
+	document.addEventListener("sideBySideCompare", function(e) {
+		splitScreenWithDraggableDivider(e);
+	});
+
+	if (currentUrl.includes("&btns=disable")) {
+		// Skip creating the buttons!
+	} else {
+		
+		addButtonBar(document);
+		buttonBarStyle(document);
+		
+		
+
+		messageImportBtn(document);
+		wrapRowsButton(document);
+		
+		textCompareBtn(document);
+		compareLegendButtons(document);
+		
+	}
 }
 
 function messageTabSearch(compareDropDown) {
