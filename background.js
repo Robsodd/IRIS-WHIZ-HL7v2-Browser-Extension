@@ -6,6 +6,9 @@ const repo = "IRIS-WHIZ-HL7v2-Browser-Extension";
 
 if (Debug) console.log(Debug, "true");
 
+importScripts('config.js');
+let updateTimeout = null; // Holds our debounce timer
+
 // CHROME STORAGE
 let instances = []
 let settings = {
@@ -81,7 +84,7 @@ chrome.storage.onChanged.addListener(function(changes, areaName) {
 				instances = []
 			} else {
 				instances = stored.instances;
-				update_content_scripts();
+				updateContentScripts();
 			}
 				// Let users know the instances object needs setting up
 			if (instances.length == 0) {
@@ -428,282 +431,135 @@ chrome.contextMenus.onClicked.addListener(function(clickData, tab){
 		}
 
 	});
-	
-// Content Scripts
 
-const scriptDefinitions = {
-    messageSearch: {
-        id: "message_search",
-        js: ["content_scripts/message_search.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal*"],
-        excludePaths: ["/csp/*/EnsPortal.ProductionConfig.zen*"]
-    },
-    schemaExpansion: {
-        id: "schema_expansion",
-        js: ["content_scripts/schema_expansion.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
-        excludePaths: [
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*"
-        ]
-    },
-    segmentSearch: {
-        id: "segment_search",
-        js: ["content_scripts/segment_search.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
-        excludePaths: [
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&schema_expansion=disable*"
-        ]
-    },
-    textCompare: {
-        id: "text_compare",
-        js: ["content_scripts/text_compare.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
-        excludePaths: [
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&text_compare=disable*"
-        ]
-    },
-    copyRawText: {
-        id: "copy_raw_text",
-        js: ["content_scripts/copy_raw_text.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*"],
-        excludePaths: [
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&RAW=1",
-            "/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&copy_raw_text=disable*"
-        ]
-    },
-    traceViewer: {
-        id: "trace_viewer",
-        js: ["content_scripts/trace_viewer.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.VisualTrace.zen?SESSIONID=*"]
-    },
-    messageViewer: {
-        id: "message_viewer",
-        js: ["content_scripts/message_viewer.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
-    },
-    messageviewerExport: {
-        id: "messageviewerExport",
-        js: ["content_scripts/message_viewer_export.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
-    },
-    criteriaCache: {
-        id: "criteria_cache",
-        js: ["content_scripts/criteria_cache.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
-    },
-    shareMessages: {
-        id: "share_messages",
-        js: ["content_scripts/share_messages.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageContents.zen?HeaderClass=Ens.MessageHeader&HeaderId=*&share=1*"]
-    },
-    componentReport: {
-        id: "component_report",
-        js: ["content_scripts/component_report.js"],
-        allFrames: false, // Originally false in your code
-        paths: [
-            "/csp/sys/%25CSP.Portal.Home.zen*",
-            "/csp/sys/UtilHome.csp"
-        ],
-        excludePaths: ["/csp/*/*disableComponentReport=true"]
-    },
-    pdfViewer: {
-        id: "pdf_viewer",
-        js: ["content_scripts/pdf_viewer.js"],
-        allFrames: true,
-        paths: ["/csp/*"],
-        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
-    },
-    saveMessageViewer: {
-        id: "save_message_viewer",
-        js: ["content_scripts/save_message_viewer.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
-    },
-    utils: {
-        id: "utils",
-        js: ["utils.js"],
-        allFrames: true,
-        runAt: "document_start",
-        paths: ["/csp/*"],
-        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
-    },
-    messageGenerator: {
-        id: "messageGenerator",
-        js: ["content_scripts/message_generator.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.Dialog.TestingService.cls*"]
-    },
-    namespaceCategorySearch: {
-        id: "namespaceCategorySearch",
-        js: ["content_scripts/namespace_category_search.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.ProductionConfig.zen*"],
-        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
-    },
-    productionQueue: {
-        id: "productionQueue",
-        js: ["content_scripts/production_queue.js"],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.ProductionConfig.zen*"],
-        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
-    },
-    queueRefresh: {
-        id: "queueRefresh",
-        js: ["content_scripts/queue_refresh.js"],
-        allFrames: true,
-        paths: [
-            "/*/EnsPortal.Queues.zen*", 
-            "/*/EnsPortal.Queues.cls*"
-        ]
-    },
-    customCss: {
-        id: "customCSS",
-        css: ["css/custom.css"],
-        allFrames: true,
-        paths: ["/csp/*"],
-        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
-    },
-    buttonCss: {
-        id: "buttonCSS",
-        css: ["css/button.css"],
-        allFrames: true,
-        paths: ["/csp/*"]
-    },
-    customColours: {
-        id: "customColours",
-        js: ["content_scripts/custom_css.js"],
-        allFrames: true,
-        runAt: "document_start",
-        paths: ["/csp/*"],
-        excludePaths: ["/csp/*/*disableNamespaceCategorySearch=true"]
-    },
-    pageTitles: {
-        id: "pageTitles",
-        js: ["content_scripts/page_titles.js"],
-        allFrames: false, // Originally false in your code
-        paths: ["/csp/*"]
-    },
-	// This is going to take too much time and I'm shelving it.
-    // darkMode: {
-    //     id: "darkMode",
-    //     css: [
-    //         "css/darkmode/d_ZEN_SVGComponent.css", 
-    //         "css/darkmode/d_page-defined-styles_svg.css",
-    //         "css/darkmode/d_ZEN_Portal_standardPage.css",
-    //         "css/darkmode/d_ZEN_Componenet_core_3.css",
-    //         "css/darkmode/d_home.css"
-    //     ],
-    //     allFrames: true,
-    //     runAt: "document_start",
-    //     paths: ["/csp/*"]
-    // },
-    analysis: {
-        id: "analysis",
-        js: [
-            "chartjs/chart.umd.js",
-            "chartjs/chartjs-adapter-date-fns.bundle.min.js",
-            "chartjs/chartjs-plugin-datalabels.min.js",
-            "chartjs/hammer.min.js",
-            "chartjs/chartjs-plugin-zoom.min.js",
-            "content_scripts/analysis.js"
-        ],
-        allFrames: true,
-        paths: ["/csp/*/EnsPortal.MessageViewer.zen*"]
-    }
-};
-
-let matches = [];
-
-
-// Add Content Scripts functionality
-function update_content_scripts() {
-    chrome.storage.local.get({ settings: {}, instances: [] }, async function(storage) {
+function updateContentScripts() {
+    
+    // DEBOUNCER: Clear the previous timer if multiple requests come in rapidly
+    if (updateTimeout) clearTimeout(updateTimeout);
+    
+    // Wait 300ms for the dust to settle before updating
+    updateTimeout = setTimeout(async () => {
         
-        // 2. Clear existing scripts first
-        try {
+        // Fetch the user's saved settings and instances from storage
+        const stored = await chrome.storage.local.get({ settings: {}, instances: [] });
+        const userSettings = stored.settings;
+        const userInstances = stored.instances;
+
+        if (userInstances.length === 0) {
+            console.log("[IRIS Whiz] No instances defined. Unregistering all dynamic scripts.");
             await chrome.scripting.unregisterContentScripts();
-        } catch (e) {
-            console.error("Error unregistering scripts:", e);
+            return;
         }
 
-        if (storage.instances.length === 0) return;
+        let scriptsToRegister = [];
 
-        // 3. Build the dynamic scripts array
-        const scriptsToRegister = [];
-
-        // Helper function to build full URLs from instances and paths
+        // 1. RESTORED: Robust Path Builder (Supports Health Connect nested paths!)
         const buildMatches = (instances, paths) => {
             let fullUrls = [];
             instances.forEach(instance => {
-                // Ensure instance.url doesn't have trailing slashes before appending paths
-                const baseHost = String(instance.url).replace(/\/$/, ""); 
-                paths.forEach(path => {
-                    fullUrls.push(`*://${baseHost}${path}`);
-                    fullUrls.push(`*://${baseHost}:*${path}`); // Account for specific ports
-					fullUrls.push(`*://${baseHost}/*/${path}`); // Health Connect
-                    fullUrls.push(`*://${baseHost}:*/*/${path}`); // Health Connect: Account for specific ports
-                });
+                if (instance.url) {
+                    const baseHost = String(instance.url).replace(/\/$/, ""); 
+                    paths.forEach(path => {
+                        let cleanPath = path.startsWith('/') ? path.substring(1) : path;
+                        fullUrls.push(`*://${baseHost}/${cleanPath}`);
+                        fullUrls.push(`*://${baseHost}:*/${cleanPath}`); // Account for specific ports
+                        fullUrls.push(`*://${baseHost}/*/${cleanPath}`); // Health Connect nested paths
+                        fullUrls.push(`*://${baseHost}:*/*/${cleanPath}`); // Health Connect ports
+                    });
+                }
             });
-            return fullUrls;
+            // Return unique array to satisfy Chrome's strict manifest rules
+            return [...new Set(fullUrls)];
         };
 
-        // Populate the scripts array with the dynamically generated URLs
-        for (const [key, scriptDef] of Object.entries(scriptDefinitions)) {
+        // 2. Loop through the config.js blueprint for standard scripts
+        Object.values(scriptDefinitions).forEach(scriptDef => {
             
-            // Example: Skip component report if setting is off
-            if (key === 'componentReport' && !storage.settings.HomepageReports) continue;
-
-            const scriptConfig = {
-                id: scriptDef.id,
-                js: scriptDef.js,
-                css: scriptDef.css,
-                allFrames: scriptDef.allFrames,
-                runAt: scriptDef.runAt,
-                matches: buildMatches(storage.instances, scriptDef.paths)
-            };
-
-            if (scriptDef.excludePaths) {
-                 scriptConfig.excludeMatches = buildMatches(storage.instances, scriptDef.excludePaths);
+            let isEnabled = userSettings[scriptDef.id];
+            if (isEnabled === undefined) {
+                isEnabled = scriptDef.default;
             }
 
-            scriptsToRegister.push(scriptConfig);
-        }
+            if (isEnabled) {
+                
+                let scriptConfig = {
+                    id: scriptDef.id,
+                    matches: buildMatches(userInstances, scriptDef.paths),
+                    allFrames: scriptDef.allFrames,
+                    runAt: scriptDef.runAt || "document_idle"
+                };
 
-        // 4. Instance-specific CSS (Dark mode / Custom Colors)
-        if (storage.settings.CSS) {
-            storage.instances.forEach(instance => {
-                const colour = defaultColours.includes(instance.colour) ? instance.colour : "grey";
-                scriptsToRegister.push({
-                    id: `${instance.name}_CSS`,
-                    css: [`css/${colour}.css`],
-                    allFrames: true,
-                    matches: [`*://${instance.url}/*`, `*://${instance.url}:*/*`]
-                });
+                // Prevent Chrome from crashing if the matches array is empty
+                if (scriptConfig.matches.length === 0) return;
+
+                if (scriptDef.js) scriptConfig.js = scriptDef.js;
+                if (scriptDef.css) scriptConfig.css = scriptDef.css;
+                
+                if (scriptDef.excludePaths) {
+                    scriptConfig.excludeMatches = buildMatches(userInstances, scriptDef.excludePaths);
+                }
+
+                scriptsToRegister.push(scriptConfig);
+            }
+        });
+		console.log("[IRIS Whiz] Injecting CSS")
+		console.log(userSettings)
+        // 3. RESTORED: Instance-Specific CSS Engine!
+        // (Assumes defaultColours array is defined at the top of your background.js)
+        if (userSettings.CustomColours) {
+            userInstances.forEach((instance, index) => {
+				console.log("Instance ", instance, " injecting CSS")
+                if (instance.url) {
+                    const baseHost = String(instance.url).replace(/\/$/, "");
+                    
+                    // Fallback to grey if the colour isn't found
+					const colour = (typeof defaultColours !== 'undefined' && defaultColours.includes(instance.colour)) 
+						? instance.colour 
+						: "grey";
+                    console.log("Instance ", instance, " injecting CSS: ", colour)
+                    scriptsToRegister.push({
+                        // Appended an index to guarantee ID uniqueness
+                        id: `instance_CSS_${index}_${instance.name.replace(/[^a-zA-Z0-9]/g, '_')}`,
+                        css: [`css/${colour}.css`],
+                        allFrames: true,
+                        matches: [
+                            `*://${baseHost}/*`, 
+                            `*://${baseHost}:*/*`
+                        ]
+                    });
+                }
             });
         }
-
-        // 5. Register with error catching
+		console.log("[IRIS Whiz] Finish Injecting CSS")
+        // 4. Unregister old scripts and register the newly approved ones
         try {
-            await chrome.scripting.registerContentScripts(scriptsToRegister);
-            if (Debug) console.log("Scripts successfully updated.");
-        } catch (error) {
-            console.error("Failed to register dynamic scripts:", error);
+            // Clean slate: Unregister ALL dynamic scripts
+            await chrome.scripting.unregisterContentScripts();
+
+            // Register the active ones
+            if (scriptsToRegister.length > 0) {
+                await chrome.scripting.registerContentScripts(scriptsToRegister);
+                console.log(`[IRIS Whiz] Successfully registered ${scriptsToRegister.length} scripts based on user settings.`);
+            }
+        } catch (err) {
+            console.error("[IRIS Whiz] Error updating content scripts:", err);
+            console.error("Payload was:", scriptsToRegister);
         }
-    });
+        
+    }, 300); 
 }
+
+// Trigger this function when the extension installs, loads, or settings change
+chrome.runtime.onInstalled.addListener(updateContentScripts);
+chrome.runtime.onStartup.addListener(updateContentScripts);
+
+// Listen for the message from options.js when settings are saved!
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === "update-scripts") {
+        updateContentScripts();
+        sendResponse({ status: "success" });
+    }
+});
 
 // Listen for Message to get all Message Tabs
 // Iterate through current tabs
@@ -711,7 +567,7 @@ function update_content_scripts() {
 // Send list of tabs with IDs back
 
 chrome.runtime.onInstalled.addListener(() => {
-	update_content_scripts();
+	updateContentScripts();
 });
 
 chrome.runtime.onMessage.addListener(
