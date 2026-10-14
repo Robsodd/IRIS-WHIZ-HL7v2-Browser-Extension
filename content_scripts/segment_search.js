@@ -1,20 +1,22 @@
 // Segment Search
 console.log("Segment Search Content Script");
 
-
-document.addEventListener("searchSegments", function(e) {
-	searchSegments(e);
-});
-
-
-if (currentUrl.includes("&btns=disable")) {
-	// Skip creating the buttons!
+if (document instanceof XMLDocument || (document.contentType && document.contentType.includes("xml"))) {
+	console.log("XML document detected, skipping Segment Search.");
 } else {
-	addButtonBar(document);
-	buttonBarStyle(document);
-	searchSegmentsButton(document);
-}
+	document.addEventListener("searchSegments", function(e) {
+		searchSegments(e);
+	});
 
+
+	if (currentUrl.includes("&btns=disable")) {
+		// Skip creating the buttons!
+	} else {
+		addButtonBar(document);
+		buttonBarStyle(document);
+		searchSegmentsButton(document);
+	}
+}
 
 const keys = ["ArrowUp", "ArrowRight", "ArrowDown", "ArrowLeft", "Control", "Shift"]
 let highlighted = false;
