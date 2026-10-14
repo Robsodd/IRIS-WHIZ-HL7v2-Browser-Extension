@@ -390,7 +390,7 @@ On XML/JSON/FHIR messages you can now prettify the content.
 
 ## Updates
 
-##### 07/09/2026 Updates:
+##### 14/10/2026 Updates:
 
 Version 1.12.0
 
@@ -766,3 +766,4 @@ __Feature added: Message Viewer Page - Extended Criteria Search History__
 
 Caches the Extended Criteria used when the Search button is clicked (up to 10 searches). Allows user to scroll through previous criteria and click them to add them back to the extended criteria section.
 Should help when performing similar searches across test and production environments. 
+
