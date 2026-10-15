@@ -755,7 +755,7 @@ async function checkForNewVersion() {
 	
 			// Compare with the extension's version
 			const currentVersion = chrome.runtime.getManifest().version;
-			if (currentVersion === latestVersion) {
+			if (currentVersion !== latestVersion) {
 				console.log("A new version is available!");
 				notifyUser(latestVersion); // Notify the user
 			} else {
